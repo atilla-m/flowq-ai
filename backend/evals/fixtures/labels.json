@@ -1,0 +1,149 @@
+{
+  "synthetic": true,
+  "devices": {
+    "honest_clean": {
+      "files": [
+        "honest_clean_screen.png",
+        "honest_clean_back.png",
+        "honest_clean_battery.png",
+        "honest_clean_about.png"
+      ],
+      "observation": {
+        "model": "iPhone 13",
+        "storage": 128,
+        "battery_health": 95,
+        "screen_cracked": false,
+        "back_cracked": false,
+        "other_damage": [],
+        "confidence": 0.99,
+        "reason": "",
+        "evidence": {
+          "screen_photo": true,
+          "back_photo": true,
+          "battery_screenshot": true,
+          "about_screenshot": true
+        }
+      }
+    },
+    "honest_worn": {
+      "files": [
+        "honest_worn_screen.png",
+        "honest_worn_back.png",
+        "honest_worn_battery.png",
+        "honest_worn_about.png"
+      ],
+      "observation": {
+        "model": "iPhone 12",
+        "storage": 128,
+        "battery_health": 85,
+        "screen_cracked": false,
+        "back_cracked": true,
+        "other_damage": [],
+        "confidence": 0.99,
+        "reason": "",
+        "evidence": {
+          "screen_photo": true,
+          "back_photo": true,
+          "battery_screenshot": true,
+          "about_screenshot": true
+        }
+      }
+    },
+    "galaxy_worn": {
+      "files": [
+        "galaxy_worn_screen.png",
+        "galaxy_worn_back.png",
+        "galaxy_worn_battery.png",
+        "galaxy_worn_about.png"
+      ],
+      "observation": {
+        "model": "Samsung Galaxy S21",
+        "storage": 128,
+        "battery_health": 88,
+        "screen_cracked": false,
+        "back_cracked": false,
+        "other_damage": [],
+        "confidence": 0.99,
+        "reason": "",
+        "evidence": {
+          "screen_photo": true,
+          "back_photo": true,
+          "battery_screenshot": true,
+          "about_screenshot": true
+        }
+      }
+    },
+    "lying_screen": {
+      "files": [
+        "lying_screen_screen.png",
+        "lying_screen_back.png",
+        "lying_screen_battery.png",
+        "lying_screen_about.png"
+      ],
+      "observation": {
+        "model": "iPhone 13",
+        "storage": 128,
+        "battery_health": 76,
+        "screen_cracked": true,
+        "back_cracked": false,
+        "other_damage": [],
+        "confidence": 0.99,
+        "reason": "",
+        "evidence": {
+          "screen_photo": true,
+          "back_photo": true,
+          "battery_screenshot": true,
+          "about_screenshot": true
+        }
+      }
+    },
+    "lying_back": {
+      "files": [
+        "lying_back_screen.png",
+        "lying_back_back.png",
+        "lying_back_battery.png",
+        "lying_back_about.png"
+      ],
+      "observation": {
+        "model": "iPhone 12",
+        "storage": 128,
+        "battery_health": 79,
+        "screen_cracked": false,
+        "back_cracked": true,
+        "other_damage": [],
+        "confidence": 0.99,
+        "reason": "",
+        "evidence": {
+          "screen_photo": true,
+          "back_photo": true,
+          "battery_screenshot": true,
+          "about_screenshot": true
+        }
+      }
+    },
+    "lying_battery": {
+      "files": [
+        "lying_battery_screen.png",
+        "lying_battery_back.png",
+        "lying_battery_battery.png",
+        "lying_battery_about.png"
+      ],
+      "observation": {
+        "model": "iPhone 13",
+        "storage": 128,
+        "battery_health": 82,
+        "screen_cracked": false,
+        "back_cracked": false,
+        "other_damage": [],
+        "confidence": 0.99,
+        "reason": "",
+        "evidence": {
+          "screen_photo": true,
+          "back_photo": true,
+          "battery_screenshot": true,
+          "about_screenshot": true
+        }
+      }
+    }
+  }
+}

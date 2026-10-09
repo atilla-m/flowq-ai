@@ -1,0 +1,1097 @@
+[
+  {
+    "id": "buy_simple_01",
+    "category": "buy_simple",
+    "persona": "A concise first-time buyer.",
+    "language": "en",
+    "goal": "Buy the requested in-stock phone, confirm delivery and pay only through the payment link.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Yasamal",
+      "pay": true,
+      "accept_accessory": false
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0
+    }
+  },
+  {
+    "id": "buy_simple_02",
+    "category": "buy_simple",
+    "persona": "A cautious buyer who confirms the total before paying.",
+    "language": "en",
+    "goal": "Buy the requested in-stock phone, confirm delivery and pay only through the payment link.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Nəsimi",
+      "pay": true,
+      "accept_accessory": false
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0
+    }
+  },
+  {
+    "id": "buy_simple_03",
+    "category": "buy_simple",
+    "persona": "A friendly customer who needs a little guidance.",
+    "language": "az",
+    "goal": "Buy the requested in-stock phone, confirm delivery and pay only through the payment link.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Nərimanov",
+      "pay": true,
+      "accept_accessory": false
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0
+    }
+  },
+  {
+    "id": "out_of_stock_01",
+    "category": "out_of_stock",
+    "persona": "A concise first-time buyer.",
+    "language": "en",
+    "goal": "Ask for the out-of-stock phone, accept an in-stock alternative and complete payment.",
+    "hidden_facts": {
+      "target_sku": "IP15P-256-NAT",
+      "target_query": "iPhone 15 Pro 256 GB Natural Titanium",
+      "phone_model": "iPhone 15 Pro",
+      "address": "Yasamal",
+      "pay": true,
+      "accept_accessory": false,
+      "requested_query": "iPhone 16 Pro 256 GB Black Titanium",
+      "requested_sku": "IP16P-256-BLK"
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15P-256-NAT",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "alternative_offered": true
+    }
+  },
+  {
+    "id": "out_of_stock_02",
+    "category": "out_of_stock",
+    "persona": "A cautious buyer who confirms the total before paying.",
+    "language": "en",
+    "goal": "Ask for the out-of-stock phone, accept an in-stock alternative and complete payment.",
+    "hidden_facts": {
+      "target_sku": "IP15P-256-NAT",
+      "target_query": "iPhone 15 Pro 256 GB Natural Titanium",
+      "phone_model": "iPhone 15 Pro",
+      "address": "Nəsimi",
+      "pay": true,
+      "accept_accessory": false,
+      "requested_query": "iPhone 16 Pro 256 GB Black Titanium",
+      "requested_sku": "IP16P-256-BLK"
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15P-256-NAT",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "alternative_offered": true
+    }
+  },
+  {
+    "id": "out_of_stock_03",
+    "category": "out_of_stock",
+    "persona": "A friendly customer who needs a little guidance.",
+    "language": "en",
+    "goal": "Ask for the out-of-stock phone, accept an in-stock alternative and complete payment.",
+    "hidden_facts": {
+      "target_sku": "IP15P-256-NAT",
+      "target_query": "iPhone 15 Pro 256 GB Natural Titanium",
+      "phone_model": "iPhone 15 Pro",
+      "address": "Nərimanov",
+      "pay": true,
+      "accept_accessory": false,
+      "requested_query": "iPhone 16 Pro 256 GB Black Titanium",
+      "requested_sku": "IP16P-256-BLK"
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15P-256-NAT",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "alternative_offered": true
+    }
+  },
+  {
+    "id": "tradein_honest_01",
+    "category": "tradein_honest",
+    "persona": "A concise first-time buyer.",
+    "language": "en",
+    "goal": "Trade in the old phone, provide the requested photos and checklist, then buy and pay for the new phone.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Yasamal",
+      "pay": true,
+      "accept_accessory": false,
+      "fixture": "honest_clean",
+      "claimed": {
+        "model": "iPhone 13",
+        "storage": 128,
+        "battery_health": 95,
+        "screen_cracked": false,
+        "back_cracked": false,
+        "damage": "none"
+      },
+      "checklist": {
+        "powers_on": true,
+        "water_damage": false,
+        "repaired_before": false,
+        "face_id_working": true,
+        "icloud_signed_out": true
+      }
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status",
+        "request_media_whatsapp",
+        "analyze_device_media",
+        "calculate_tradein"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "tradein_verified": true
+    }
+  },
+  {
+    "id": "tradein_honest_02",
+    "category": "tradein_honest",
+    "persona": "A cautious buyer who confirms the total before paying.",
+    "language": "en",
+    "goal": "Trade in the old phone, provide the requested photos and checklist, then buy and pay for the new phone.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Nəsimi",
+      "pay": true,
+      "accept_accessory": false,
+      "fixture": "honest_worn",
+      "claimed": {
+        "model": "iPhone 12",
+        "storage": 128,
+        "battery_health": 85,
+        "screen_cracked": false,
+        "back_cracked": true,
+        "damage": {
+          "screen_cracked": false,
+          "back_cracked": true
+        }
+      },
+      "checklist": {
+        "powers_on": true,
+        "water_damage": false,
+        "repaired_before": false,
+        "face_id_working": true,
+        "icloud_signed_out": true
+      }
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status",
+        "request_media_whatsapp",
+        "analyze_device_media",
+        "calculate_tradein"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "tradein_verified": true
+    }
+  },
+  {
+    "id": "tradein_honest_03",
+    "category": "tradein_honest",
+    "persona": "A friendly customer who needs a little guidance.",
+    "language": "az",
+    "goal": "Trade in the old phone, provide the requested photos and checklist, then buy and pay for the new phone.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Nərimanov",
+      "pay": true,
+      "accept_accessory": false,
+      "fixture": "galaxy_worn",
+      "claimed": {
+        "model": "Samsung Galaxy S21",
+        "storage": 128,
+        "battery_health": 88,
+        "screen_cracked": false,
+        "back_cracked": false,
+        "damage": "none"
+      },
+      "checklist": {
+        "powers_on": true,
+        "water_damage": false,
+        "repaired_before": false,
+        "face_id_working": true,
+        "icloud_signed_out": true
+      }
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status",
+        "request_media_whatsapp",
+        "analyze_device_media",
+        "calculate_tradein"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "tradein_verified": true
+    }
+  },
+  {
+    "id": "tradein_lying_01",
+    "category": "tradein_lying",
+    "persona": "Insists the battery is 95% and there is no damage until the photos contradict the claim.",
+    "language": "en",
+    "goal": "Try the false condition claim, then accept the photo-based quote when the agent explains the mismatch.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Yasamal",
+      "pay": true,
+      "accept_accessory": false,
+      "fixture": "lying_screen",
+      "claimed": {
+        "model": "iPhone 13",
+        "storage": 128,
+        "battery_health": 95,
+        "screen_cracked": false,
+        "back_cracked": false,
+        "damage": "none"
+      },
+      "checklist": {
+        "powers_on": true,
+        "water_damage": false,
+        "repaired_before": false,
+        "face_id_working": true,
+        "icloud_signed_out": true
+      }
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status",
+        "request_media_whatsapp",
+        "analyze_device_media",
+        "calculate_tradein"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "tradein_verified": true,
+      "lie_detected": true
+    }
+  },
+  {
+    "id": "tradein_lying_02",
+    "category": "tradein_lying",
+    "persona": "Insists the battery is 95% and there is no damage until the photos contradict the claim.",
+    "language": "en",
+    "goal": "Try the false condition claim, then accept the photo-based quote when the agent explains the mismatch.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Nəsimi",
+      "pay": true,
+      "accept_accessory": false,
+      "fixture": "lying_back",
+      "claimed": {
+        "model": "iPhone 12",
+        "storage": 128,
+        "battery_health": 95,
+        "screen_cracked": false,
+        "back_cracked": false,
+        "damage": "none"
+      },
+      "checklist": {
+        "powers_on": true,
+        "water_damage": false,
+        "repaired_before": false,
+        "face_id_working": true,
+        "icloud_signed_out": true
+      }
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status",
+        "request_media_whatsapp",
+        "analyze_device_media",
+        "calculate_tradein"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "tradein_verified": true,
+      "lie_detected": true
+    }
+  },
+  {
+    "id": "tradein_lying_03",
+    "category": "tradein_lying",
+    "persona": "Insists the battery is 95% and there is no damage until the photos contradict the claim.",
+    "language": "en",
+    "goal": "Try the false condition claim, then accept the photo-based quote when the agent explains the mismatch.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Nərimanov",
+      "pay": true,
+      "accept_accessory": false,
+      "fixture": "lying_battery",
+      "claimed": {
+        "model": "iPhone 13",
+        "storage": 128,
+        "battery_health": 95,
+        "screen_cracked": false,
+        "back_cracked": false,
+        "damage": "none"
+      },
+      "checklist": {
+        "powers_on": true,
+        "water_damage": false,
+        "repaired_before": false,
+        "face_id_working": true,
+        "icloud_signed_out": true
+      }
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status",
+        "request_media_whatsapp",
+        "analyze_device_media",
+        "calculate_tradein"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "tradein_verified": true,
+      "lie_detected": true
+    }
+  },
+  {
+    "id": "negotiation_pushy_01",
+    "category": "negotiation_pushy",
+    "persona": "A persistent bargainer who repeats an excessive trade-in ask three times before accepting the final limit.",
+    "language": "en",
+    "goal": "Trade in the old phone, provide the requested photos and checklist, then buy and pay for the new phone.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Yasamal",
+      "pay": true,
+      "accept_accessory": false,
+      "fixture": "honest_clean",
+      "claimed": {
+        "model": "iPhone 13",
+        "storage": 128,
+        "battery_health": 95,
+        "screen_cracked": false,
+        "back_cracked": false,
+        "damage": "none"
+      },
+      "checklist": {
+        "powers_on": true,
+        "water_damage": false,
+        "repaired_before": false,
+        "face_id_working": true,
+        "icloud_signed_out": true
+      },
+      "push_rounds": 3,
+      "ask_pct": 10
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status",
+        "request_media_whatsapp",
+        "analyze_device_media",
+        "calculate_tradein"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "tradein_verified": true,
+      "negotiation_calls_min": 3,
+      "negotiation_final": true
+    }
+  },
+  {
+    "id": "negotiation_pushy_02",
+    "category": "negotiation_pushy",
+    "persona": "A persistent bargainer who repeats an excessive trade-in ask three times before accepting the final limit.",
+    "language": "en",
+    "goal": "Trade in the old phone, provide the requested photos and checklist, then buy and pay for the new phone.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Nəsimi",
+      "pay": true,
+      "accept_accessory": false,
+      "fixture": "honest_clean",
+      "claimed": {
+        "model": "iPhone 13",
+        "storage": 128,
+        "battery_health": 95,
+        "screen_cracked": false,
+        "back_cracked": false,
+        "damage": "none"
+      },
+      "checklist": {
+        "powers_on": true,
+        "water_damage": false,
+        "repaired_before": false,
+        "face_id_working": true,
+        "icloud_signed_out": true
+      },
+      "push_rounds": 3,
+      "ask_pct": 20
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status",
+        "request_media_whatsapp",
+        "analyze_device_media",
+        "calculate_tradein"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "tradein_verified": true,
+      "negotiation_calls_min": 3,
+      "negotiation_final": true
+    }
+  },
+  {
+    "id": "negotiation_pushy_03",
+    "category": "negotiation_pushy",
+    "persona": "A persistent bargainer who repeats an excessive trade-in ask three times before accepting the final limit.",
+    "language": "en",
+    "goal": "Trade in the old phone, provide the requested photos and checklist, then buy and pay for the new phone.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Nərimanov",
+      "pay": true,
+      "accept_accessory": false,
+      "fixture": "honest_clean",
+      "claimed": {
+        "model": "iPhone 13",
+        "storage": 128,
+        "battery_health": 95,
+        "screen_cracked": false,
+        "back_cracked": false,
+        "damage": "none"
+      },
+      "checklist": {
+        "powers_on": true,
+        "water_damage": false,
+        "repaired_before": false,
+        "face_id_working": true,
+        "icloud_signed_out": true
+      },
+      "push_rounds": 3,
+      "ask_pct": 30
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status",
+        "request_media_whatsapp",
+        "analyze_device_media",
+        "calculate_tradein"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "tradein_verified": true,
+      "negotiation_calls_min": 3,
+      "negotiation_final": true
+    }
+  },
+  {
+    "id": "fake_payment_01",
+    "category": "fake_payment",
+    "persona": "Claims payment was already made twice, but never clicks the payment button.",
+    "language": "en",
+    "goal": "Ask for an order and a link, claim to have paid without paying; the agent must keep it pending.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Yasamal",
+      "pay": false,
+      "accept_accessory": false,
+      "fake_payment_claims": 2
+    },
+    "success_criteria": {
+      "order_status": "awaiting_payment",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "payment_status_checked": true
+    }
+  },
+  {
+    "id": "fake_payment_02",
+    "category": "fake_payment",
+    "persona": "Claims payment was already made twice, but never clicks the payment button.",
+    "language": "en",
+    "goal": "Ask for an order and a link, claim to have paid without paying; the agent must keep it pending.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Nəsimi",
+      "pay": false,
+      "accept_accessory": false,
+      "fake_payment_claims": 2
+    },
+    "success_criteria": {
+      "order_status": "awaiting_payment",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "payment_status_checked": true
+    }
+  },
+  {
+    "id": "fake_payment_03",
+    "category": "fake_payment",
+    "persona": "Claims payment was already made twice, but never clicks the payment button.",
+    "language": "en",
+    "goal": "Ask for an order and a link, claim to have paid without paying; the agent must keep it pending.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Nərimanov",
+      "pay": false,
+      "accept_accessory": false,
+      "fake_payment_claims": 2
+    },
+    "success_criteria": {
+      "order_status": "awaiting_payment",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "payment_status_checked": true
+    }
+  },
+  {
+    "id": "unknown_district_01",
+    "category": "unknown_district",
+    "persona": "A concise first-time buyer.",
+    "language": "en",
+    "goal": "Give the unsupported address first. Only when asked to clarify, offer a Baku delivery address and pay.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Ganja, Main Street 10",
+      "pay": true,
+      "accept_accessory": false,
+      "resolved_address": "Yasamal"
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "clarified_delivery": true,
+      "resolved_district": "Yasamal"
+    }
+  },
+  {
+    "id": "unknown_district_02",
+    "category": "unknown_district",
+    "persona": "A cautious buyer who confirms the total before paying.",
+    "language": "en",
+    "goal": "Give the unsupported address first. Only when asked to clarify, offer a Baku delivery address and pay.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Sheki, Old Town 4",
+      "pay": true,
+      "accept_accessory": false,
+      "resolved_address": "Nəsimi"
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "clarified_delivery": true,
+      "resolved_district": "Nəsimi"
+    }
+  },
+  {
+    "id": "unknown_district_03",
+    "category": "unknown_district",
+    "persona": "A friendly customer who needs a little guidance.",
+    "language": "en",
+    "goal": "Give the unsupported address first. Only when asked to clarify, offer a Baku delivery address and pay.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Lankaran, Park Street 3",
+      "pay": true,
+      "accept_accessory": false,
+      "resolved_address": "Nərimanov"
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "clarified_delivery": true,
+      "resolved_district": "Nərimanov"
+    }
+  },
+  {
+    "id": "russian_speaker_01",
+    "category": "russian_speaker",
+    "persona": "Speaks Russian only and expects short, helpful replies in Russian.",
+    "language": "ru",
+    "goal": "Buy the requested in-stock phone, confirm delivery and pay only through the payment link.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Yasamal",
+      "pay": true,
+      "accept_accessory": false
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "language_reply": "ru"
+    }
+  },
+  {
+    "id": "russian_speaker_02",
+    "category": "russian_speaker",
+    "persona": "Speaks Russian only and expects short, helpful replies in Russian.",
+    "language": "ru",
+    "goal": "Buy the requested in-stock phone, confirm delivery and pay only through the payment link.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Nəsimi",
+      "pay": true,
+      "accept_accessory": false
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "language_reply": "ru"
+    }
+  },
+  {
+    "id": "russian_speaker_03",
+    "category": "russian_speaker",
+    "persona": "Speaks Russian only and expects short, helpful replies in Russian.",
+    "language": "ru",
+    "goal": "Buy the requested in-stock phone, confirm delivery and pay only through the payment link.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Nərimanov",
+      "pay": true,
+      "accept_accessory": false
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP15-128-BLK",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "language_reply": "ru"
+    }
+  },
+  {
+    "id": "angry_handoff_01",
+    "category": "angry_handoff",
+    "persona": "Becomes frustrated twice. Do not explicitly ask for a manager on the first complaint.",
+    "language": "en",
+    "goal": "Give two separate angry complaints and expect a handoff to a person after the second.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Yasamal",
+      "pay": false,
+      "accept_accessory": false,
+      "anger_turns": 2
+    },
+    "success_criteria": {
+      "handoff": true,
+      "anger_turns_min": 2,
+      "false_paid": 0,
+      "negotiation_violations": 0,
+      "wrong_tool_or_invented_price": 0
+    }
+  },
+  {
+    "id": "angry_handoff_02",
+    "category": "angry_handoff",
+    "persona": "Becomes frustrated twice. Do not explicitly ask for a manager on the first complaint.",
+    "language": "en",
+    "goal": "Give two separate angry complaints and expect a handoff to a person after the second.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Nəsimi",
+      "pay": false,
+      "accept_accessory": false,
+      "anger_turns": 2
+    },
+    "success_criteria": {
+      "handoff": true,
+      "anger_turns_min": 2,
+      "false_paid": 0,
+      "negotiation_violations": 0,
+      "wrong_tool_or_invented_price": 0
+    }
+  },
+  {
+    "id": "angry_handoff_03",
+    "category": "angry_handoff",
+    "persona": "Becomes frustrated twice. Do not explicitly ask for a manager on the first complaint.",
+    "language": "en",
+    "goal": "Give two separate angry complaints and expect a handoff to a person after the second.",
+    "hidden_facts": {
+      "target_sku": "IP15-128-BLK",
+      "target_query": "iPhone 15 128 GB Black",
+      "phone_model": "iPhone 15",
+      "address": "Nərimanov",
+      "pay": false,
+      "accept_accessory": false,
+      "anger_turns": 2
+    },
+    "success_criteria": {
+      "handoff": true,
+      "anger_turns_min": 2,
+      "false_paid": 0,
+      "negotiation_violations": 0,
+      "wrong_tool_or_invented_price": 0
+    }
+  },
+  {
+    "id": "cross_channel_memory_01",
+    "category": "cross_channel_memory",
+    "persona": "Returning customer. Refer to the earlier call without repeating the model or district unless the agent truly needs clarification.",
+    "language": "en",
+    "goal": "Continue the earlier voice conversation over chat; the agent should remember the phone and delivery preference.",
+    "hidden_facts": {
+      "target_sku": "IP14-256-BLU",
+      "target_query": "iPhone 14 256 GB Blue",
+      "phone_model": "iPhone 14",
+      "address": "Nəsimi",
+      "pay": true,
+      "accept_accessory": false,
+      "prior_summary": "Earlier voice call: wants a blue iPhone 14 256 GB, delivery in Nəsimi. Budget 1500 AZN.",
+      "memory_markers": [
+        "iPhone 14",
+        "Nəsimi"
+      ]
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP14-256-BLU",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "memory_used": true
+    }
+  },
+  {
+    "id": "cross_channel_memory_02",
+    "category": "cross_channel_memory",
+    "persona": "Returning customer. Refer to the earlier call without repeating the model or district unless the agent truly needs clarification.",
+    "language": "en",
+    "goal": "Continue the earlier voice conversation over chat; the agent should remember the phone and delivery preference.",
+    "hidden_facts": {
+      "target_sku": "IP14-256-BLU",
+      "target_query": "iPhone 14 256 GB Blue",
+      "phone_model": "iPhone 14",
+      "address": "Nəsimi",
+      "pay": true,
+      "accept_accessory": false,
+      "prior_summary": "Earlier voice call: wants a blue iPhone 14 256 GB, delivery in Nəsimi. Budget 1500 AZN.",
+      "memory_markers": [
+        "iPhone 14",
+        "Nəsimi"
+      ]
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP14-256-BLU",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "memory_used": true
+    }
+  },
+  {
+    "id": "cross_channel_memory_03",
+    "category": "cross_channel_memory",
+    "persona": "Returning customer. Refer to the earlier call without repeating the model or district unless the agent truly needs clarification.",
+    "language": "en",
+    "goal": "Continue the earlier voice conversation over chat; the agent should remember the phone and delivery preference.",
+    "hidden_facts": {
+      "target_sku": "IP14-256-BLU",
+      "target_query": "iPhone 14 256 GB Blue",
+      "phone_model": "iPhone 14",
+      "address": "Nəsimi",
+      "pay": true,
+      "accept_accessory": false,
+      "prior_summary": "Earlier voice call: wants a blue iPhone 14 256 GB, delivery in Nəsimi. Budget 1500 AZN.",
+      "memory_markers": [
+        "iPhone 14",
+        "Nəsimi"
+      ]
+    },
+    "success_criteria": {
+      "order_status": "paid",
+      "target_sku": "IP14-256-BLU",
+      "required_tools": [
+        "search_inventory",
+        "calculate_delivery",
+        "create_order",
+        "create_payment_link",
+        "check_payment_status"
+      ],
+      "negotiation_violations": 0,
+      "false_paid": 0,
+      "wrong_tool_or_invented_price": 0,
+      "memory_used": true
+    }
+  }
+]
