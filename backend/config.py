@@ -32,6 +32,7 @@ class Settings:
     twilio_account_sid: str = ""
     twilio_auth_token: str = ""
     twilio_phone_number: str = ""
+    twilio_whatsapp_from: str = ""
     public_base_url: str = ""
     demo_caller_phone: str = ""
 
@@ -48,6 +49,7 @@ class Settings:
             twilio_account_sid=os.getenv("TWILIO_ACCOUNT_SID", ""),
             twilio_auth_token=os.getenv("TWILIO_AUTH_TOKEN", ""),
             twilio_phone_number=os.getenv("TWILIO_PHONE_NUMBER", ""),
+            twilio_whatsapp_from=os.getenv("TWILIO_WHATSAPP_FROM", "").strip(),
             public_base_url=os.getenv("PUBLIC_BASE_URL", "").rstrip("/"),
             demo_caller_phone=os.getenv("DEMO_CALLER_PHONE", ""),
             database_path=rooted_path(os.getenv("DATABASE_PATH", "backend/data/flowq.sqlite3")),

@@ -1,23 +1,22 @@
 from contextlib import asynccontextmanager
-from io import BytesIO
 from pathlib import Path
 from typing import Any, Literal
-from uuid import uuid4
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel, Field, field_validator
 
 from backend.ai import AIClient, AIProviderError, AIUnavailable
 from backend.agent import ChatAgent, memory_instructions
 from backend.config import Settings
-from backend.db import Database, normalize_phone, now_iso
+from backend.db import Database, normalize_phone
+from backend.media import MediaError, save_image
 from backend.pack import IndustryPack
 from backend.tools.service import ToolService
 from backend.tools.schemas import realtime_tools
 from backend.telephony import Telephony
+from backend.whatsapp import WhatsApp
 
 
 class PhoneBody(BaseModel):
@@ -50,7 +49,8 @@ def checked_phone(value: str) -> str:
         raise HTTPException(422, str(error)) from error
 
 
-def create_app(settings: Settings | None = None, ai=None, *, twilio_gateway=None, realtime_connector=None) -> FastAPI:
+def create_app(settings: Settings | None = None, ai=None, *, twilio_gateway=None, realtime_connector=None,
+               whatsapp_gateway=None) -> FastAPI:
     settings = settings or Settings.from_env()
     pack = IndustryPack.load(settings.industry_pack)
     db = Database(settings.database_path)
@@ -58,15 +58,18 @@ def create_app(settings: Settings | None = None, ai=None, *, twilio_gateway=None
     tools = ToolService(db, pack, settings, ai)
     agent = ChatAgent(db, tools, pack, ai)
     telephony = Telephony(settings, db, pack, tools, agent, gateway=twilio_gateway, connector=realtime_connector)
+    whatsapp = WhatsApp(settings, db, pack, agent, telephony, gateway=whatsapp_gateway)
 
     @asynccontextmanager
     async def lifespan(app):
         db.initialize(pack)
         settings.upload_dir.mkdir(parents=True, exist_ok=True)
         await telephony.start()
+        await whatsapp.start()
         try:
             yield
         finally:
+            await whatsapp.close()
             await telephony.close()
             if hasattr(ai, "close"):
                 await ai.close()
@@ -77,7 +80,9 @@ def create_app(settings: Settings | None = None, ai=None, *, twilio_gateway=None
     app.state.settings, app.state.pack, app.state.db, app.state.tools, app.state.ai = settings, pack, db, tools, ai
     app.state.agent = agent
     app.state.telephony = telephony
+    app.state.whatsapp = whatsapp
     app.include_router(telephony.router())
+    app.include_router(whatsapp.router())
 
     @app.get("/api/health")
     def health():
@@ -153,30 +158,10 @@ def create_app(settings: Settings | None = None, ai=None, *, twilio_gateway=None
         phone = db.ensure_customer(checked_phone(phone))["phone"]
         data = await file.read(settings.max_upload_bytes + 1)
         await file.close()
-        if len(data) > settings.max_upload_bytes:
-            raise HTTPException(413, "Images must be at most 10 MB")
         try:
-            with Image.open(BytesIO(data)) as uploaded:
-                image_format = uploaded.format
-                if uploaded.width * uploaded.height > 30_000_000:
-                    raise HTTPException(413, "Image dimensions are too large")
-                uploaded.verify()
-        except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as error:
-            raise HTTPException(415, "Upload a valid JPEG, PNG or WebP image") from error
-        formats = {"JPEG": (".jpg", "image/jpeg"), "PNG": (".png", "image/png"), "WEBP": (".webp", "image/webp")}
-        if image_format not in formats:
-            raise HTTPException(415, "Upload a JPEG, PNG or WebP image")
-        suffix, mime_type = formats[image_format]
-        media_id = "media_" + uuid4().hex
-        path = settings.upload_dir / (media_id + suffix)
-        path.write_bytes(data)
-        url = f"{settings.backend_url}/api/media/{media_id}"
-        with db.connection(write=True) as connection:
-            connection.execute("INSERT INTO media VALUES (?, ?, ?, ?, ?, ?)",
-                               (media_id, phone, now_iso(), str(path.resolve()), mime_type, url))
-            db.add_message(phone, "customer", "image", image_url=url,
-                           data={"media_id": media_id}, connection=connection)
-        return {"media_id": media_id, "url": url}
+            return save_image(db, settings, phone, data)
+        except MediaError as error:
+            raise HTTPException(error.status, error.detail) from error
 
     @app.get("/api/media/{media_id}")
     def uploaded_media(media_id: str):

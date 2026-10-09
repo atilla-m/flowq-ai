@@ -108,6 +108,13 @@ CREATE TABLE IF NOT EXISTS phone_turns (
     response_id TEXT NOT NULL, speech_to_first_audio_ms REAL,
     response_ms REAL NOT NULL, status TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS whatsapp_outbox (
+    message_id TEXT PRIMARY KEY REFERENCES messages(id), ts TEXT NOT NULL,
+    status TEXT NOT NULL, twilio_sid TEXT, error TEXT
+);
+CREATE TABLE IF NOT EXISTS whatsapp_inbound (
+    message_sid TEXT PRIMARY KEY, ts TEXT NOT NULL
+);
 """
 
 

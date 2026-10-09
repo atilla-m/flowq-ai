@@ -45,6 +45,7 @@ Interactive API docs: <http://localhost:8000/docs>. Frontend integration details
 | `TWILIO_PHONE_NUMBER` | empty | Voice-capable Twilio number, in E.164 format, e.g. `+12025550123` |
 | `PUBLIC_BASE_URL` | empty | Public HTTPS backend origin, e.g. `https://name.trycloudflare.com`; no path/query |
 | `DEMO_CALLER_PHONE` | empty | Your actual E.164 caller number; maps to Aysel's demo customer memory/inbox |
+| `TWILIO_WHATSAPP_FROM` | empty | Optional WhatsApp sender, e.g. the sandbox `whatsapp:+14155238886`; turns on real WhatsApp for `DEMO_CALLER_PHONE` |
 | `EVAL_INPUT_USD_PER_MILLION` | `2` for default chat model | Optional behavior-eval input rate for model overrides |
 | `EVAL_OUTPUT_USD_PER_MILLION` | `10` for default chat model | Optional behavior-eval output rate for model overrides |
 
@@ -152,7 +153,21 @@ backend/.venv/bin/python -m pytest backend/tests -q
 
 Tests cover deterministic trade-in deductions/battery bands, 1,000 random negotiation asks, tampered quote arguments, photo-over-claim pricing, payment status changes only via the payment endpoint, exact accessory compatibility and labels, delivery lookup, stock reservation/idempotency, customer isolation, durable callback timing, inbox cursors, bounded agent loops, OpenAI request payloads, key secrecy, and missing-key behavior. OpenAI calls are mocked, so the suite needs no key or API spend.
 
-This is a hackathon demo: the WhatsApp panel, browser callback, human handoff and payment are browser/SQLite effects. With Twilio configured, telephone calls and callbacks use the real phone network. There is no real WhatsApp transport, live human telephone transfer, courier booking or financial charge. New orders progress from `awaiting_payment` to `paid`; seeded history also includes processing/delivered/returned states. The customer-picker app has no authentication; the CORS allowlist controls browser access, not API authentication. Twilio entry points require valid signatures.
+This is a hackathon demo: the WhatsApp panel, browser callback, human handoff and payment are browser/SQLite effects. With Twilio configured, telephone calls and callbacks use the real phone network, and with `TWILIO_WHATSAPP_FROM` set the one demo caller also gets real WhatsApp messages through the Twilio sandbox. There is no live human telephone transfer, courier booking or financial charge. New orders progress from `awaiting_payment` to `paid`; seeded history also includes processing/delivered/returned states. The customer-picker app has no authentication; the CORS allowlist controls browser access, not API authentication. Twilio entry points require valid signatures.
+
+## Real WhatsApp with the Twilio sandbox
+
+Optional, and only for the one person in `DEMO_CALLER_PHONE`, who is mapped to Aysel's demo customer exactly as for telephone calls. It needs `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `PUBLIC_BASE_URL`, `DEMO_CALLER_PHONE` and `TWILIO_WHATSAPP_FROM`; it does not need `TWILIO_PHONE_NUMBER`. The browser WhatsApp panel keeps working and shows the same conversation.
+
+1. In Twilio Console open **Messaging → Try it out → Send a WhatsApp message**. From the demo person's WhatsApp, send the shown `join <two-words>` code to `+1 415 523 8886`. Sandbox membership expires after 72 hours; rejoin the same way.
+2. In **Sandbox settings**, set **When a message comes in** to `<PUBLIC_BASE_URL>/api/twilio/whatsapp`, method **POST**.
+3. Set `TWILIO_WHATSAPP_FROM=whatsapp:+14155238886` in `backend/.env` and restart the backend.
+
+**Outbound.** Every agent message written to that customer's inbox after startup is also sent to their WhatsApp as text: replies, the photo request (including when `request_media_whatsapp` runs during a telephone call), product cards, order summaries and payment links. Earlier history is never replayed. `whatsapp_outbox` claims each message before the network call, so one inbox message is sent at most once, including across restarts; a failed send stores only Twilio's numeric error code (for example `twilio_error_63015`, recipient has not joined the sandbox) and is not retried. Payment links use `FRONTEND_URL`, so point that at a public frontend if the link must open on the phone.
+
+**Inbound.** `POST /api/twilio/whatsapp` validates the Twilio signature against `PUBLIC_BASE_URL` and the account SID, handles each `MessageSid` once, and answers with empty TwiML at once. Messages from anyone except `DEMO_CALLER_PHONE` are ignored. Photos (up to 8, JPEG/PNG/WebP, 10 MB) are downloaded from `api.twilio.com` with account auth, verified like browser uploads and stored in the inbox. During a live telephone call a photo-only message is left to the voice agent, whose inbox watcher announces the new media IDs to the call; otherwise the chat agent runs one turn and its reply is delivered by the outbound path.
+
+Product cards go out as text; accessory placeholder images are not attached.
 
 ## Real telephone calls with Twilio
 
