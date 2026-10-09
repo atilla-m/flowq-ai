@@ -63,4 +63,5 @@ def test_voice_sessions_are_capped_per_visitor(tmp_path):
                                        headers={"CF-Connecting-IP": ip}).status_code
         assert [start("203.0.113.5") for _ in range(4)] == [200, 200, 200, 429]
         assert start("203.0.113.6") == 200  # another visitor is unaffected
-    assert ai.realtime_session.await_count == 4
+        assert [start("127.0.0.1") for _ in range(5)] == [200] * 5  # local operator is not capped
+    assert ai.realtime_session.await_count == 9

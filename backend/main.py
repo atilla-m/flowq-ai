@@ -122,6 +122,8 @@ def create_app(settings: Settings | None = None, ai=None, *, twilio_gateway=None
             return
         # Behind Cloudflare Tunnel the visitor's address arrives in CF-Connecting-IP.
         visitor = request.headers.get("cf-connecting-ip") or (request.client.host if request.client else "unknown")
+        if visitor in ("127.0.0.1", "::1", "localhost"):
+            return  # the operator's own machine (local recording) is never capped
         now = time.monotonic()
         recent = [started for started in voice_starts.get(visitor, []) if now - started < 3600]
         voice_starts[visitor] = recent
