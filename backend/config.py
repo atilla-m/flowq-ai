@@ -27,6 +27,7 @@ class Settings:
     upload_dir: Path = ROOT / "backend/data/media"
     backend_url: str = "http://localhost:8000"
     frontend_url: str = "http://localhost:5173"
+    allowed_origins: tuple[str, ...] = ("http://localhost:5173",)
     max_upload_bytes: int = 10 * 1024 * 1024
 
     @classmethod
@@ -43,4 +44,6 @@ class Settings:
             upload_dir=rooted_path(os.getenv("UPLOAD_DIR", "backend/data/media")),
             backend_url=os.getenv("BACKEND_PUBLIC_URL", cls.backend_url).rstrip("/"),
             frontend_url=os.getenv("FRONTEND_URL", cls.frontend_url).rstrip("/"),
+            allowed_origins=tuple(origin.strip().rstrip("/") for origin in
+                                  os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",") if origin.strip()),
         )

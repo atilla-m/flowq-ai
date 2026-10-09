@@ -1,0 +1,12 @@
+**
+!backend/
+!backend/*.py
+!backend/requirements.txt
+!backend/tools/
+!backend/tools/*.py
+!industry_packs/
+!industry_packs/**
+**/.env
+**/*.env
+**/.env.*
+**/__pycache__/

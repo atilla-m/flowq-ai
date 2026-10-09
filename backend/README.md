@@ -1,6 +1,6 @@
 # FlowQ AI backend
 
-FastAPI + SQLite backend for the Azerbaijan gadget-shop demo. All business prices and domain prompts come from `industry_packs/$INDUSTRY_PACK`. Catalog prices, trade-in values and customer records are fictional demo data in AZN. No files in `/frontend` are owned or edited by this backend.
+FastAPI + SQLite backend for the Azerbaijan gadget-shop demo. The agent speaks English by default and follows the customer's language when they switch. Backend notices, media instructions and order/payment messages are English. Baku district names and AZN stay unchanged. All business prices and domain prompts come from `industry_packs/$INDUSTRY_PACK`. Catalog prices, trade-in values and customer records are fictional demo data in AZN.
 
 ## Run
 
@@ -16,6 +16,8 @@ uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 If `uv` is installed, `uv venv backend/.venv --python 3.11` and `uv pip install --python backend/.venv/bin/python -r backend/requirements.txt` also work. Run from the repo root; relative database and upload paths resolve against that root. The seed is idempotent. A new database starts with 8 customers, 25 phone SKUs and 15 accessories. Orders reserve stock immediately, including unpaid orders, for this short demo.
+
+Once dependencies and `backend/.env` are ready, start with one command: `backend/.venv/bin/python -m backend`. It reads `PORT` (default 8000) and binds to `0.0.0.0`. Startup refreshes static seeded memory from the pack's English summaries while preserving real conversation history and stock.
 
 Health, customer memory, deterministic tools, media upload, inbox, order, trace and mock payment endpoints work without an OpenAI key. Chat, photo verification and voice require a key with access to the configured models. Chat/session return HTTP 503 when the key is absent; tools return an error result. Call-end memory falls back to an explicitly unverified transcript excerpt if summarization is unavailable. No synthetic voice key or fabricated image analysis is generated.
 
@@ -36,12 +38,16 @@ Interactive API docs: <http://localhost:8000/docs>. Frontend integration details
 | `UPLOAD_DIR` | `backend/data/media` | Verified JPEG/PNG/WebP uploads, maximum 10 MB each |
 | `BACKEND_PUBLIC_URL` | `http://localhost:8000` | Absolute upload and accessory image URLs |
 | `FRONTEND_URL` | `http://localhost:5173` | Payment-link destination |
+| `ALLOWED_ORIGINS` | `http://localhost:5173` | Comma-separated CORS origins; set the deployed frontend origin |
+| `PORT` | `8000` | Port used by `python -m backend` and the Docker health check |
+| `EVAL_INPUT_USD_PER_MILLION` | `2` for default chat model | Optional behavior-eval input rate for model overrides |
+| `EVAL_OUTPUT_USD_PER_MILLION` | `10` for default chat model | Optional behavior-eval output rate for model overrides |
 
 Model defaults were checked against official OpenAI documentation on 2026-10-09. GPT-6.1 Sol function calling uses the Responses API; model overrides must support Responses tools/vision as applicable. Realtime uses the GA `POST /v1/realtime/client_secrets` API, not the retired beta `/realtime/sessions` API. Sources: [model selection](https://developers.openai.com/api/docs/models), [GPT-6.1 Sol](https://developers.openai.com/api/docs/models/gpt-6.1-sol), [client secrets](https://developers.openai.com/api/reference/resources/realtime/subresources/client_secrets/methods/create), [Realtime functions](https://developers.openai.com/api/docs/guides/realtime-mcp), [browser WebRTC](https://developers.openai.com/api/docs/guides/voice-webrtc?voice-api=realtime).
 
 ## API and curl examples
 
-All twelve shared-contract routes are implemented. CORS permits all origins. Set an `order_id` from the order tool result for the order/payment examples below.
+All twelve shared-contract routes are implemented. CORS uses the configured origin allowlist. Set an `order_id` from the order tool result for the order/payment examples below.
 
 ```bash
 # GET /api/health
@@ -66,7 +72,7 @@ curl -s http://localhost:8000/api/tools/search_inventory \
 # POST /api/chat — returns customer + tool cards + final agent messages for this turn
 curl -s http://localhost:8000/api/chat \
   -H 'Content-Type: application/json' \
-  -d '{"phone":"+994501234567","text":"Salam, iPhone 15 istəyirəm","media_ids":[]}'
+  -d '{"phone":"+994501234567","text":"Hi, I would like an iPhone 15","media_ids":[]}'
 
 # POST /api/media — multipart fields are exactly file and phone
 curl -s http://localhost:8000/api/media \
@@ -96,7 +102,7 @@ curl -sG http://localhost:8000/api/trace --data-urlencode 'phone=+994501234567'
 # POST /api/call/end
 curl -s http://localhost:8000/api/call/end \
   -H 'Content-Type: application/json' \
-  -d '{"phone":"+994501234567","transcript":"Müştəri: iPhone 15 istəyirəm. FlowQ: Çatdırılma hansı rayonadır? Müştəri: Yasamal."}'
+  -d '{"phone":"+994501234567","transcript":"Customer: I want an iPhone 15. FlowQ: Which district for delivery? Customer: Yasamal."}'
 ```
 
 Additional asset routes are `GET /api/media/{media_id}` for uploaded images and `GET /api/assets/accessories/{sku}.svg` for local placeholders labeled with the exact compatible model.
@@ -134,6 +140,41 @@ backend/.venv/bin/python -m pytest backend/tests -q
 
 Tests cover deterministic trade-in deductions/battery bands, 1,000 random negotiation asks, tampered quote arguments, photo-over-claim pricing, payment status changes only via the payment endpoint, exact accessory compatibility and labels, delivery lookup, stock reservation/idempotency, customer isolation, durable callback timing, inbox cursors, bounded agent loops, OpenAI request payloads, key secrecy, and missing-key behavior. OpenAI calls are mocked, so the suite needs no key or API spend.
 
-This is a local hackathon demo: the WhatsApp panel, callback, handoff and payment are browser/SQLite effects. No real WhatsApp transport, telephone callback, courier booking or financial charge is made. Orders progress from `awaiting_payment` to `paid`; fulfillment is reported honestly at that stage. The open-CORS, customer-picker app has no authentication and is intended for local demo use.
+This is a hackathon demo: the WhatsApp panel, callback, handoff and payment are browser/SQLite effects. No real WhatsApp transport, telephone callback, courier booking or financial charge is made. Orders progress from `awaiting_payment` to `paid`; fulfillment is reported honestly at that stage. The customer-picker app has no authentication; the CORS allowlist controls browser access, not API authentication.
 
 Data lives under ignored `backend/data/`. To start a fresh demo without deleting history, choose another `DATABASE_PATH` and `UPLOAD_DIR` before restarting. Existing databases preserve stock and history when reseeded. A new industry pack implements the same JSON files and prompts; the core loader does not import industry-specific Python code.
+
+## Evals
+
+No separate server is required. Each run starts an isolated FastAPI app and sends real HTTP route requests against a fresh temporary database; the demo database stays intact.
+
+```bash
+# No key needed: 30 scenarios × 3 repeats, scripted provider doubles.
+backend/.venv/bin/python backend/evals/run_evals.py --dry-run --concurrency 4 --max-cost-usd 5
+# After setting OPENAI_API_KEY in backend/.env:
+backend/.venv/bin/python backend/evals/run_evals.py --concurrency 4 --max-cost-usd 5
+backend/.venv/bin/python backend/evals/report.py
+# Add consented photos and rows to backend/evals/photos/labels.csv first:
+backend/.venv/bin/python backend/evals/vision_eval.py --max-cost-usd 5
+```
+
+The scenarios use 25 English, 3 Russian and 2 Azerbaijani customer profiles. Behavior evals mock image interpretation from labeled fixtures; the real vision test is separate. Dry-run scores validate the pipeline and are not LLM-quality claims. Transcripts and result JSON are saved under ignored `backend/evals/output/`; [the generated report](evals/results.md) includes task success, pass^3, policy violations, price flags, turns, latency, selected failures and an empty hotline baseline table. See [eval documentation](evals/README.md) for cost accounting, overrides and exit codes, and [real-photo labeling instructions](evals/photos/README.md).
+
+## Docker / Render deployment prep
+
+Build from the repository root. The Dockerfile and its ignore file are both under `backend/`; the image includes only backend runtime code and industry-pack data. Environment files, databases, eval output and the frontend are excluded from the build context.
+
+```bash
+docker build -f backend/Dockerfile -t flowq-backend .
+# backend/.env can contain local paths; these explicit overrides keep data persistent.
+docker run --rm --name flowq-backend -p 8000:8000 \
+  --env-file backend/.env \
+  -e DATABASE_PATH=/data/flowq.sqlite3 -e UPLOAD_DIR=/data/media \
+  -v flowq-data:/data flowq-backend
+```
+
+Python is 3.11. Start command: `python -m backend`, which runs Uvicorn on `0.0.0.0:$PORT`. The image's health check is `GET /api/health`. The `/data` volume holds SQLite, its WAL files and media across container recreation. The container user is UID 10001; a manually provisioned bind mount must be writable by that user. A Docker-managed named volume inherits the image directory ownership.
+
+For Render, create a Docker web service with build context at the repository root, Dockerfile path `backend/Dockerfile`, and health-check path `/api/health`. Attach a persistent disk at `/data`; set `DATABASE_PATH=/data/flowq.sqlite3` and `UPLOAD_DIR=/data/media`. Supply the OpenAI key and model variables through the service environment. Set `BACKEND_PUBLIC_URL` to the backend HTTPS URL, and set both `FRONTEND_URL` and `ALLOWED_ORIGINS` to the frontend HTTPS origin (comma-separate extra allowed origins). Keep one service instance for this SQLite demo. The image honors Render's assigned `PORT`. Only files on the mounted disk persist across redeploys. [Render Docker setup](https://render.com/docs/docker), [persistent-disk setup](https://render.com/docs/disks).
+
+The service can start and pass its health check before a key is configured; AI routes return a clear configuration error until the key is added. No deployment is performed by these prep files.

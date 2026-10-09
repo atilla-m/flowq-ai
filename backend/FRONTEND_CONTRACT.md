@@ -1,6 +1,6 @@
 # FlowQ frontend integration
 
-Backend base URL: `http://localhost:8000`. All twelve routes from the shared contract are available. CORS is open. Read [README.md](README.md) for a complete tool argument table and curl examples; OpenAPI is at `/docs`.
+Backend base URL: `http://localhost:8000`. All twelve routes from the shared contract are available. CORS allows origins from `ALLOWED_ORIGINS`, defaulting to `http://localhost:5173`. The agent defaults to English and replies in the customer's language when they switch. Read [README.md](README.md) for a complete tool argument table and curl examples; OpenAPI is at `/docs`.
 
 ## Voice
 

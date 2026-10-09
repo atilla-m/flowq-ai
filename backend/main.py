@@ -66,7 +66,8 @@ def create_app(settings: Settings | None = None, ai=None) -> FastAPI:
             await ai.close()
 
     app = FastAPI(title="FlowQ AI", version="0.1.0", lifespan=lifespan)
-    app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+    app.add_middleware(CORSMiddleware, allow_origins=list(settings.allowed_origins),
+                       allow_methods=["*"], allow_headers=["*"])
     app.state.settings, app.state.pack, app.state.db, app.state.tools, app.state.ai = settings, pack, db, tools, ai
     app.state.agent = agent
 

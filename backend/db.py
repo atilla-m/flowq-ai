@@ -123,7 +123,8 @@ class Database:
                 connection.execute("INSERT OR IGNORE INTO customers VALUES (?, ?, ?)",
                                    (customer["id"], phone, customer["name"]))
                 for i, history in enumerate(customer.get("history", [])):
-                    connection.execute("INSERT OR IGNORE INTO conversations VALUES (?, ?, ?, ?, ?)",
+                    connection.execute("INSERT INTO conversations VALUES (?, ?, ?, ?, ?) "
+                                       "ON CONFLICT(id) DO UPDATE SET summary=excluded.summary",
                                        (f"seed:{pack.name}:{customer['id']}:{i}", phone,
                                         history["channel"], history["summary"], iso_timestamp(history["ts"])))
             for item in pack.catalog + pack.accessories:

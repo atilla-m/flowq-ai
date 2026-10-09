@@ -51,7 +51,10 @@ def test_contract_health_customers_and_cors(client):
     assert history["name"] == "Aysel Məmmədova" and history["history_summary"]
     response = client.options("/api/tools/search_inventory", headers={"Origin": "http://localhost:5173",
                            "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "content-type"})
-    assert response.headers["access-control-allow-origin"] == "*"
+    assert response.headers["access-control-allow-origin"] == "http://localhost:5173"
+    denied = client.options("/api/tools/search_inventory", headers={"Origin": "https://unconfigured.example",
+                            "Access-Control-Request-Method": "POST"})
+    assert denied.status_code == 400 and "access-control-allow-origin" not in denied.headers
 
 
 def test_voice_pushes_media_request_and_logs_call(client):
