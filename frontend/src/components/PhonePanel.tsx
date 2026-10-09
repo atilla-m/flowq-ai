@@ -100,7 +100,7 @@ export function PhonePanel({ customer, call }: { customer: Customer; call: CallS
           {status === 'connected' && call.agentSpeaking && (
             <span className="absolute inset-0 animate-ring rounded-full bg-cyan-400/40" />
           )}
-          <Logo className="relative h-11 w-11 rounded-full ring-2 ring-white/10" />
+          <Logo className="relative h-11 w-11 rounded-full ring-2 ring-white/10 [@media(max-height:820px)]:h-7 [@media(max-height:820px)]:w-7" />
         </div>
         <h2 className="mt-1.5 text-sm font-semibold">FlowQ Store</h2>
         <p className="flex items-center gap-2 text-xs text-slate-400">

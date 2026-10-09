@@ -46,6 +46,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Full-HD recordings: scale the whole rem-based UI up a notch so text stays readable on video. */
+@media (min-width: 1800px) and (min-height: 950px) {
+  html {
+    font-size: 112.5%;
+  }
+}
+
 /* Thin, unobtrusive scrollbars so panels look clean on video. */
 .scroll-thin {
   scrollbar-width: thin;

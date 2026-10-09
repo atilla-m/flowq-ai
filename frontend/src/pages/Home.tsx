@@ -9,12 +9,21 @@ import { HandoffBanner, IncomingCall } from '../components/Overlays'
 import { PhonePanel } from '../components/PhonePanel'
 import { TraceDrawer } from '../components/TraceDrawer'
 import { useInbox } from '../hooks/useInbox'
-import { pickStr } from '../lib/pick'
+import { latestTs, loadReset, saveReset, type DemoReset } from '../lib/demoReset'
+import { pickNum, pickStr } from '../lib/pick'
 import { useCall } from '../voice/useCall'
 
 const PHONE_KEY = 'flowq-selected-phone'
 
-function Workspace({ customer, showScript, onHideScript }: { customer: Customer; showScript: boolean; onHideScript(): void }) {
+interface WorkspaceProps {
+  customer: Customer
+  showScript: boolean
+  onHideScript(): void
+  reset: DemoReset | null
+  onShowHistory(): void
+}
+
+function Workspace({ customer, showScript, onHideScript, reset, onShowHistory }: WorkspaceProps) {
   const phone = customer.phone
   const call = useCall(phone)
   const [incoming, setIncoming] = useState(false)
@@ -22,17 +31,24 @@ function Workspace({ customer, showScript, onHideScript }: { customer: Customer;
   const [toast, setToast] = useState<string | null>(null)
   const [memory, setMemory] = useState<string | undefined>(customer.history_summary)
 
+  const resetTraceUpTo = reset?.traceUpTo
   const onEvent = useCallback((e: InboxEvent) => {
-    if (e.type === 'incoming_callback') setIncoming(true)
-    else if (e.type === 'handoff')
+    if (e.type === 'incoming_callback') {
+      // A callback's timestamp is when it is due, not when it was asked for. One that was
+      // scheduled before "Reset demo" belongs to the previous take, so don't ring for it.
+      const due = Date.parse(pickStr(e.data, 'scheduled_at') ?? e.ts)
+      const askedAt = due - (pickNum(e.data, 'delay_seconds') ?? 0) * 1000
+      if (resetTraceUpTo && askedAt <= Date.parse(resetTraceUpTo) + 1000) return
+      setIncoming(true)
+    } else if (e.type === 'handoff')
       setHandoff(pickStr(e.data, 'summary', 'reason', 'text') ?? 'A human agent is taking over this conversation.')
     else if (e.type === 'order_update') {
       const id = pickStr(e.data, 'order_id', 'id')
       const status = pickStr(e.data, 'status')?.replace(/_/g, ' ')
       setToast(`Order ${id ?? ''} ${status ? `· ${status}` : 'updated'}`)
     }
-  }, [])
-  const inbox = useInbox(phone, onEvent)
+  }, [resetTraceUpTo])
+  const inbox = useInbox(phone, onEvent, reset?.messagesUpTo)
 
   useEffect(() => {
     if (!toast) return
@@ -91,10 +107,10 @@ function Workspace({ customer, showScript, onHideScript }: { customer: Customer;
         )}
       </main>
 
-      <TraceDrawer phone={phone} />
+      <TraceDrawer phone={phone} reset={reset} onShowHistory={onShowHistory} />
 
       {toast && (
-        <div className="fixed top-3 left-1/2 z-40 -translate-x-1/2 animate-rise rounded-lg border border-emerald-400/40 bg-slate-900 px-4 py-2 text-sm text-emerald-200 shadow-xl" role="status">
+        <div className="fixed top-[4.25rem] left-1/2 z-40 -translate-x-1/2 animate-rise rounded-lg border border-emerald-400/40 bg-slate-900 px-4 py-2 text-sm text-emerald-200 shadow-xl" role="status">
           {toast}
         </div>
       )}
@@ -136,6 +152,35 @@ export default function Home() {
   }, [attempt])
 
   const customer = customers?.find((c) => c.phone === phone) ?? customers?.[0]
+
+  // "Reset demo": frontend-only. Remember what the backend already had, hide it, and remount the
+  // workspace so transcript, latency, banners, script ticks and stats all start from zero.
+  const [resetCount, setResetCount] = useState(0)
+  const [resetting, setResetting] = useState(false)
+  const reset = customer ? loadReset(customer.phone) : null
+
+  const resetDemo = async () => {
+    if (!customer) return
+    setResetting(true)
+    const now = new Date().toISOString()
+    const [inbox, trace] = await Promise.all([
+      api.inbox(customer.phone).catch(() => null),
+      api.trace(customer.phone).catch(() => null),
+    ])
+    saveReset(customer.phone, {
+      messagesUpTo: inbox ? latestTs(inbox.messages ?? []) : now,
+      traceUpTo: trace ? latestTs(trace) : now,
+      at: now,
+    })
+    setResetting(false)
+    setResetCount((n) => n + 1)
+  }
+
+  const showHistory = () => {
+    if (!customer) return
+    saveReset(customer.phone, null)
+    setResetCount((n) => n + 1)
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -186,6 +231,14 @@ export default function Home() {
             </select>
           </label>
           <button
+            onClick={resetDemo}
+            disabled={!customer || resetting}
+            title="Clears this browser's view for the selected customer: chat, call transcript, trace and stats. Backend data and the agent's memory are not changed."
+            className="cursor-pointer rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-sm text-slate-200 transition hover:border-slate-500 disabled:opacity-50"
+          >
+            {resetting ? 'Resetting…' : 'Reset demo'}
+          </button>
+          <button
             onClick={() => setShowScript((s) => !s)}
             aria-pressed={showScript}
             className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-sm transition ${
@@ -200,7 +253,9 @@ export default function Home() {
 
       {customer ? (
         <Workspace
-          key={customer.phone}
+          key={`${customer.phone}:${resetCount}`}
+          reset={reset}
+          onShowHistory={showHistory}
           customer={customer}
           showScript={showScript}
           onHideScript={() => setShowScript(false)}
@@ -210,10 +265,27 @@ export default function Home() {
           {error ? (
             <div className="max-w-md space-y-3">
               <h2 className="text-lg font-semibold">Can’t reach the FlowQ backend</h2>
-              <p className="text-sm text-slate-400">
-                {error}. Start the API at <code className="text-slate-200">{API_BASE}</code>, or run the frontend with{' '}
-                <code className="text-slate-200">VITE_MOCK=1</code> to use built-in demo data.
-              </p>
+              <p className="text-sm text-slate-400">{error}</p>
+              <ul className="space-y-1.5 text-left text-sm text-slate-400">
+                <li>
+                  Is the API running at <code className="text-slate-200">{API_BASE}</code>?
+                </li>
+                <li>
+                  The backend only answers browsers on its allowlist: its{' '}
+                  <code className="text-slate-200">ALLOWED_ORIGINS</code> must include{' '}
+                  <code className="text-slate-200">{window.location.origin}</code>.
+                </li>
+                {window.location.protocol === 'https:' && API_BASE.startsWith('http://') && (
+                  <li className="text-amber-300">
+                    This page is on HTTPS but <code>VITE_API_BASE</code> is plain HTTP, which browsers block. Point it
+                    at the backend’s https:// URL and rebuild.
+                  </li>
+                )}
+                <li>
+                  No backend? Run the frontend with <code className="text-slate-200">VITE_MOCK=1</code> for built-in
+                  demo data.
+                </li>
+              </ul>
               <button
                 onClick={() => setAttempt((a) => a + 1)}
                 className="cursor-pointer rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-400"

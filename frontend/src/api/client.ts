@@ -17,7 +17,8 @@ async function http<T>(path: string, init?: RequestInit): Promise<T> {
   try {
     res = await fetch(API_BASE + path, init)
   } catch {
-    throw new ApiError(0, `Backend unreachable at ${API_BASE}`)
+    // A CORS rejection looks identical to a network failure from inside the browser.
+    throw new ApiError(0, `No response from ${API_BASE} (not running, or this origin is not in its ALLOWED_ORIGINS)`)
   }
   if (!res.ok) {
     const body = await res.text().catch(() => '')

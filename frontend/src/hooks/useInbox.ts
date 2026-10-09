@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { absUrl, api } from '../api/client'
 import type { InboxEvent, Message } from '../api/types'
+import { newer } from '../lib/demoReset'
 
 const POLL_MS = 2000
 
@@ -15,14 +16,10 @@ function sameContent(a: Message, b: Message) {
   return (a.text ?? '') === (b.text ?? '')
 }
 
-/** Backend timestamps carry microseconds; Date.parse only sees milliseconds, so break ties on the string. */
-function newer(a: string, b: string) {
-  const d = Date.parse(a) - Date.parse(b)
-  return d > 0 || (d === 0 && a > b)
-}
-
 /** Merge server messages into the list: dedupe by id, and let a server copy replace our optimistic one. */
-function merge(prev: Message[], incoming: Message[]): Message[] {
+function merge(prev: Message[], all: Message[], hideUpTo?: string): Message[] {
+  // "Reset demo" hides everything the backend already had at reset time.
+  const incoming = hideUpTo ? all.filter((m) => newer(m.ts, hideUpTo)) : all
   if (!incoming.length) return prev
   const next = [...prev]
   const ids = new Set(prev.map((m) => m.id))
@@ -39,8 +36,9 @@ function merge(prev: Message[], incoming: Message[]): Message[] {
 /**
  * Polls GET /api/inbox every 2s for one customer. The first poll loads history; events seen in it
  * are treated as already handled so a page reload doesn't replay an old callback or handoff.
+ * `hideUpTo` (from "Reset demo") drops server messages up to that timestamp from the view.
  */
-export function useInbox(phone: string, onEvent: (e: InboxEvent) => void) {
+export function useInbox(phone: string, onEvent: (e: InboxEvent) => void, hideUpTo?: string) {
   const [messages, setMessages] = useState<Message[]>([])
   const [online, setOnline] = useState(true)
   const onEventRef = useRef(onEvent)
@@ -65,7 +63,7 @@ export function useInbox(phone: string, onEvent: (e: InboxEvent) => void) {
         for (const item of [...msgs, ...events]) {
           if (!since || newer(item.ts, since)) since = item.ts
         }
-        setMessages((prev) => merge(prev, msgs))
+        setMessages((prev) => merge(prev, msgs, hideUpTo))
         for (const e of events) {
           if (seenEvents.has(e.id)) continue
           seenEvents.add(e.id)
@@ -83,7 +81,7 @@ export function useInbox(phone: string, onEvent: (e: InboxEvent) => void) {
       alive = false
       clearTimeout(timer)
     }
-  }, [phone])
+  }, [phone, hideUpTo])
 
   const addLocal = useCallback((m: Omit<Message, 'id' | 'ts'>) => {
     const msg: Message = { ...m, id: `local-${crypto.randomUUID()}`, ts: new Date().toISOString() }
@@ -92,9 +90,10 @@ export function useInbox(phone: string, onEvent: (e: InboxEvent) => void) {
     setMessages((prev) => (m.type === 'image' && prev.some((x) => sameContent(x, msg)) ? prev : [...prev, msg]))
   }, [])
 
-  const mergeServer = useCallback((incoming: Message[]) => {
-    setMessages((prev) => merge(prev, incoming))
-  }, [])
+  const mergeServer = useCallback(
+    (incoming: Message[]) => setMessages((prev) => merge(prev, incoming, hideUpTo)),
+    [hideUpTo],
+  )
 
   return { messages, online, addLocal, mergeServer }
 }
