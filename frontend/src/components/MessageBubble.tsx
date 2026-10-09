@@ -28,6 +28,7 @@ function ProductCard({ m }: { m: Message }) {
   const img = absUrl(m.image_url ?? pickStr(d, 'image_url', 'image'))
   const stock = pickNum(d, 'stock')
   const storage = pickNum(d, 'storage')
+  const compatible = pickArr(d, 'compatible_models').filter((x): x is string => typeof x === 'string')
   const variant = [storage ? `${storage} GB` : undefined, pickStr(d, 'color')].filter(Boolean).join(' · ')
   return (
     <div className="w-60">
@@ -35,6 +36,7 @@ function ProductCard({ m }: { m: Message }) {
       <div className="px-1 pt-2">
         <div className="text-sm font-semibold">{pickStr(d, 'name', 'title') ?? m.text ?? 'Product'}</div>
         {variant && <div className="text-xs text-wa-meta">{variant}</div>}
+        {compatible.length > 0 && <div className="text-xs text-wa-meta">Uyğundur: {compatible.join(', ')}</div>}
         <div className="mt-0.5 flex items-baseline justify-between">
           <span className="text-base font-bold text-emerald-700">{azn(pickNum(d, 'price_azn', 'price'))}</span>
           {stock !== undefined && <span className="text-xs text-wa-meta">Stokda: {stock}</span>}

@@ -4,7 +4,7 @@
 
 import type { Api, Channel, Customer, InboxEvent, Json, Message, MessageType, TraceEntry } from './types'
 
-const KEY = 'flowq-mock-v1'
+const KEY = 'flowq-mock-v2'
 
 interface PhoneState {
   quoteId?: string
@@ -20,13 +20,17 @@ interface PhoneState {
 
 interface MockOrder extends Json {
   id: string
+  order_id: string
   phone: string
   status: 'awaiting_payment' | 'paid'
-  items: { sku: string; name: string; quantity: number; price_azn: number; line_total_azn: number }[]
-  tradein: { quote_id?: string; credit_azn: number } | null
-  delivery: { district: string; fee_azn: number }
-  total_azn: number
   ts: string
+  items: { sku: string; name: string; kind: 'phone' | 'accessory'; quantity: number; price_azn: number; line_total_azn: number }[]
+  tradein: { quote_id?: string; offer: number; credit_azn: number } | null
+  delivery: { address: string; district: string; fee_azn: number }
+  total: number
+  total_azn: number
+  currency: 'AZN'
+  paid_at: string | null
 }
 
 interface Store {
@@ -66,7 +70,10 @@ const CUSTOMERS: (Customer & { history_summary: string })[] = [
 ]
 
 const PHONE = { sku: 'IP15-128-BLK', name: 'iPhone 15', storage: 128, color: 'Black', price_azn: 1399, stock: 5 }
-const CASE = { sku: 'ACC-007', name: 'iPhone 15 — Qoruyucu kabro', category: 'case', price_azn: 29, stock: 12 }
+const CASE = { sku: 'ACC-006', name: 'iPhone 15 — Qoruyucu kabro', category: 'case', price_azn: 29, stock: 12 }
+const MEDIA_INSTRUCTIONS =
+  'Zəhmət olmasa WhatsApp panelinə 4 aydın şəkil göndərin: 1) ekranın tam görünüşü, 2) arxa tərəf, ' +
+  '3) Settings > Battery > Battery Health ekran görüntüsü, 4) Settings > General > About ekran görüntüsü.'
 const MAX_INCREASE_PCT = 5
 const STEP_PCT = 2
 
@@ -133,7 +140,7 @@ const CASE_IMG = svg('iPhone 15 case', '#0f766e')
 
 // ---------------------------------------------------------------- tools
 
-type ToolFn = (s: Store, phone: string, args: Json) => Json
+type ToolFn = (s: Store, phone: string, args: Json, channel: Channel) => Json
 
 const TOOLS: Record<string, ToolFn> = {
   get_customer_history: (_s, phone) => {
@@ -141,22 +148,14 @@ const TOOLS: Record<string, ToolFn> = {
     return { name: c?.name ?? null, history_summary: c?.history_summary ?? 'Yeni müştəri.' }
   },
 
-  search_inventory: () => ({ items: [PHONE] }),
+  search_inventory: (_s, _phone, args) => ({ items: [{ ...PHONE, kind: 'phone' }], currency: 'AZN', query: String(args.query ?? '') }),
 
-  request_media_whatsapp: (s, phone) => {
+  request_media_whatsapp: (s, phone, args) => {
     st(s, phone).wantsTradeIn = true
-    pushMessage(s, phone, 'agent', 'media_request', {
-      text: 'Trade-in qiyməti üçün köhnə telefonun şəkillərini göndərin:',
-      data: {
-        instructions: [
-          'Ön tərəf — ekran yanılı vəziyyətdə',
-          'Arxa tərəf — kamera görünsün',
-          'Ayarlar → Batareya → Batareyanın vəziyyəti ekranı',
-          'Ayarlar → Haqqında (model və yaddaş)',
-        ],
-      },
-    })
-    return { sent: true, channel: 'whatsapp' }
+    const what = typeof args.what === 'string' ? args.what : ''
+    const text = what ? `${what}\n${MEDIA_INSTRUCTIONS}` : MEDIA_INSTRUCTIONS
+    pushMessage(s, phone, 'agent', 'media_request', { text, data: { what, instructions: MEDIA_INSTRUCTIONS } })
+    return { sent: true, instructions: text, channel: 'whatsapp' }
   },
 
   analyze_device_media: (s, phone, args) => {
@@ -176,123 +175,135 @@ const TOOLS: Record<string, ToolFn> = {
     }
   },
 
-  calculate_tradein: (s, phone) => {
+  calculate_tradein: (s, phone, args) => {
     const p = st(s, phone)
     p.quoteId = `q_${s.seq++}`
     p.baseOffer = 360
     p.offer = 360
     return {
       quote_id: p.quoteId,
-      base_value_azn: 480,
+      analysis_id: (args.device_info as Json | undefined)?.analysis_id ?? null,
+      base_offer: 480,
       deductions: [
         { reason: 'Ekranda çat var', amount_azn: 100 },
         { reason: 'Batareya 85%-dən aşağıdır', amount_azn: 20 },
       ],
-      offer_azn: 360,
+      final_offer: 360,
+      current_offer: 360,
+      is_final: false,
     }
   },
 
-  negotiate_offer: (s, phone) => {
+  // Same rule as the backend: ceiling = final_offer x 1.05, step = final_offer x 0.02.
+  negotiate_offer: (s, phone, args) => {
     const p = st(s, phone)
-    if (!p.baseOffer || !p.offer) return { error: 'no_quote', message: 'Əvvəlcə calculate_tradein çağırılmalıdır.' }
-    const max = Math.floor(p.baseOffer * (1 + MAX_INCREASE_PCT / 100))
-    const step = Math.round((p.baseOffer * STEP_PCT) / 100)
-    const next = Math.min(max, p.offer + step)
-    const blocked = p.offer >= max
-    p.offer = next
-    return {
-      quote_id: p.quoteId,
-      base_offer_azn: p.baseOffer,
-      offer_azn: next,
-      max_offer_azn: max,
-      is_final: next >= max,
-      ...(blocked ? { blocked: true, reason: 'max_offer reached (base_offer × 1.05)' } : {}),
-    }
+    if (!p.baseOffer || !p.offer) return { error: 'invalid_request', message: 'First obtain a verified calculate_tradein quote' }
+    const max = Math.floor(p.baseOffer * (1 + MAX_INCREASE_PCT / 100) * 100) / 100
+    const step = Math.floor(p.baseOffer * STEP_PCT) / 100
+    const ask = Number(args.customer_ask ?? Infinity)
+    p.offer = ask <= p.offer ? p.offer : Math.min(max, p.offer + step, ask)
+    return { new_offer: p.offer, max_offer: max, is_final: p.offer >= max, base_offer: p.baseOffer, currency: 'AZN', quote_id: p.quoteId }
   },
 
-  get_accessories: (s, phone) => {
-    pushMessage(s, phone, 'agent', 'product_card', {
-      image_url: CASE_IMG,
-      data: { sku: CASE.sku, name: CASE.name, price_azn: CASE.price_azn, compatible_models: ['iPhone 15'] },
-    })
-    return { model: 'iPhone 15', items: [CASE] }
+  get_accessories: (s, phone, args) => {
+    const item = { ...CASE, compatible_models: ['iPhone 15'], image_url: CASE_IMG, kind: 'accessory' }
+    pushMessage(s, phone, 'agent', 'product_card', { text: CASE.name, image_url: CASE_IMG, data: { ...item, currency: 'AZN' } })
+    return { phone_model: String(args.phone_model ?? 'iPhone 15'), items: [item], currency: 'AZN' }
   },
 
   calculate_delivery: (s, phone, args) => {
     const p = st(s, phone)
-    const q = String(args.address ?? args.district ?? 'Yasamal')
-    const pickup = /mağaza|magaza|pickup|самовывоз/i.test(q)
-    p.district = pickup ? 'Mağazadan götürmə' : /yasamal|ясамал/i.test(q) ? 'Yasamal' : q
+    const address = String(args.address ?? 'Yasamal')
+    const pickup = /mağaza|magaza|pickup|самовывоз/i.test(address)
+    p.district = pickup ? 'pickup' : /yasamal|ясамал/i.test(address) ? 'Yasamal' : address
     p.deliveryFee = pickup ? 0 : 3
-    return { district: p.district, fee_azn: p.deliveryFee, eta: pickup ? 'Bu gün' : '2 saat ərzində' }
+    return { address, district: p.district, fee_azn: p.deliveryFee, currency: 'AZN', needs_clarification: false }
   },
 
-  create_order: (s, phone) => {
+  create_order: (s, phone, args) => {
     const p = st(s, phone)
-    const line = (sku: string, name: string, price: number) => ({ sku, name, quantity: 1, price_azn: price, line_total_azn: price })
-    const items = [line(PHONE.sku, 'iPhone 15 · 128 GB · Black', PHONE.price_azn)]
-    if (p.accessory) items.push(line(CASE.sku, CASE.name, CASE.price_azn))
-    const tradein = p.offer ?? 0
-    const delivery = p.deliveryFee ?? 0
+    const skus = (Array.isArray(args.items) ? args.items : []).map((i) => String((i as Json).sku))
+    const line = (sku: string, name: string, kind: 'phone' | 'accessory', price: number) => ({
+      sku,
+      name,
+      kind,
+      quantity: 1,
+      price_azn: price,
+      line_total_azn: price,
+      ...(kind === 'phone' ? { storage: PHONE.storage, color: PHONE.color } : {}),
+    })
+    const items = [line(PHONE.sku, PHONE.name, 'phone', PHONE.price_azn)]
+    if (skus.includes(CASE.sku)) items.push(line(CASE.sku, CASE.name, 'accessory', CASE.price_azn))
+    const credit = args.tradein_quote_id && args.tradein_quote_id === p.quoteId ? (p.offer ?? 0) : 0
+    const fee = p.deliveryFee ?? 3
+    const total = items.reduce((a, i) => a + i.line_total_azn, 0) - credit + fee
+    const id = `FQ-${String(100000 + s.seq++)}`
     const order: MockOrder = {
-      id: `ORD-${1000 + s.seq++}`,
+      id,
+      order_id: id,
       phone,
-      status: 'awaiting_payment',
-      items,
-      tradein: tradein ? { quote_id: p.quoteId, credit_azn: tradein } : null,
-      delivery: { district: p.district ?? 'Yasamal', fee_azn: delivery },
-      total_azn: items.reduce((a, i) => a + i.line_total_azn, 0) - tradein + delivery,
       ts: iso(),
+      items,
+      tradein: credit ? { quote_id: p.quoteId, offer: credit, credit_azn: credit } : null,
+      delivery: { address: String(args.address ?? 'Yasamal'), district: p.district ?? 'Yasamal', fee_azn: fee },
+      total,
+      total_azn: total,
+      currency: 'AZN',
+      status: 'awaiting_payment',
+      paid_at: null,
     }
-    s.orders[order.id] = order
-    p.orderId = order.id
-    pushMessage(s, phone, 'agent', 'order_summary', { data: order })
+    s.orders[id] = order
+    p.orderId = id
+    pushMessage(s, phone, 'agent', 'order_summary', { text: `Sifariş ${id}: cəmi ${total.toFixed(2)} AZN.`, data: order })
+    pushEvent(s, phone, 'order_update', { order_id: id, status: 'awaiting_payment' })
     return order
   },
 
-  create_payment_link: (s, phone) => {
-    const p = st(s, phone)
-    const order = p.orderId ? s.orders[p.orderId] : undefined
-    if (!order) return { error: 'no_order' }
+  create_payment_link: (s, phone, args) => {
+    const order = s.orders[String(args.order_id)]
+    if (!order || order.phone !== phone) return { error: 'invalid_request', message: 'Order not found for this customer' }
+    if (order.status === 'paid') return { order_id: order.id, status: 'paid', message: 'Bu sifariş artıq ödənilib.' }
     const url = `${location.origin}/pay/${order.id}`
     pushMessage(s, phone, 'agent', 'payment_link', {
-      text: 'Ödəniş linki hazırdır.',
+      text: 'Ödəniş üçün keçid:',
       data: { order_id: order.id, url, status: 'pending' },
     })
     return { order_id: order.id, url, status: 'pending' }
   },
 
-  check_payment_status: (s, phone) => {
-    const p = st(s, phone)
-    const order = p.orderId ? s.orders[p.orderId] : undefined
-    if (!order) return { error: 'no_order' }
-    return { order_id: order.id, status: order.status, paid: order.status === 'paid' }
-  },
-
-  get_order_status: (s, phone) => {
-    const p = st(s, phone)
-    const order = p.orderId ? s.orders[p.orderId] : undefined
-    if (!order) return { error: 'no_order' }
+  // Reads only. Nothing in the tools can set an order to paid; only mockApi.pay (the endpoint) does.
+  check_payment_status: (s, phone, args) => {
+    const order = s.orders[String(args.order_id)]
+    if (!order || order.phone !== phone) return { error: 'invalid_request', message: 'Order not found for this customer' }
     return {
       order_id: order.id,
-      status: order.status === 'paid' ? 'out_for_delivery' : order.status,
-      eta: order.status === 'paid' ? 'Kuryer yoldadır, təxminən 40 dəqiqə' : null,
+      status: order.status === 'paid' ? 'paid' : 'pending',
+      paid_at: order.paid_at,
+      total_azn: order.total_azn,
     }
   },
 
-  schedule_callback: (s, phone, args) => {
-    const delay = Number(args.delay_seconds ?? 8)
-    pushEvent(s, phone, 'incoming_callback', { reason: args.reason ?? 'Müştəri geri zəng istədi' }, delay * 1000)
-    return { scheduled: true, delay_seconds: delay }
+  get_order_status: (s, phone, args) => {
+    if (args.order_id) {
+      const order = s.orders[String(args.order_id)]
+      return order && order.phone === phone ? order : { error: 'invalid_request', message: 'Order not found for this customer' }
+    }
+    return { orders: Object.values(s.orders).filter((o) => o.phone === phone) }
   },
 
-  handoff_to_human: (s, phone, args) => {
-    const summary =
-      typeof args.summary === 'string' && args.summary
-        ? args.summary
-        : 'Müştəri iPhone 15 (128 GB, qara) alır, iPhone 13 trade-in edir. Menecerlə danışmaq istədi.'
-    pushEvent(s, phone, 'handoff', { summary })
-    return { transferred: true, summary }
+  schedule_callback: (s, phone, args) => {
+    const delay = Number(args.delay_seconds ?? 15)
+    const scheduled_at = iso(delay * 1000)
+    const name = CUSTOMERS.find((c) => c.phone === phone)?.name ?? null
+    pushEvent(s, phone, 'incoming_callback', { phone, name, scheduled_at, delay_seconds: delay }, delay * 1000)
+    return { scheduled: true, scheduled_at, delay_seconds: delay }
+  },
+
+  handoff_to_human: (s, phone, args, channel) => {
+    const summary = typeof args.summary === 'string' && args.summary ? args.summary : 'Müştəri menecerlə danışmaq istədi.'
+    pushEvent(s, phone, 'handoff', { phone, summary, channel })
+    pushMessage(s, phone, 'agent', 'text', { text: 'Sizi əməkdaşımıza yönləndirirəm.' })
+    return { handed_off: true }
   },
 }
 
@@ -302,7 +313,7 @@ async function runTool(name: string, phone: string, channel: Channel, args: unkn
   return mutate((s) => {
     const fn = TOOLS[name]
     const a = (args && typeof args === 'object' ? args : {}) as Json
-    const result = fn ? fn(s, phone, a) : { error: 'unknown_tool', tool: name }
+    const result = fn ? fn(s, phone, a, channel) : { error: 'unknown_tool', message: `Unknown tool ${name}` }
     ;(s.trace[phone] ??= []).push({ ts: iso(), channel, tool: name, args: a, result, latency_ms: latency })
     return result
   })
@@ -320,58 +331,72 @@ async function chatTurn(phone: string, text: string, mediaIds: string[]): Promis
     mutate((s) => pushMessage(s, phone, 'agent', type, { text: msg, ...rest }))
   const state = () => load().state[phone] ?? {}
 
+  const HANDOFF_SUMMARY = 'Müştəri iPhone 15 (128 GB, qara) alır, iPhone 13 trade-in edir. Menecerlə danışmaq istədi.'
+
   if (mediaIds.length) {
-    const analysis = await tool('analyze_device_media', { media_ids: mediaIds })
-    const quote = await tool('calculate_tradein', { analysis_id: analysis.analysis_id })
+    const analysis = await tool('analyze_device_media', { media_ids: mediaIds, claimed: { model: 'iPhone 13', screen_cracked: false } })
+    const quote = await tool('calculate_tradein', {
+      device_info: { analysis_id: analysis.analysis_id, powers_on: true, water_damage: false, repaired_before: false, face_id_working: true, icloud_signed_out: true },
+    })
     say(
       `Şəkilləri yoxladım. Şəkildə ekranın çatladığı görünür, ona görə qiyməti buna əsasən hesablayıram. ` +
-        `iPhone 13 128 GB üçün trade-in təklifim: ${quote.offer_azn} AZN (ekran −100, batareya −20).`,
+        `iPhone 13 128 GB üçün trade-in təklifim: ${quote.final_offer} AZN (ekran −100, batareya −20).`,
     )
   } else if (has(t, 'menecer', 'operator', 'insan', 'менеджер', 'manager')) {
-    await tool('handoff_to_human', {})
-    say('Sizi menecerimizə yönləndirirəm, söhbətin xülasəsini ona ötürdüm.')
+    await tool('handoff_to_human', { summary: HANDOFF_SUMMARY })
   } else if (has(t, 'zəng', 'zeng', 'позвон', 'call me')) {
     await tool('schedule_callback', { delay_seconds: 8 })
     say('Əlbəttə, bir neçə saniyəyə sizə zəng edirik.')
   } else if (has(t, 'ödədim', 'odedim', 'оплатил', 'paid')) {
-    const res = await tool('check_payment_status')
+    const res = state().orderId ? await tool('check_payment_status', { order_id: state().orderId }) : { error: 'no_order' }
     say(
-      res.paid
-        ? 'Ödənişiniz alındı, təşəkkür edirik! Sifariş hazırlanır.'
-        : 'Sistemdə ödəniş hələ görünmür. Zəhmət olmasa linkdəki "Pay" düyməsi ilə tamamlayın.',
+      res.error
+        ? 'Hələ aktiv sifarişiniz yoxdur.'
+        : res.status === 'paid'
+          ? 'Ödənişiniz təsdiqləndi, təşəkkür edirik! Sifariş hazırlanır.'
+          : 'Sistemdə ödəniş hələ görünmür. Zəhmət olmasa linkdəki "Pay" düyməsi ilə tamamlayın.',
     )
   } else if (has(t, 'haradadır', 'haradadir', 'status', 'где заказ', 'izlə')) {
-    const res = await tool('get_order_status')
-    say(res.error ? 'Hələ aktiv sifarişiniz yoxdur.' : `Sifariş ${res.order_id}: ${res.eta ?? 'ödəniş gözlənilir'}.`)
+    const res = await tool('get_order_status', state().orderId ? { order_id: state().orderId } : {})
+    say(
+      res.id
+        ? `Sifariş ${res.id}: ${res.status === 'paid' ? 'ödənilib, hazırlanır' : 'ödəniş gözlənilir'}.`
+        : 'Hələ aktiv sifarişiniz yoxdur.',
+    )
   } else if (has(t, 'trade', 'köhnə', 'kohne', 'dəyiş', 'deyis', 'обмен')) {
-    await tool('request_media_whatsapp')
+    await tool('request_media_whatsapp', { what: 'iPhone 13 trade-in' })
     say('Yoxlamaq üçün bir neçə şəkil lazımdır — yuxarıdakı təlimata baxın.')
   } else if (has(t, 'artır', 'artir', 'azdır', 'azdir', 'endirim', 'мало', 'больше')) {
-    const res = await tool('negotiate_offer', { quote_id: state().quoteId })
+    const res = await tool('negotiate_offer', { quote_id: state().quoteId, customer_ask: 450 })
     say(
       res.error
         ? 'Əvvəlcə telefonun şəkillərini göndərin, sonra qiyməti müzakirə edək.'
         : res.is_final
-          ? `Son təklifim ${res.offer_azn} AZN-dir — bundan artıq mümkün deyil.`
-          : `Sizin üçün ${res.offer_azn} AZN edə bilərəm.`,
+          ? `Son təklifim ${res.new_offer} AZN-dir — bundan artıq mümkün deyil.`
+          : `Sizin üçün ${res.new_offer} AZN edə bilərəm.`,
     )
   } else if (has(t, 'kabro', 'aksesuar', 'case', 'чехол')) {
-    await tool('get_accessories', { model: 'iPhone 15' })
+    await tool('get_accessories', { phone_model: 'iPhone 15' })
     mutate((s) => void (st(s, phone).accessory = true))
     say('iPhone 15 üçün uyğun kabro: 29 AZN. Sifarişə əlavə etdim.')
   } else if (has(t, 'çatdır', 'catdir', 'yasamal', 'доставк', 'mağaza', 'ünvan')) {
     const res = await tool('calculate_delivery', { address: text })
-    say(`${res.district}: çatdırılma ${res.fee_azn} AZN, ${res.eta}.`)
+    say(`${res.district}: çatdırılma ${res.fee_azn} AZN.`)
   } else if (has(t, 'sifariş', 'sifaris', 'razıyam', 'raziyam', 'alıram', 'aliram', 'беру', 'оформ')) {
     if (state().deliveryFee === undefined) await tool('calculate_delivery', { address: 'Yasamal' })
-    await tool('create_order', { items: [PHONE.sku], tradein_quote_id: state().quoteId })
-    await tool('create_payment_link')
+    const cur = state()
+    const order = await tool('create_order', {
+      items: [{ sku: PHONE.sku, quantity: 1 }, ...(cur.accessory ? [{ sku: CASE.sku, quantity: 1 }] : [])],
+      address: cur.district ?? 'Yasamal',
+      ...(cur.quoteId ? { tradein_quote_id: cur.quoteId } : {}),
+    })
+    await tool('create_payment_link', { order_id: order.id })
   } else {
     await tool('search_inventory', { query: text || 'iPhone 15' })
     say('', 'product_card', {
-      text: undefined,
+      text: PHONE.name,
       image_url: PHONE_IMG,
-      data: { sku: PHONE.sku, name: 'iPhone 15 · 128 GB · Black', price_azn: PHONE.price_azn, stock: PHONE.stock },
+      data: { ...PHONE, kind: 'phone', currency: 'AZN' },
     })
     say('iPhone 15 128 GB qara stokda var — 1399 AZN. Köhnə telefonunuzu trade-in etmək istəyirsiniz?')
   }
@@ -460,12 +485,13 @@ export const mockApi: Api = {
       if (!order) throw new Error(`Order ${orderId} not found`)
       if (order.status !== 'paid') {
         order.status = 'paid'
+        order.paid_at = iso()
         pushMessage(s, order.phone, 'agent', 'text', {
           text: `Ödənişiniz alındı ✅ Sifariş ${order.id} hazırlanır, kuryer 2 saat ərzində çatdıracaq.`,
         })
         pushEvent(s, order.phone, 'order_update', { order_id: order.id, status: 'paid' })
       }
-      return { status: 'paid' }
+      return { status: 'paid' as const }
     })
   },
 

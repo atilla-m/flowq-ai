@@ -55,7 +55,7 @@ export interface OrderView {
 export function toOrderView(raw: unknown): OrderView {
   const root = asObj(raw)
   const o = root.order && typeof root.order === 'object' ? asObj(root.order) : root
-  const status = pickStr(o, 'status', 'payment_status')
+  const status = pickStr(o, 'status')
   const items = pickArr(o, 'items', 'lines', 'line_items').map((it): OrderLine => {
     const qty = pickNum(it, 'qty', 'quantity') ?? 1
     const storage = pickNum(it, 'storage')
@@ -81,7 +81,7 @@ export function toOrderView(raw: unknown): OrderView {
   return {
     id: pickStr(o, 'id', 'order_id'),
     status,
-    paid: status === 'paid' || o.paid === true || pickStr(o, 'payment_status') === 'paid',
+    paid: status === 'paid',
     items,
     tradeIn: tradeIn === undefined ? undefined : Math.abs(tradeIn),
     delivery: pickNum(delivery, 'fee_azn', 'fee') ?? pickNum(o, 'delivery_fee_azn', 'delivery_fee', 'delivery_azn'),

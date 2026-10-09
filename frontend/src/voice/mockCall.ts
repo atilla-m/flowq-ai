@@ -17,7 +17,7 @@ const FIRST_CALL: Step[] = [
   { customer: 'Bəli. iPhone 15, 128 giqabayt, qara rəng var? Köhnə iPhone 13-ü də vermək istəyirəm.' },
   { agent: 'Bir saniyə, yoxlayıram.' },
   { tool: 'search_inventory', args: { query: 'iPhone 15 128 Black' } },
-  { tool: 'request_media_whatsapp', args: { device: 'iPhone 13' } },
+  { tool: 'request_media_whatsapp', args: { what: 'iPhone 13 trade-in' } },
   { agent: 'Bəli, stokda var — 1399 manat. Trade-in üçün WhatsApp-a təlimat göndərdim, şəkilləri ora yükləyin.' },
   { customer: 'Yaxşı, amma indi vaxtım yoxdur. Mənə geri zəng edin.' },
   { tool: 'schedule_callback', args: { delay_seconds: 8 } },

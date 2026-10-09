@@ -14,6 +14,8 @@ export interface CallState {
   agentSpeaking: boolean
   userSpeaking: boolean
   latencies: number[]
+  /** Bumps each time POST /api/call/end settles, i.e. when the backend's memory is up to date. */
+  savedCalls: number
   start(): void
   end(): void
   /** Photos landed in WhatsApp during the call: nudge the voice agent so it reacts right away. */
@@ -31,6 +33,7 @@ export function useCall(phone: string): CallState {
   const [agentSpeaking, setAgentSpeaking] = useState(false)
   const [userSpeaking, setUserSpeaking] = useState(false)
   const [latencies, setLatencies] = useState<number[]>([])
+  const [savedCalls, setSavedCalls] = useState(0)
 
   const driver = useRef<CallDriver | null>(null)
   const linesRef = useRef<Line[]>([])
@@ -61,7 +64,10 @@ export function useCall(phone: string): CallState {
           .filter((l) => l.role !== 'tool' && l.text.trim())
           .map((l) => `${l.role === 'agent' ? 'Agent' : 'Customer'}: ${l.text.trim()}`)
           .join('\n')
-        api.endCall(phone, transcript).catch((e) => console.warn('call/end failed', e))
+        api
+          .endCall(phone, transcript)
+          .catch((e) => console.warn('call/end failed', e))
+          .finally(() => setSavedCalls((n) => n + 1))
       }
     },
     [phone, updateLines],
@@ -122,6 +128,7 @@ export function useCall(phone: string): CallState {
     agentSpeaking,
     userSpeaking,
     latencies,
+    savedCalls,
     start,
     end,
     notifyUpload: useCallback((mediaIds: string[]) => {

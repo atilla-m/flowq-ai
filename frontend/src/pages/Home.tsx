@@ -40,25 +40,19 @@ function Workspace({ customer, showScript, onHideScript }: { customer: Customer;
     return () => clearTimeout(t)
   }, [toast])
 
-  // What the agent remembers about this customer; refreshed after each call since the backend
-  // saves a call summary on hang-up.
-  const callStatus = call.status
+  // What the agent remembers about this customer. Re-fetched once POST /api/call/end has settled,
+  // because that is when the backend has saved the call summary.
+  const savedCalls = call.savedCalls
   useEffect(() => {
-    if (callStatus !== 'idle' && callStatus !== 'ended') return
     let alive = true
-    const t = setTimeout(
-      () =>
-        api
-          .customerByPhone(phone)
-          .then((c) => alive && setMemory(c.history_summary))
-          .catch(() => {}),
-      callStatus === 'ended' ? 1500 : 0,
-    )
+    api
+      .customerByPhone(phone)
+      .then((c) => alive && setMemory(c.history_summary))
+      .catch(() => {})
     return () => {
       alive = false
-      clearTimeout(t)
     }
-  }, [phone, callStatus])
+  }, [phone, savedCalls])
 
   return (
     <>

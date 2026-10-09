@@ -10,18 +10,14 @@ export default function PayPage({ orderId }: { orderId: string }) {
   const [order, setOrder] = useState<OrderView | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [paying, setPaying] = useState(false)
-  const [paid, setPaid] = useState(false)
+  // "Paid" is never decided here: it is whatever GET /api/orders/{id} reports.
+  const paid = order?.paid ?? false
 
   useEffect(() => {
     let alive = true
     api
       .order(orderId)
-      .then((raw) => {
-        if (!alive) return
-        const view = toOrderView(raw)
-        setOrder(view)
-        setPaid(view.paid)
-      })
+      .then((raw) => alive && setOrder(toOrderView(raw)))
       .catch((e) => alive && setError(e instanceof Error ? e.message : String(e)))
     return () => {
       alive = false
@@ -32,8 +28,11 @@ export default function PayPage({ orderId }: { orderId: string }) {
     setPaying(true)
     setError(null)
     try {
-      await api.pay(orderId)
-      setPaid(true)
+      // The only call that can mark the order paid. Then read the order back from the backend.
+      const res = await api.pay(orderId)
+      const fresh = toOrderView(await api.order(orderId))
+      setOrder(fresh)
+      if (res.status !== 'paid' || !fresh.paid) setError('The backend has not recorded this payment yet.')
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
     } finally {

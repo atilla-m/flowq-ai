@@ -69,11 +69,11 @@ const realApi: Api = {
   },
 
   inbox: (phone, since) =>
-    http<Inbox>(`/api/inbox?phone=${enc(phone)}${since ? `&since=${enc(since)}` : ''}`),
+    http<Inbox>(`/api/inbox?${new URLSearchParams(since ? { phone, since } : { phone })}`),
 
   order: (orderId) => http(`/api/orders/${enc(orderId)}`),
-  pay: (orderId) => post(`/api/payments/${enc(orderId)}/pay`, {}),
-  trace: (phone) => http<TraceEntry[]>(`/api/trace?phone=${enc(phone)}`),
+  pay: (orderId) => http(`/api/payments/${enc(orderId)}/pay`, { method: 'POST' }),
+  trace: (phone) => http<TraceEntry[]>(`/api/trace?${new URLSearchParams({ phone })}`),
 
   endCall: (phone, transcript) => post('/api/call/end', { phone, transcript }),
 }

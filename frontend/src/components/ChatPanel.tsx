@@ -45,7 +45,7 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
       for (const file of files) {
         const { media_id, url } = await api.uploadMedia(phone, file)
         mediaIds.push(media_id)
-        addLocal({ from: 'customer', type: 'image', image_url: url })
+        addLocal({ from: 'customer', type: 'image', image_url: url, data: { media_id } })
       }
       if (trimmed) addLocal({ from: 'customer', type: 'text', text: trimmed })
       // During a call the voice agent picks the photos up via analyze_device_media; a parallel

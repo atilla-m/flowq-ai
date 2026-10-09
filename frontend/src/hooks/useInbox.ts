@@ -4,9 +4,14 @@ import type { InboxEvent, Message } from '../api/types'
 
 const POLL_MS = 2000
 
+const mediaId = (m: Message) => (typeof m.data?.media_id === 'string' ? m.data.media_id : undefined)
+
 function sameContent(a: Message, b: Message) {
   if (a.type !== b.type || a.from !== b.from) return false
-  if (a.type === 'image') return absUrl(a.image_url) === absUrl(b.image_url)
+  if (a.type === 'image') {
+    const [x, y] = [mediaId(a), mediaId(b)]
+    return x && y ? x === y : absUrl(a.image_url) === absUrl(b.image_url)
+  }
   return (a.text ?? '') === (b.text ?? '')
 }
 
@@ -82,7 +87,9 @@ export function useInbox(phone: string, onEvent: (e: InboxEvent) => void) {
 
   const addLocal = useCallback((m: Omit<Message, 'id' | 'ts'>) => {
     const msg: Message = { ...m, id: `local-${crypto.randomUUID()}`, ts: new Date().toISOString() }
-    setMessages((prev) => [...prev, msg])
+    // POST /api/media already inserts the image into the inbox; if a poll delivered it before the
+    // upload response arrived, there is nothing to add.
+    setMessages((prev) => (m.type === 'image' && prev.some((x) => sameContent(x, msg)) ? prev : [...prev, msg]))
   }, [])
 
   const mergeServer = useCallback((incoming: Message[]) => {

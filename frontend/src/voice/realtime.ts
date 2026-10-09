@@ -25,13 +25,17 @@ function micErrorMessage(e: unknown): string {
   return `Could not open the microphone${e instanceof Error ? `: ${e.message}` : '.'}`
 }
 
-function parseArgs(raw: unknown): unknown {
-  if (typeof raw !== 'string') return raw ?? {}
-  try {
-    return JSON.parse(raw || '{}')
-  } catch {
-    return {}
+/** The tools endpoint requires `args` to be a JSON object; anything else from the model becomes {}. */
+function parseArgs(raw: unknown): Record<string, unknown> {
+  let value = raw
+  if (typeof raw === 'string') {
+    try {
+      value = JSON.parse(raw || '{}')
+    } catch {
+      value = {}
+    }
   }
+  return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
 }
 
 export function startRealtimeCall(phone: string, sink: CallSink): CallDriver {
@@ -267,8 +271,10 @@ export function startRealtimeCall(phone: string, sink: CallSink): CallDriver {
       )
     }
     if (stopped) return stop0()
-    const key = typeof session.client_secret === 'string' ? session.client_secret : session.client_secret?.value
-    if (!key) throw new StartError('session', 'The backend did not return a Realtime client secret.')
+    // Contract: client_secret is the ephemeral token itself (a string), not OpenAI's {value} wrapper.
+    const key = session.client_secret
+    if (typeof key !== 'string' || !key)
+      throw new StartError('session', 'The backend did not return a Realtime client secret string.')
 
     pc = new RTCPeerConnection()
     pc.ontrack = (e) => {
@@ -292,7 +298,6 @@ export function startRealtimeCall(phone: string, sink: CallSink): CallDriver {
           type: 'realtime',
           instructions: session.instructions,
           tools: session.tools ?? [],
-          tool_choice: 'auto',
         },
       })
       later(greet, 1500) // in case session.updated never arrives

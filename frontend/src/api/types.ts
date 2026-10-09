@@ -50,13 +50,19 @@ export interface TraceEntry {
   latency_ms: number
 }
 
+export interface RealtimeTool {
+  type: 'function'
+  name: string
+  description: string
+  parameters: Json
+}
+
 export interface RealtimeSession {
-  // Ephemeral key. The contract says string; OpenAI's own response nests it as {value}.
-  client_secret: string | { value: string }
+  /** Ephemeral `ek_...` token as a plain STRING; used directly as the Bearer for the SDP exchange. */
+  client_secret: string
   model: string
   instructions: string
-  tools: unknown[]
-  voice?: string
+  tools: RealtimeTool[]
 }
 
 export interface Api {
@@ -69,7 +75,7 @@ export interface Api {
   uploadMedia(phone: string, file: File): Promise<{ media_id: string; url: string }>
   inbox(phone: string, since?: string): Promise<Inbox>
   order(orderId: string): Promise<unknown>
-  pay(orderId: string): Promise<{ status: string }>
+  pay(orderId: string): Promise<{ status: 'paid' }>
   trace(phone: string): Promise<TraceEntry[]>
   endCall(phone: string, transcript: string): Promise<{ ok: boolean }>
 }
