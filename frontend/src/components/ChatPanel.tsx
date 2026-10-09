@@ -15,6 +15,10 @@ interface Props {
   mergeServer(m: Message[]): void
 }
 
+// Backend limits (see backend/main.py): at most 8 media_ids per chat turn; JPEG, PNG or WebP only.
+const MAX_PHOTOS = 8
+const ACCEPT = 'image/jpeg,image/png,image/webp'
+
 interface Draft {
   file: File
   preview: string
@@ -57,7 +61,7 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
       const res = await api.chat(phone, trimmed, mediaIds)
       mergeServer(res.messages ?? [])
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Message failed to send')
+      setError(`Couldn’t send: ${e instanceof Error ? e.message : 'message failed'}`)
     } finally {
       setBusy(false)
     }
@@ -73,10 +77,16 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
   }
 
   const onFiles = (list: FileList | null) => {
-    const files = [...(list ?? [])].filter((f) => f.type.startsWith('image/'))
+    const picked = [...(list ?? [])]
+    const files = picked.filter((f) => ACCEPT.split(',').includes(f.type))
     if (fileInput.current) fileInput.current.value = ''
-    if (!files.length) return
-    setDrafts((prev) => [...prev, ...files.map((file) => ({ file, preview: URL.createObjectURL(file) }))])
+    if (files.length < picked.length) setError('Only JPEG, PNG or WebP photos can be sent.')
+    const room = MAX_PHOTOS - drafts.length
+    if (files.length > room) setError(`You can send up to ${MAX_PHOTOS} photos in one message.`)
+    setDrafts((prev) => [
+      ...prev,
+      ...files.slice(0, Math.max(0, room)).map((file) => ({ file, preview: URL.createObjectURL(file) })),
+    ])
   }
 
   return (
@@ -124,7 +134,7 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
 
       {error && (
         <div className="flex items-center justify-between gap-3 bg-red-50 px-4 py-1.5 text-xs text-red-700">
-          <span className="truncate">Couldn’t send: {error}</span>
+          <span className="truncate">{error}</span>
           <button onClick={() => setError(null)} className="cursor-pointer" aria-label="Dismiss">
             <CloseIcon className="h-3.5 w-3.5" />
           </button>
@@ -161,7 +171,7 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
         <input
           ref={fileInput}
           type="file"
-          accept="image/*"
+          accept={ACCEPT}
           multiple
           hidden
           onChange={(e) => onFiles(e.target.files)}

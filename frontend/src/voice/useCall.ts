@@ -64,6 +64,7 @@ export function useCall(phone: string): CallState {
           .filter((l) => l.role !== 'tool' && l.text.trim())
           .map((l) => `${l.role === 'agent' ? 'Agent' : 'Customer'}: ${l.text.trim()}`)
           .join('\n')
+          .slice(-100_000) // backend limit on transcript length
         api
           .endCall(phone, transcript)
           .catch((e) => console.warn('call/end failed', e))
