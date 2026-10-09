@@ -46,7 +46,7 @@ def verified_quote(client):
 
 def test_contract_health_customers_and_cors(client):
     assert client.get("/api/health").json() == {"ok": True}
-    assert len(client.get("/api/customers").json()) == 8
+    assert len(client.get("/api/customers").json()) == 20
     history = client.get(f"/api/customers/by-phone/{PHONE}").json()
     assert history["name"] == "Aysel Məmmədova" and history["history_summary"]
     response = client.options("/api/tools/search_inventory", headers={"Origin": "http://localhost:5173",

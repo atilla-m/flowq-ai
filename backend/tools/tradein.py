@@ -1,10 +1,10 @@
-from backend.tools.common import money, normalize_text
+from backend.tools.common import money, normalize_model
 
 
 def calculate_tradein(device_info: dict, rules: dict) -> dict:
     """Pure, deterministic valuation. The service supplies photo-verified facts."""
-    requested = normalize_text(str(device_info.get("model", "")))
-    model = next((name for name in rules["base_values"] if normalize_text(name) == requested), None)
+    requested = normalize_model(str(device_info.get("model", "")))
+    model = next((name for name in rules["base_values"] if normalize_model(name) == requested), None)
     if not model:
         raise ValueError("This model is not in the trade-in rules; ask a human")
     storage = device_info.get("storage")

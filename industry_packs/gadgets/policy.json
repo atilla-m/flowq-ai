@@ -1,0 +1,126 @@
+{
+  "demo_data": true,
+  "timezone": "Asia/Baku",
+  "branches": [
+    {
+      "id": "branch_yasamal",
+      "name": "FlowQ Yasamal",
+      "district": "Yasamal",
+      "address": "12 Mətbuat prospekti, Yasamal, Baku",
+      "hours": {
+        "mon_sat": "10:00–20:00",
+        "sun": "11:00–18:00"
+      },
+      "district_aliases": [
+        "Yasamal",
+        "Ясамал"
+      ],
+      "serves_districts": [
+        "Yasamal",
+        "Səbail",
+        "Qaradağ"
+      ]
+    },
+    {
+      "id": "branch_nasimi",
+      "name": "FlowQ Nəsimi",
+      "district": "Nəsimi",
+      "address": "25 Azadlıq prospekti, Nəsimi, Baku",
+      "hours": {
+        "mon_sat": "10:00–21:00",
+        "sun": "11:00–19:00"
+      },
+      "district_aliases": [
+        "Nəsimi",
+        "Nasimi",
+        "Nesimi",
+        "Насими"
+      ],
+      "serves_districts": [
+        "Nəsimi",
+        "Binəqədi",
+        "Sumqayıt",
+        "Abşeron"
+      ]
+    },
+    {
+      "id": "branch_narimanov",
+      "name": "FlowQ Nərimanov",
+      "district": "Nərimanov",
+      "address": "45 Təbriz küçəsi, Nərimanov, Baku",
+      "hours": {
+        "mon_sat": "10:00–20:00",
+        "sun": "11:00–18:00"
+      },
+      "district_aliases": [
+        "Nərimanov",
+        "Narimanov",
+        "Нариманов"
+      ],
+      "serves_districts": [
+        "Nərimanov",
+        "Xətai",
+        "Sabunçu",
+        "Suraxanı",
+        "Xəzər",
+        "Nizami",
+        "Pirallahı"
+      ]
+    }
+  ],
+  "returns": {
+    "days": 14,
+    "conditions": [
+      "Receipt or order number required.",
+      "Keep packaging and included accessories.",
+      "Unused items may be returned within 14 days; opened items require an assistant to confirm eligibility.",
+      "Manufacturing defects are assessed under the warranty policy."
+    ],
+    "exceptions": [
+      "Opened in-ear headphones cannot be returned for change of mind.",
+      "Physical damage, water damage and locked trade-in devices require human review."
+    ],
+    "process": "Contact a shop assistant or visit a branch with the item and order number."
+  },
+  "warranty": {
+    "default_months": 12,
+    "accessories_months": 6,
+    "source": "The exact warranty_months is stored on each catalog/accessory SKU.",
+    "covers": [
+      "Manufacturing defects under normal use."
+    ],
+    "excludes": [
+      "Accidental damage",
+      "Liquid damage",
+      "Unauthorized repairs",
+      "Normal battery wear"
+    ],
+    "process": "Bring the receipt and device to a branch for inspection."
+  },
+  "installments": {
+    "months": [
+      3,
+      6,
+      12
+    ],
+    "interest_pct": 0,
+    "fee_azn": 0,
+    "down_payment_azn": 0,
+    "minimum_price_azn": 200,
+    "eligible_categories": [
+      "phones",
+      "laptops",
+      "tablets",
+      "watches",
+      "headphones",
+      "consoles"
+    ],
+    "requires_in_stock": true,
+    "conditions": [
+      "Demo estimate for a single SKU, before delivery and trade-in.",
+      "A participating installment card and identity verification are required.",
+      "Eligibility is not financing approval; final approval comes from the payment provider."
+    ],
+    "rounding": "Equal installments rounded down to cents; the final installment settles the remainder."
+  }
+}

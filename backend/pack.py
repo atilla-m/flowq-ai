@@ -17,6 +17,7 @@ class IndustryPack:
     negotiation: dict
     delivery: dict
     customers: list[dict]
+    policy: dict
     voice_prompt: str
     whatsapp_prompt: str
 
@@ -33,7 +34,7 @@ class IndustryPack:
             name=name, directory=directory, catalog=read("catalog.json"),
             accessories=read("accessories.json"), tradein_rules=read("tradein_rules.json"),
             negotiation=read("negotiation.json"), delivery=read("delivery.json"),
-            customers=read("customers.json"),
+            customers=read("customers.json"), policy=read("policy.json"),
             voice_prompt=(directory / "prompts/voice_system.md").read_text(encoding="utf-8"),
             whatsapp_prompt=(directory / "prompts/whatsapp_system.md").read_text(encoding="utf-8"),
         )

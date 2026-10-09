@@ -32,7 +32,7 @@ def test_realtime_ga_client_secret_payload_memory_and_key_secrecy(tmp_path):
         result = response.json()
         assert result["client_secret"] == "ek_ephemeral_demo"
         assert "Aysel Məmmədova" in result["instructions"]
-        assert len(result["tools"]) == 14
+        assert len(result["tools"]) == 17
         assert settings.api_key not in response.text
         payload = client.realtime.client_secrets.create.call_args.kwargs
         assert payload["session"]["type"] == "realtime"
@@ -50,7 +50,7 @@ def test_missing_key_realtime_returns_503(tmp_path):
 
 def test_schema_names_are_identical_between_voice_and_chat():
     assert [tool["name"] for tool in realtime_tools()] == [tool["name"] for tool in response_tools()]
-    assert len({tool["name"] for tool in realtime_tools()}) == 14
+    assert len({tool["name"] for tool in realtime_tools()}) == 17
 
 
 def test_vision_sdk_request_contains_every_image_and_env_model(tmp_path, pack):

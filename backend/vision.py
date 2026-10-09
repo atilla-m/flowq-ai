@@ -1,7 +1,7 @@
 """Validate model observations and compare claims outside the LLM."""
 from pydantic import BaseModel, ConfigDict, Field
 
-from backend.tools.common import normalize_text
+from backend.tools.common import normalize_model, normalize_text
 
 
 class Evidence(BaseModel):
@@ -26,10 +26,10 @@ class DeviceObservation(BaseModel):
 
 
 def canonical_model(value: str, rules: dict) -> str:
-    normalized = normalize_text(value)
+    normalized = normalize_model(value)
     for model in rules["base_values"]:
         aliases = [model, *rules.get("model_aliases", {}).get(model, [])]
-        if any(normalize_text(alias) == normalized for alias in aliases):
+        if any(normalize_model(alias) == normalized for alias in aliases):
             return model
     return value
 

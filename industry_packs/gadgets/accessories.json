@@ -8,7 +8,8 @@
     "compatible_models": [
       "iPhone 11"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-001.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-001.svg",
+    "warranty_months": 6
   },
   {
     "sku": "ACC-002",
@@ -19,7 +20,8 @@
     "compatible_models": [
       "iPhone 12"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-002.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-002.svg",
+    "warranty_months": 6
   },
   {
     "sku": "ACC-003",
@@ -30,7 +32,8 @@
     "compatible_models": [
       "iPhone 13"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-003.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-003.svg",
+    "warranty_months": 6
   },
   {
     "sku": "ACC-004",
@@ -41,7 +44,8 @@
     "compatible_models": [
       "iPhone 13"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-004.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-004.svg",
+    "warranty_months": 6
   },
   {
     "sku": "ACC-005",
@@ -52,7 +56,8 @@
     "compatible_models": [
       "iPhone 14"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-005.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-005.svg",
+    "warranty_months": 6
   },
   {
     "sku": "ACC-006",
@@ -63,7 +68,8 @@
     "compatible_models": [
       "iPhone 15"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-006.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-006.svg",
+    "warranty_months": 6
   },
   {
     "sku": "ACC-007",
@@ -74,7 +80,8 @@
     "compatible_models": [
       "iPhone 15"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-007.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-007.svg",
+    "warranty_months": 6
   },
   {
     "sku": "ACC-008",
@@ -85,7 +92,8 @@
     "compatible_models": [
       "iPhone 16"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-008.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-008.svg",
+    "warranty_months": 6
   },
   {
     "sku": "ACC-009",
@@ -96,7 +104,8 @@
     "compatible_models": [
       "iPhone 16"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-009.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-009.svg",
+    "warranty_months": 6
   },
   {
     "sku": "ACC-010",
@@ -107,7 +116,8 @@
     "compatible_models": [
       "Samsung Galaxy S21"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-010.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-010.svg",
+    "warranty_months": 6
   },
   {
     "sku": "ACC-011",
@@ -118,7 +128,8 @@
     "compatible_models": [
       "Samsung Galaxy S22"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-011.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-011.svg",
+    "warranty_months": 6
   },
   {
     "sku": "ACC-012",
@@ -129,7 +140,8 @@
     "compatible_models": [
       "Samsung Galaxy S23"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-012.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-012.svg",
+    "warranty_months": 6
   },
   {
     "sku": "ACC-013",
@@ -140,7 +152,8 @@
     "compatible_models": [
       "Samsung Galaxy S24"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-013.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-013.svg",
+    "warranty_months": 6
   },
   {
     "sku": "ACC-014",
@@ -151,7 +164,8 @@
     "compatible_models": [
       "Samsung Galaxy A55"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-014.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-014.svg",
+    "warranty_months": 6
   },
   {
     "sku": "ACC-015",
@@ -162,6 +176,282 @@
     "compatible_models": [
       "Xiaomi Redmi Note 13"
     ],
-    "image_url": "http://localhost:8000/api/assets/accessories/ACC-015.svg"
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-015.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-016",
+    "name": "Clear case — iPhone 17",
+    "compatible_models": [
+      "iPhone 17"
+    ],
+    "price_azn": 29,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-016.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-017",
+    "name": "Tempered glass — iPhone 17",
+    "compatible_models": [
+      "iPhone 17"
+    ],
+    "price_azn": 19,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-017.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-018",
+    "name": "Silicone case — iPhone 17 Pro",
+    "compatible_models": [
+      "iPhone 17 Pro"
+    ],
+    "price_azn": 39,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-018.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-019",
+    "name": "Tempered glass — iPhone 17 Pro",
+    "compatible_models": [
+      "iPhone 17 Pro"
+    ],
+    "price_azn": 25,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-019.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-020",
+    "name": "Silicone case — iPhone 17 Pro Max",
+    "compatible_models": [
+      "iPhone 17 Pro Max"
+    ],
+    "price_azn": 39,
+    "stock": 0,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-020.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-021",
+    "name": "Protective case — Samsung Galaxy S25",
+    "compatible_models": [
+      "Samsung Galaxy S25"
+    ],
+    "price_azn": 29,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-021.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-022",
+    "name": "Tempered glass — Samsung Galaxy S25",
+    "compatible_models": [
+      "Samsung Galaxy S25"
+    ],
+    "price_azn": 19,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-022.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-023",
+    "name": "Protective case — Samsung Galaxy S25 Ultra",
+    "compatible_models": [
+      "Samsung Galaxy S25 Ultra"
+    ],
+    "price_azn": 39,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-023.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-024",
+    "name": "Protective case — Samsung Galaxy A56",
+    "compatible_models": [
+      "Samsung Galaxy A56"
+    ],
+    "price_azn": 19,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-024.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-025",
+    "name": "Protective case — Xiaomi Redmi Note 14",
+    "compatible_models": [
+      "Xiaomi Redmi Note 14"
+    ],
+    "price_azn": 19,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-025.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-026",
+    "name": "Protective case — Google Pixel 9",
+    "compatible_models": [
+      "Google Pixel 9"
+    ],
+    "price_azn": 29,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-026.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-027",
+    "name": "Folio case — iPad A16",
+    "compatible_models": [
+      "iPad A16"
+    ],
+    "price_azn": 49,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-027.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-028",
+    "name": "Folio case — iPad Air 11 M3",
+    "compatible_models": [
+      "iPad Air 11 M3"
+    ],
+    "price_azn": 59,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-028.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-029",
+    "name": "Screen protector — Samsung Galaxy Tab S10 FE",
+    "compatible_models": [
+      "Samsung Galaxy Tab S10 FE"
+    ],
+    "price_azn": 25,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-029.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-030",
+    "name": "Keyboard folio — Samsung Galaxy Tab S9 FE",
+    "compatible_models": [
+      "Samsung Galaxy Tab S9 FE"
+    ],
+    "price_azn": 99,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-030.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-031",
+    "name": "13-inch sleeve — MacBook Air 13 M4",
+    "compatible_models": [
+      "MacBook Air 13 M4"
+    ],
+    "price_azn": 49,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-031.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-032",
+    "name": "USB-C HDMI hub — MacBook Air 13 M4",
+    "compatible_models": [
+      "MacBook Air 13 M4"
+    ],
+    "price_azn": 79,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-032.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-033",
+    "name": "14-inch sleeve — MacBook Pro 14 M4",
+    "compatible_models": [
+      "MacBook Pro 14 M4"
+    ],
+    "price_azn": 59,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-033.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-034",
+    "name": "Cooling stand — Asus TUF Gaming A15 FA507NV",
+    "compatible_models": [
+      "Asus TUF Gaming A15 FA507NV"
+    ],
+    "price_azn": 69,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-034.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-035",
+    "name": "Laptop sleeve — Lenovo LOQ 15IRX9",
+    "compatible_models": [
+      "Lenovo LOQ 15IRX9"
+    ],
+    "price_azn": 39,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-035.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-036",
+    "name": "Sport band — Apple Watch Series 10 42mm",
+    "compatible_models": [
+      "Apple Watch Series 10 42mm"
+    ],
+    "price_azn": 29,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-036.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-037",
+    "name": "Watch band — Samsung Galaxy Watch7 44mm",
+    "compatible_models": [
+      "Samsung Galaxy Watch7 44mm"
+    ],
+    "price_azn": 25,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-037.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-038",
+    "name": "Silicone charging-case cover — Apple AirPods Pro 2 USB-C",
+    "compatible_models": [
+      "Apple AirPods Pro 2 USB-C"
+    ],
+    "price_azn": 19,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-038.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-039",
+    "name": "DualSense controller — Sony PlayStation 5 Slim Disc",
+    "compatible_models": [
+      "Sony PlayStation 5 Slim Disc"
+    ],
+    "price_azn": 149,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-039.svg",
+    "warranty_months": 6
+  },
+  {
+    "sku": "ACC-040",
+    "name": "Travel case — Nintendo Switch OLED",
+    "compatible_models": [
+      "Nintendo Switch OLED"
+    ],
+    "price_azn": 35,
+    "stock": 8,
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-040.svg",
+    "warranty_months": 6
   }
 ]

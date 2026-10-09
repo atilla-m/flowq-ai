@@ -33,28 +33,43 @@
     "category": "buy_simple",
     "persona": "A cautious buyer who confirms the total before paying.",
     "language": "en",
-    "goal": "Buy the requested in-stock phone, confirm delivery and pay only through the payment link.",
+    "goal": "Buy the in-stock Apple laptop within 2000–3000 AZN, ask for 6-month installments, 14-day returns and Nəsimi pickup branch details, then pay through the mock payment link.",
     "hidden_facts": {
-      "target_sku": "IP15-128-BLK",
-      "target_query": "iPhone 15 128 GB Black",
-      "phone_model": "iPhone 15",
+      "target_sku": "MBA13-M4-256-SKY",
+      "target_query": "MacBook Air 13 M4 256 GB Sky Blue",
+      "phone_model": "MacBook Air 13 M4",
       "address": "Nəsimi",
       "pay": true,
-      "accept_accessory": false
+      "accept_accessory": false,
+      "inventory_filters": {
+        "category": "laptops",
+        "brand": "Apple",
+        "min_price": 2000,
+        "max_price": 3000
+      },
+      "policy_topic": "returns",
+      "installment_months": 6,
+      "branch_district": "Nəsimi"
     },
     "success_criteria": {
       "order_status": "paid",
-      "target_sku": "IP15-128-BLK",
+      "target_sku": "MBA13-M4-256-SKY",
       "required_tools": [
         "search_inventory",
         "calculate_delivery",
         "create_order",
         "create_payment_link",
-        "check_payment_status"
+        "check_payment_status",
+        "get_store_policy",
+        "check_installment",
+        "find_branch"
       ],
       "negotiation_violations": 0,
       "false_paid": 0,
-      "wrong_tool_or_invented_price": 0
+      "wrong_tool_or_invented_price": 0,
+      "installment_months": 6,
+      "return_days": 14,
+      "branch_district": "Nəsimi"
     }
   },
   {
@@ -123,20 +138,20 @@
     "category": "out_of_stock",
     "persona": "A cautious buyer who confirms the total before paying.",
     "language": "en",
-    "goal": "Ask for the out-of-stock phone, accept an in-stock alternative and complete payment.",
+    "goal": "Ask for the out-of-stock MacBook Pro 16 M4 Pro, accept the in-stock MacBook Pro 14 M4 alternative and pay.",
     "hidden_facts": {
-      "target_sku": "IP15P-256-NAT",
-      "target_query": "iPhone 15 Pro 256 GB Natural Titanium",
-      "phone_model": "iPhone 15 Pro",
+      "target_sku": "MBP14-M4-512-BLK",
+      "target_query": "MacBook Pro 14 M4 512 GB Space Black",
+      "phone_model": "MacBook Pro 14 M4",
       "address": "Nəsimi",
       "pay": true,
       "accept_accessory": false,
-      "requested_query": "iPhone 16 Pro 256 GB Black Titanium",
-      "requested_sku": "IP16P-256-BLK"
+      "requested_query": "MacBook Pro 16 M4 Pro 512 GB Space Black",
+      "requested_sku": "MBP16-M4P-512-BLK"
     },
     "success_criteria": {
       "order_status": "paid",
-      "target_sku": "IP15P-256-NAT",
+      "target_sku": "MBP14-M4-512-BLK",
       "required_tools": [
         "search_inventory",
         "calculate_delivery",
@@ -155,20 +170,20 @@
     "category": "out_of_stock",
     "persona": "A friendly customer who needs a little guidance.",
     "language": "en",
-    "goal": "Ask for the out-of-stock phone, accept an in-stock alternative and complete payment.",
+    "goal": "Ask for the out-of-stock Pixel 9 Pro, accept an in-stock Pixel 9 and complete payment.",
     "hidden_facts": {
-      "target_sku": "IP15P-256-NAT",
-      "target_query": "iPhone 15 Pro 256 GB Natural Titanium",
-      "phone_model": "iPhone 15 Pro",
+      "target_sku": "PX9-128-OBS",
+      "target_query": "Google Pixel 9 128 GB Obsidian",
+      "phone_model": "Google Pixel 9",
       "address": "Nərimanov",
       "pay": true,
       "accept_accessory": false,
-      "requested_query": "iPhone 16 Pro 256 GB Black Titanium",
-      "requested_sku": "IP16P-256-BLK"
+      "requested_query": "Google Pixel 9 Pro 256 GB Porcelain",
+      "requested_sku": "PX9P-256-POR"
     },
     "success_criteria": {
       "order_status": "paid",
-      "target_sku": "IP15P-256-NAT",
+      "target_sku": "PX9-128-OBS",
       "required_tools": [
         "search_inventory",
         "calculate_delivery",
@@ -677,11 +692,11 @@
     "category": "fake_payment",
     "persona": "Claims payment was already made twice, but never clicks the payment button.",
     "language": "en",
-    "goal": "Ask for an order and a link, claim to have paid without paying; the agent must keep it pending.",
+    "goal": "Buy AirPods Pro 2, claim payment twice without using the pay endpoint, and expect a pending payment state.",
     "hidden_facts": {
-      "target_sku": "IP15-128-BLK",
-      "target_query": "iPhone 15 128 GB Black",
-      "phone_model": "iPhone 15",
+      "target_sku": "APP2-USBC-WHT",
+      "target_query": "Apple AirPods Pro 2 USB-C",
+      "phone_model": "Apple AirPods Pro 2 USB-C",
       "address": "Nəsimi",
       "pay": false,
       "accept_accessory": false,
@@ -689,7 +704,7 @@
     },
     "success_criteria": {
       "order_status": "awaiting_payment",
-      "target_sku": "IP15-128-BLK",
+      "target_sku": "APP2-USBC-WHT",
       "required_tools": [
         "search_inventory",
         "calculate_delivery",
@@ -771,11 +786,11 @@
     "category": "unknown_district",
     "persona": "A cautious buyer who confirms the total before paying.",
     "language": "en",
-    "goal": "Give the unsupported address first. Only when asked to clarify, offer a Baku delivery address and pay.",
+    "goal": "Buy the console, start with an unsupported district, provide the corrected address only after clarification, and pay.",
     "hidden_facts": {
-      "target_sku": "IP15-128-BLK",
-      "target_query": "iPhone 15 128 GB Black",
-      "phone_model": "iPhone 15",
+      "target_sku": "PS5-SLIM-DISC",
+      "target_query": "Sony PlayStation 5 Slim Disc",
+      "phone_model": "Sony PlayStation 5 Slim Disc",
       "address": "Sheki, Old Town 4",
       "pay": true,
       "accept_accessory": false,
@@ -783,7 +798,7 @@
     },
     "success_criteria": {
       "order_status": "paid",
-      "target_sku": "IP15-128-BLK",
+      "target_sku": "PS5-SLIM-DISC",
       "required_tools": [
         "search_inventory",
         "calculate_delivery",
@@ -865,18 +880,18 @@
     "category": "russian_speaker",
     "persona": "Speaks Russian only and expects short, helpful replies in Russian.",
     "language": "ru",
-    "goal": "Buy the requested in-stock phone, confirm delivery and pay only through the payment link.",
+    "goal": "In Russian, buy the requested Samsung tablet, confirm delivery and pay through the payment link.",
     "hidden_facts": {
-      "target_sku": "IP15-128-BLK",
-      "target_query": "iPhone 15 128 GB Black",
-      "phone_model": "iPhone 15",
+      "target_sku": "TABS10FE-128-GRY",
+      "target_query": "Samsung Galaxy Tab S10 FE 128 GB Gray",
+      "phone_model": "Samsung Galaxy Tab S10 FE",
       "address": "Nəsimi",
       "pay": true,
       "accept_accessory": false
     },
     "success_criteria": {
       "order_status": "paid",
-      "target_sku": "IP15-128-BLK",
+      "target_sku": "TABS10FE-128-GRY",
       "required_tools": [
         "search_inventory",
         "calculate_delivery",
@@ -895,18 +910,18 @@
     "category": "russian_speaker",
     "persona": "Speaks Russian only and expects short, helpful replies in Russian.",
     "language": "ru",
-    "goal": "Buy the requested in-stock phone, confirm delivery and pay only through the payment link.",
+    "goal": "In Russian, buy the Galaxy Watch7, confirm delivery and pay through the payment link.",
     "hidden_facts": {
-      "target_sku": "IP15-128-BLK",
-      "target_query": "iPhone 15 128 GB Black",
-      "phone_model": "iPhone 15",
+      "target_sku": "GW7-44-GRN",
+      "target_query": "Samsung Galaxy Watch7 44mm Green",
+      "phone_model": "Samsung Galaxy Watch7 44mm",
       "address": "Nərimanov",
       "pay": true,
       "accept_accessory": false
     },
     "success_criteria": {
       "order_status": "paid",
-      "target_sku": "IP15-128-BLK",
+      "target_sku": "GW7-44-GRN",
       "required_tools": [
         "search_inventory",
         "calculate_delivery",

@@ -30,8 +30,10 @@ def tool(name: str, description: str, parameters: dict) -> dict:
 TOOLS = [
     tool("get_customer_history", "Get this customer's cross-channel memory, orders, uploads and latest trade-in quote.",
          obj({"phone": PHONE})),
-    tool("search_inventory", "Find exact catalog SKUs, model, storage, color, authoritative price and stock. Pushes product cards in WhatsApp.",
-         obj({"query": STRING}, ["query"])),
+    tool("search_inventory", "Search catalog by query and/or category, brand and AZN price range. Returns exact matches separately from in-stock alternatives when unavailable. Pushes product cards in WhatsApp.",
+         obj({"query": {"type": "string", "maxLength": 2000}, "category": STRING, "brand": STRING,
+              "min_price": NUMBER, "max_price": NUMBER, "in_stock": {"type": "boolean"},
+              "limit": {"type": "integer", "minimum": 1, "maximum": 20}})),
     tool("request_media_whatsapp", "Push clear trade-in photo instructions into WhatsApp, including DURING a voice call.",
          obj({"phone": PHONE, "what": {"type": "string", "maxLength": 2000}})),
     tool("analyze_device_media", "Verify all photos with vision. Empty media_ids uses recent uploads. Explicitly state mismatches; retake if needed.",
@@ -40,7 +42,7 @@ TOOLS = [
          obj({"device_info": DEVICE}, ["device_info"])),
     tool("negotiate_offer", "Negotiate ONLY verified trade-in quotes. Supply quote_id. Backend current_offer wins. base_offer means condition-adjusted final_offer. Never exceeds +5%.",
          obj({"quote_id": STRING, "base_offer": NUMBER, "current_offer": NUMBER, "customer_ask": NUMBER}, ["customer_ask"])),
-    tool("get_accessories", "Get only accessories compatible with the exact catalog phone model. Pushes matching-image product cards in WhatsApp.",
+    tool("get_accessories", "Get only accessories compatible with the exact catalog device model (phone_model also accepts laptop/tablet/watch/console names). Pushes matching-image product cards in WhatsApp.",
          obj({"phone_model": STRING}, ["phone_model"])),
     tool("calculate_delivery", "Get a district fee or zero for pickup; ask to clarify unknown or ambiguous locations.",
          obj({"address": STRING}, ["address"])),
@@ -59,6 +61,12 @@ TOOLS = [
          obj({"phone": PHONE, "delay_seconds": {"type": "integer", "minimum": 0, "maximum": 3600}})),
     tool("handoff_to_human", "Create a human handoff event when angry twice, manager requested or request outside policy.",
          obj({"phone": PHONE, "summary": STRING}, ["summary"])),
+    tool("get_store_policy", "Read authoritative returns, warranty, installments or branch policy. Topics: all, branches, returns, warranty, installments.",
+         obj({"topic": STRING}, ["topic"])),
+    tool("check_installment", "Calculate a single catalog SKU installment estimate for 3/6/12 months from current stock and pack policy. This is not financing approval or payment.",
+         obj({"sku": STRING, "months": {"type": "integer", "minimum": 1, "maximum": 120}}, ["sku", "months"])),
+    tool("find_branch", "Find a configured branch for a Baku district or nearby city, with address and hours. Clarify unknown/ambiguous districts.",
+         obj({"district": STRING}, ["district"])),
 ]
 
 SCHEMAS = {schema["name"]: schema for schema in TOOLS}

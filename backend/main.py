@@ -137,6 +137,8 @@ def create_app(settings: Settings | None = None, ai=None) -> FastAPI:
             return db.mark_paid(order_id)
         except LookupError as error:
             raise HTTPException(404, str(error)) from error
+        except ValueError as error:
+            raise HTTPException(409, str(error)) from error
 
     @app.post("/api/media")
     async def media(file: UploadFile = File(...), phone: str = Form(...)):

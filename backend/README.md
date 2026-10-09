@@ -1,6 +1,6 @@
 # FlowQ AI backend
 
-FastAPI + SQLite backend for the Azerbaijan gadget-shop demo. The agent speaks English by default and follows the customer's language when they switch. Backend notices, media instructions and order/payment messages are English. Baku district names and AZN stay unchanged. All business prices and domain prompts come from `industry_packs/$INDUSTRY_PACK`. Catalog prices, trade-in values and customer records are fictional demo data in AZN.
+FastAPI + SQLite backend for the Azerbaijan gadget-shop demo. The agent speaks English by default and follows the customer's language when they switch. Backend notices, media instructions and order/payment messages are English. Baku district names and AZN stay unchanged. All business prices and domain prompts come from `industry_packs/$INDUSTRY_PACK`. Catalog prices are static Baku retail estimates; stock, trade-in offers, customer records and branch locations are demo data. See the pack's [data notes and references](../industry_packs/gadgets/README.md).
 
 ## Run
 
@@ -15,7 +15,7 @@ cp backend/.env.example backend/.env
 uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-If `uv` is installed, `uv venv backend/.venv --python 3.11` and `uv pip install --python backend/.venv/bin/python -r backend/requirements.txt` also work. Run from the repo root; relative database and upload paths resolve against that root. The seed is idempotent. A new database starts with 8 customers, 25 phone SKUs and 15 accessories. Orders reserve stock immediately, including unpaid orders, for this short demo.
+If `uv` is installed, `uv venv backend/.venv --python 3.11` and `uv pip install --python backend/.venv/bin/python -r backend/requirements.txt` also work. Run from the repo root; relative database and upload paths resolve against that root. The seed is idempotent. A new database starts with 20 customers, 80 product SKUs, 40 accessories and 10 historical/open demo orders. Orders reserve stock immediately, including unpaid orders, for this short demo. Seeded processing and unpaid orders reserve once; delivered and returned history does not change current stock.
 
 Once dependencies and `backend/.env` are ready, start with one command: `backend/.venv/bin/python -m backend`. It reads `PORT` (default 8000) and binds to `0.0.0.0`. Startup refreshes static seeded memory from the pack's English summaries while preserving real conversation history and stock.
 
@@ -114,21 +114,28 @@ Every request has `{phone, channel:"voice"|"whatsapp", args:{...}}` and returns 
 | Name | `args` | Result / effect |
 | --- | --- | --- |
 | `get_customer_history` | `{}` | Name, summaries from both channels, past orders, recent messages/uploads and latest quote |
-| `search_inventory` | `{query}` | `{items, currency, query}` with authoritative SKU/price/remaining stock; WhatsApp gets up to two cards |
+| `search_inventory` | `{query?,category?,brand?,min_price?,max_price?,in_stock?,limit?}` | `{items,alternatives,out_of_stock,currency,query,filters}`; inclusive AZN bounds, canonical category or singular form, limit 1–20 (default 6). Requires a query or filter. Alternatives keep explicit category/brand/budget constraints; WhatsApp gets up to two match/alternative cards |
 | `request_media_whatsapp` | `{what?}` | Pushes a `media_request` even during voice; four-view instructions come from pack |
 | `analyze_device_media` | `{media_ids?:[], claimed?:{model,storage,battery_health,damage,...}}` | All images sent to vision; structured observations, `analysis_id`, computed mismatches, `need_retake`, reason |
 | `calculate_tradein` | `{device_info:{analysis_id?,powers_on,water_damage,repaired_before,face_id_working,icloud_signed_out}}` | `quote_id`, pristine `base_offer`, deductions, condition-adjusted `final_offer`, `current_offer`; verified visual fields override submitted claims |
 | `negotiate_offer` | `{quote_id?,customer_ask,base_offer?,current_offer?}` | `{new_offer,max_offer,is_final,quote_id}`; backend quote overrides monetary input arguments |
-| `get_accessories` | `{phone_model}` | Only exact compatible model items; WhatsApp gets matching-image cards |
+| `get_accessories` | `{phone_model}` | Exact compatible device model, including laptops/tablets/watches/consoles/headphones; existing argument name retained; WhatsApp gets matching-image cards |
 | `calculate_delivery` | `{address}` | District/fee or `needs_clarification:true`; explicit pickup = 0 |
 | `create_order` | `{items:[{sku,quantity?}],address,tradein_quote_id?,idempotency_key?}` | Server-recomputed Order + `order_summary` and `order_update`; reserves stock |
 | `create_payment_link` | `{order_id}` | Pending URL at `/pay/{order_id}` + `payment_link`; paid orders stay paid |
-| `check_payment_status` | `{order_id}` | DB-only pending/paid status |
+| `check_payment_status` | `{order_id}` | DB-only pending/paid status, or `not_recorded` for historical orders without payment evidence |
 | `get_order_status` | `{order_id?}` | One order or `{orders:[]}` for this phone |
 | `schedule_callback` | `{delay_seconds?:15}` | Due `incoming_callback` inbox event; no background timer needed |
 | `handoff_to_human` | `{summary}` | `handoff` event and an agent inbox message |
+| `get_store_policy` | `{topic}` | Read all/branches/returns/warranty/installments from `policy.json`; unknown topics ask for clarification |
+| `check_installment` | `{sku,months}` | 3/6/12-month single-SKU quote from current stock and policy: eligibility, monthly/final amounts, total and approval requirement. No payment state changes |
+| `find_branch` | `{district}` | Configured district branch assignment with address/hours/timezone; unknown or ambiguous districts ask for clarification |
 
-The phone in the request envelope owns the operation. An optional tool-argument `phone` must match it. A tool cannot read another customer's media, quote, order or payment. Orders ignore no prices silently: unsupported `total`, `price`, `status` and discount arguments fail schema validation. Purchase price comes from the catalog. Trade-in credit comes from a persisted verified quote, and one analysis cannot fund multiple orders. Accessories in an order must match a phone model in that order.
+The phone in the request envelope owns the operation. An optional tool-argument `phone` must match it. A tool cannot read another customer's media, quote, order or payment. Orders ignore no prices silently: unsupported `total`, `price`, `status` and discount arguments fail schema validation. Purchase price comes from the catalog. Trade-in credit comes from a persisted verified quote, and one analysis cannot fund multiple orders. Accessories in an order must match a device model in that order.
+
+The shared chat/Realtime registry has 17 tools. Inventory categories are phones/laptops/tablets/watches/headphones/consoles. Cards retain `kind:"phone"` for phones and use `kind:"product"` for other catalog devices. Order items include category, brand, specs and SKU warranty. Store returns are 14 days under the pack conditions; installment estimates exclude delivery and trade-in and require provider approval. They round early payments down to cents and settle the remainder in the last payment. Trade-in bases cover every catalog phone/tablet/laptop model+storage; older phone models remain eligible for trade-in even if no longer sold. The photo checklist's Face ID and iCloud fields mean not applicable/no account locks for devices without those features, as documented in the prompts.
+
+Seeded demo order `DEMO-10-01` is processing, `DEMO-11-01` is unpaid and `DEMO-12-01` is returned. Earlier delivered orders and trade-ins appear in customer memory. A seed never sets a payment to paid. Orders without a payment ledger report `not_recorded`; the pay endpoint rejects processing/delivered/returned orders with HTTP 409. A human handles historical payment/refund questions.
 
 Negotiation's trusted baseline is the **condition-adjusted `final_offer`** from `calculate_tradein`. Its ceiling is that value × 1.05, rounded down to cents. Its step is that value × 0.02. The pristine `base_offer` before deductions is for explanation only. For example, iPhone 13 128 GB with 79% battery and a cracked screen: 480 − 80 − 100 = 300 AZN; negotiation goes 306 → 312 → 315, then holds firm. iCloud sign-out is recorded as a pickup requirement, not falsely inferred from photos.
 
@@ -140,7 +147,7 @@ backend/.venv/bin/python -m pytest backend/tests -q
 
 Tests cover deterministic trade-in deductions/battery bands, 1,000 random negotiation asks, tampered quote arguments, photo-over-claim pricing, payment status changes only via the payment endpoint, exact accessory compatibility and labels, delivery lookup, stock reservation/idempotency, customer isolation, durable callback timing, inbox cursors, bounded agent loops, OpenAI request payloads, key secrecy, and missing-key behavior. OpenAI calls are mocked, so the suite needs no key or API spend.
 
-This is a hackathon demo: the WhatsApp panel, callback, handoff and payment are browser/SQLite effects. No real WhatsApp transport, telephone callback, courier booking or financial charge is made. Orders progress from `awaiting_payment` to `paid`; fulfillment is reported honestly at that stage. The customer-picker app has no authentication; the CORS allowlist controls browser access, not API authentication.
+This is a hackathon demo: the WhatsApp panel, callback, handoff and payment are browser/SQLite effects. No real WhatsApp transport, telephone callback, courier booking or financial charge is made. New orders progress from `awaiting_payment` to `paid`; seeded history also includes processing/delivered/returned states. The customer-picker app has no authentication; the CORS allowlist controls browser access, not API authentication.
 
 Data lives under ignored `backend/data/`. To start a fresh demo without deleting history, choose another `DATABASE_PATH` and `UPLOAD_DIR` before restarting. Existing databases preserve stock and history when reseeded. A new industry pack implements the same JSON files and prompts; the core loader does not import industry-specific Python code.
 

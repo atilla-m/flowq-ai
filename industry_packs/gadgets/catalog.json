@@ -1,43 +1,23 @@
 [
   {
-    "sku": "IP11-64-BLK",
-    "name": "iPhone 11",
-    "storage": 64,
-    "color": "Black",
-    "price_azn": 499,
-    "stock": 4
-  },
-  {
-    "sku": "IP11-128-WHT",
-    "name": "iPhone 11",
-    "storage": 128,
-    "color": "White",
-    "price_azn": 549,
-    "stock": 3
-  },
-  {
-    "sku": "IP12-64-BLK",
-    "name": "iPhone 12",
-    "storage": 64,
-    "color": "Black",
-    "price_azn": 649,
-    "stock": 5
-  },
-  {
-    "sku": "IP12-128-BLU",
-    "name": "iPhone 12",
-    "storage": 128,
-    "color": "Blue",
-    "price_azn": 699,
-    "stock": 3
-  },
-  {
     "sku": "IP13-128-MID",
     "name": "iPhone 13",
     "storage": 128,
     "color": "Midnight",
     "price_azn": 899,
-    "stock": 6
+    "stock": 6,
+    "category": "phones",
+    "brand": "Apple",
+    "specs": {
+      "ram_gb": 4,
+      "cpu": "Apple A15 Bionic",
+      "screen": "6.1-inch OLED, 60 Hz",
+      "storage_gb": 128
+    },
+    "colors": [
+      "Midnight"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "IP13-256-STR",
@@ -45,7 +25,19 @@
     "storage": 256,
     "color": "Starlight",
     "price_azn": 999,
-    "stock": 2
+    "stock": 2,
+    "category": "phones",
+    "brand": "Apple",
+    "specs": {
+      "ram_gb": 4,
+      "cpu": "Apple A15 Bionic",
+      "screen": "6.1-inch OLED, 60 Hz",
+      "storage_gb": 256
+    },
+    "colors": [
+      "Starlight"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "IP14-128-PUR",
@@ -53,7 +45,19 @@
     "storage": 128,
     "color": "Purple",
     "price_azn": 1099,
-    "stock": 4
+    "stock": 4,
+    "category": "phones",
+    "brand": "Apple",
+    "specs": {
+      "ram_gb": null,
+      "cpu": "Apple A15 Bionic",
+      "screen": "6.1-inch OLED, 60 Hz",
+      "storage_gb": 128
+    },
+    "colors": [
+      "Purple"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "IP14-256-BLU",
@@ -61,7 +65,19 @@
     "storage": 256,
     "color": "Blue",
     "price_azn": 1199,
-    "stock": 2
+    "stock": 2,
+    "category": "phones",
+    "brand": "Apple",
+    "specs": {
+      "ram_gb": null,
+      "cpu": "Apple A15 Bionic",
+      "screen": "6.1-inch OLED, 60 Hz",
+      "storage_gb": 256
+    },
+    "colors": [
+      "Blue"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "IP15-128-BLK",
@@ -69,7 +85,19 @@
     "storage": 128,
     "color": "Black",
     "price_azn": 1399,
-    "stock": 5
+    "stock": 5,
+    "category": "phones",
+    "brand": "Apple",
+    "specs": {
+      "ram_gb": 6,
+      "cpu": "Apple A16 Bionic",
+      "screen": "6.1-inch OLED, 60 Hz",
+      "storage_gb": 128
+    },
+    "colors": [
+      "Black"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "IP15-256-PNK",
@@ -77,7 +105,19 @@
     "storage": 256,
     "color": "Pink",
     "price_azn": 1549,
-    "stock": 3
+    "stock": 3,
+    "category": "phones",
+    "brand": "Apple",
+    "specs": {
+      "ram_gb": 6,
+      "cpu": "Apple A16 Bionic",
+      "screen": "6.1-inch OLED, 60 Hz",
+      "storage_gb": 256
+    },
+    "colors": [
+      "Pink"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "IP16-128-ULT",
@@ -85,7 +125,19 @@
     "storage": 128,
     "color": "Ultramarine",
     "price_azn": 1699,
-    "stock": 4
+    "stock": 4,
+    "category": "phones",
+    "brand": "Apple",
+    "specs": {
+      "ram_gb": null,
+      "cpu": "Apple A18",
+      "screen": "6.1-inch OLED, 60 Hz",
+      "storage_gb": 128
+    },
+    "colors": [
+      "Ultramarine"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "IP16-256-TEL",
@@ -93,7 +145,19 @@
     "storage": 256,
     "color": "Teal",
     "price_azn": 1899,
-    "stock": 2
+    "stock": 2,
+    "category": "phones",
+    "brand": "Apple",
+    "specs": {
+      "ram_gb": null,
+      "cpu": "Apple A18",
+      "screen": "6.1-inch OLED, 60 Hz",
+      "storage_gb": 256
+    },
+    "colors": [
+      "Teal"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "IP13P-128-GRA",
@@ -101,7 +165,19 @@
     "storage": 128,
     "color": "Graphite",
     "price_azn": 1149,
-    "stock": 2
+    "stock": 2,
+    "category": "phones",
+    "brand": "Apple",
+    "specs": {
+      "ram_gb": null,
+      "cpu": "Apple A15 Bionic",
+      "screen": "6.1-inch OLED, 120 Hz",
+      "storage_gb": 128
+    },
+    "colors": [
+      "Graphite"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "IP14P-128-SLV",
@@ -109,7 +185,19 @@
     "storage": 128,
     "color": "Silver",
     "price_azn": 1399,
-    "stock": 1
+    "stock": 1,
+    "category": "phones",
+    "brand": "Apple",
+    "specs": {
+      "ram_gb": null,
+      "cpu": "Apple A16 Bionic",
+      "screen": "6.1-inch OLED, 120 Hz",
+      "storage_gb": 128
+    },
+    "colors": [
+      "Silver"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "IP15P-256-NAT",
@@ -117,7 +205,19 @@
     "storage": 256,
     "color": "Natural Titanium",
     "price_azn": 1999,
-    "stock": 2
+    "stock": 2,
+    "category": "phones",
+    "brand": "Apple",
+    "specs": {
+      "ram_gb": null,
+      "cpu": "Apple A17 Pro",
+      "screen": "6.1-inch OLED, 120 Hz",
+      "storage_gb": 256
+    },
+    "colors": [
+      "Natural Titanium"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "IP16P-256-BLK",
@@ -125,23 +225,19 @@
     "storage": 256,
     "color": "Black Titanium",
     "price_azn": 2399,
-    "stock": 0
-  },
-  {
-    "sku": "SS21-128-GRY",
-    "name": "Samsung Galaxy S21",
-    "storage": 128,
-    "color": "Phantom Gray",
-    "price_azn": 649,
-    "stock": 3
-  },
-  {
-    "sku": "SS22-128-BLK",
-    "name": "Samsung Galaxy S22",
-    "storage": 128,
-    "color": "Phantom Black",
-    "price_azn": 799,
-    "stock": 2
+    "stock": 0,
+    "category": "phones",
+    "brand": "Apple",
+    "specs": {
+      "ram_gb": null,
+      "cpu": "Apple A18 Pro",
+      "screen": "6.3-inch OLED, 120 Hz",
+      "storage_gb": 256
+    },
+    "colors": [
+      "Black Titanium"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "SS23-256-CRM",
@@ -149,7 +245,19 @@
     "storage": 256,
     "color": "Cream",
     "price_azn": 1199,
-    "stock": 4
+    "stock": 4,
+    "category": "phones",
+    "brand": "Samsung",
+    "specs": {
+      "ram_gb": 8,
+      "cpu": "Snapdragon 8 Gen 2 for Galaxy",
+      "screen": "6.1-inch AMOLED, 120 Hz",
+      "storage_gb": 256
+    },
+    "colors": [
+      "Cream"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "SS24-256-VIO",
@@ -157,7 +265,19 @@
     "storage": 256,
     "color": "Cobalt Violet",
     "price_azn": 1599,
-    "stock": 3
+    "stock": 3,
+    "category": "phones",
+    "brand": "Samsung",
+    "specs": {
+      "ram_gb": 8,
+      "cpu": "Exynos 2400",
+      "screen": "6.2-inch AMOLED, 120 Hz",
+      "storage_gb": 256
+    },
+    "colors": [
+      "Cobalt Violet"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "SA15-128-BLU",
@@ -165,7 +285,19 @@
     "storage": 128,
     "color": "Blue",
     "price_azn": 329,
-    "stock": 8
+    "stock": 8,
+    "category": "phones",
+    "brand": "Samsung",
+    "specs": {
+      "ram_gb": 4,
+      "cpu": "MediaTek Helio G99",
+      "screen": "6.5-inch AMOLED, 90 Hz",
+      "storage_gb": 128
+    },
+    "colors": [
+      "Blue"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "SA25-128-BLK",
@@ -173,7 +305,19 @@
     "storage": 128,
     "color": "Black",
     "price_azn": 449,
-    "stock": 5
+    "stock": 5,
+    "category": "phones",
+    "brand": "Samsung",
+    "specs": {
+      "ram_gb": 6,
+      "cpu": "Exynos 1280",
+      "screen": "6.5-inch AMOLED, 120 Hz",
+      "storage_gb": 128
+    },
+    "colors": [
+      "Black"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "SA55-256-ICE",
@@ -181,7 +325,19 @@
     "storage": 256,
     "color": "Iceblue",
     "price_azn": 749,
-    "stock": 4
+    "stock": 4,
+    "category": "phones",
+    "brand": "Samsung",
+    "specs": {
+      "ram_gb": 8,
+      "cpu": "Exynos 1480",
+      "screen": "6.6-inch AMOLED, 120 Hz",
+      "storage_gb": 256
+    },
+    "colors": [
+      "Iceblue"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "RN13-128-BLK",
@@ -189,7 +345,19 @@
     "storage": 128,
     "color": "Midnight Black",
     "price_azn": 379,
-    "stock": 7
+    "stock": 7,
+    "category": "phones",
+    "brand": "Xiaomi",
+    "specs": {
+      "ram_gb": 6,
+      "cpu": "Snapdragon 685",
+      "screen": "6.67-inch AMOLED, 120 Hz",
+      "storage_gb": 128
+    },
+    "colors": [
+      "Midnight Black"
+    ],
+    "warranty_months": 12
   },
   {
     "sku": "XM14-256-GRN",
@@ -197,6 +365,1238 @@
     "storage": 256,
     "color": "Jade Green",
     "price_azn": 1199,
-    "stock": 2
+    "stock": 2,
+    "category": "phones",
+    "brand": "Xiaomi",
+    "specs": {
+      "ram_gb": 12,
+      "cpu": "Snapdragon 8 Gen 3",
+      "screen": "6.36-inch AMOLED, 120 Hz",
+      "storage_gb": 256
+    },
+    "colors": [
+      "Jade Green"
+    ],
+    "warranty_months": 12
+  },
+  {
+    "sku": "IP13P-256-SBL",
+    "name": "iPhone 13 Pro",
+    "category": "phones",
+    "brand": "Apple",
+    "storage": 256,
+    "color": "Sierra Blue",
+    "colors": [
+      "Sierra Blue"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": null,
+      "cpu": "Apple A15 Bionic",
+      "screen": "6.1-inch OLED, 120 Hz"
+    },
+    "price_azn": 1249,
+    "stock": 2,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IP14P-256-PUR",
+    "name": "iPhone 14 Pro",
+    "category": "phones",
+    "brand": "Apple",
+    "storage": 256,
+    "color": "Deep Purple",
+    "colors": [
+      "Deep Purple"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": null,
+      "cpu": "Apple A16 Bionic",
+      "screen": "6.1-inch OLED, 120 Hz"
+    },
+    "price_azn": 1499,
+    "stock": 2,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IP15PM-256-BLU",
+    "name": "iPhone 15 Pro Max",
+    "category": "phones",
+    "brand": "Apple",
+    "storage": 256,
+    "color": "Blue Titanium",
+    "colors": [
+      "Blue Titanium"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": null,
+      "cpu": "Apple A17 Pro",
+      "screen": "6.7-inch OLED, 120 Hz"
+    },
+    "price_azn": 2299,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IP16PL-128-PNK",
+    "name": "iPhone 16 Plus",
+    "category": "phones",
+    "brand": "Apple",
+    "storage": 128,
+    "color": "Pink",
+    "colors": [
+      "Pink"
+    ],
+    "specs": {
+      "storage_gb": 128,
+      "ram_gb": null,
+      "cpu": "Apple A18",
+      "screen": "6.7-inch OLED, 60 Hz"
+    },
+    "price_azn": 1999,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IP16PM-256-DES",
+    "name": "iPhone 16 Pro Max",
+    "category": "phones",
+    "brand": "Apple",
+    "storage": 256,
+    "color": "Desert Titanium",
+    "colors": [
+      "Desert Titanium"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": null,
+      "cpu": "Apple A18 Pro",
+      "screen": "6.9-inch OLED, 120 Hz"
+    },
+    "price_azn": 2799,
+    "stock": 2,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IP17-256-BLK",
+    "name": "iPhone 17",
+    "category": "phones",
+    "brand": "Apple",
+    "storage": 256,
+    "color": "Black",
+    "colors": [
+      "Black"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 8,
+      "cpu": "Apple A19",
+      "screen": "6.3-inch OLED, 120 Hz"
+    },
+    "price_azn": 2409,
+    "stock": 5,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IP17-256-LAV",
+    "name": "iPhone 17",
+    "category": "phones",
+    "brand": "Apple",
+    "storage": 256,
+    "color": "Lavender",
+    "colors": [
+      "Lavender"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 8,
+      "cpu": "Apple A19",
+      "screen": "6.3-inch OLED, 120 Hz"
+    },
+    "price_azn": 2409,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IP17-512-SAG",
+    "name": "iPhone 17",
+    "category": "phones",
+    "brand": "Apple",
+    "storage": 512,
+    "color": "Sage",
+    "colors": [
+      "Sage"
+    ],
+    "specs": {
+      "storage_gb": 512,
+      "ram_gb": 8,
+      "cpu": "Apple A19",
+      "screen": "6.3-inch OLED, 120 Hz"
+    },
+    "price_azn": 2899,
+    "stock": 2,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IP17P-256-SLV",
+    "name": "iPhone 17 Pro",
+    "category": "phones",
+    "brand": "Apple",
+    "storage": 256,
+    "color": "Silver",
+    "colors": [
+      "Silver"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 12,
+      "cpu": "Apple A19 Pro",
+      "screen": "6.3-inch OLED, 120 Hz"
+    },
+    "price_azn": 3289,
+    "stock": 4,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IP17P-512-ORG",
+    "name": "iPhone 17 Pro",
+    "category": "phones",
+    "brand": "Apple",
+    "storage": 512,
+    "color": "Cosmic Orange",
+    "colors": [
+      "Cosmic Orange"
+    ],
+    "specs": {
+      "storage_gb": 512,
+      "ram_gb": 12,
+      "cpu": "Apple A19 Pro",
+      "screen": "6.3-inch OLED, 120 Hz"
+    },
+    "price_azn": 3799,
+    "stock": 0,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IP17PM-256-DBL",
+    "name": "iPhone 17 Pro Max",
+    "category": "phones",
+    "brand": "Apple",
+    "storage": 256,
+    "color": "Deep Blue",
+    "colors": [
+      "Deep Blue"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": null,
+      "cpu": "Apple A19 Pro",
+      "screen": "6.9-inch OLED, 120 Hz"
+    },
+    "price_azn": 3589,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "SS23U-256-BLK",
+    "name": "Samsung Galaxy S23 Ultra",
+    "category": "phones",
+    "brand": "Samsung",
+    "storage": 256,
+    "color": "Phantom Black",
+    "colors": [
+      "Phantom Black"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 12,
+      "cpu": "Snapdragon 8 Gen 2 for Galaxy",
+      "screen": "6.8-inch AMOLED, 120 Hz"
+    },
+    "price_azn": 1699,
+    "stock": 2,
+    "warranty_months": 12
+  },
+  {
+    "sku": "SS24U-256-GRY",
+    "name": "Samsung Galaxy S24 Ultra",
+    "category": "phones",
+    "brand": "Samsung",
+    "storage": 256,
+    "color": "Titanium Gray",
+    "colors": [
+      "Titanium Gray"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 12,
+      "cpu": "Snapdragon 8 Gen 3 for Galaxy",
+      "screen": "6.8-inch AMOLED, 120 Hz"
+    },
+    "price_azn": 1999,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "SS25-128-NAV",
+    "name": "Samsung Galaxy S25",
+    "category": "phones",
+    "brand": "Samsung",
+    "storage": 128,
+    "color": "Navy",
+    "colors": [
+      "Navy"
+    ],
+    "specs": {
+      "storage_gb": 128,
+      "ram_gb": 12,
+      "cpu": "Snapdragon 8 Elite for Galaxy",
+      "screen": "6.2-inch AMOLED, 120 Hz"
+    },
+    "price_azn": 1599,
+    "stock": 5,
+    "warranty_months": 12
+  },
+  {
+    "sku": "SS25-256-SIL",
+    "name": "Samsung Galaxy S25",
+    "category": "phones",
+    "brand": "Samsung",
+    "storage": 256,
+    "color": "Silver Shadow",
+    "colors": [
+      "Silver Shadow"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 12,
+      "cpu": "Snapdragon 8 Elite for Galaxy",
+      "screen": "6.2-inch AMOLED, 120 Hz"
+    },
+    "price_azn": 1749,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "SS25PL-256-ICE",
+    "name": "Samsung Galaxy S25+",
+    "category": "phones",
+    "brand": "Samsung",
+    "storage": 256,
+    "color": "Icyblue",
+    "colors": [
+      "Icyblue"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 12,
+      "cpu": "Snapdragon 8 Elite for Galaxy",
+      "screen": "6.7-inch AMOLED, 120 Hz"
+    },
+    "price_azn": 2099,
+    "stock": 2,
+    "warranty_months": 12
+  },
+  {
+    "sku": "SS25U-256-BLK",
+    "name": "Samsung Galaxy S25 Ultra",
+    "category": "phones",
+    "brand": "Samsung",
+    "storage": 256,
+    "color": "Titanium Black",
+    "colors": [
+      "Titanium Black"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 12,
+      "cpu": "Snapdragon 8 Elite for Galaxy",
+      "screen": "6.9-inch AMOLED, 120 Hz"
+    },
+    "price_azn": 2599,
+    "stock": 4,
+    "warranty_months": 12
+  },
+  {
+    "sku": "SA16-128-GRY",
+    "name": "Samsung Galaxy A16",
+    "category": "phones",
+    "brand": "Samsung",
+    "storage": 128,
+    "color": "Gray",
+    "colors": [
+      "Gray"
+    ],
+    "specs": {
+      "storage_gb": 128,
+      "ram_gb": 4,
+      "cpu": "MediaTek Helio G99",
+      "screen": "6.7-inch AMOLED, 90 Hz"
+    },
+    "price_azn": 349,
+    "stock": 8,
+    "warranty_months": 12
+  },
+  {
+    "sku": "SA36-256-LAV",
+    "name": "Samsung Galaxy A36",
+    "category": "phones",
+    "brand": "Samsung",
+    "storage": 256,
+    "color": "Awesome Lavender",
+    "colors": [
+      "Awesome Lavender"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 8,
+      "cpu": "Snapdragon 6 Gen 3",
+      "screen": "6.7-inch AMOLED, 120 Hz"
+    },
+    "price_azn": 649,
+    "stock": 6,
+    "warranty_months": 12
+  },
+  {
+    "sku": "SA56-256-OLV",
+    "name": "Samsung Galaxy A56",
+    "category": "phones",
+    "brand": "Samsung",
+    "storage": 256,
+    "color": "Awesome Olive",
+    "colors": [
+      "Awesome Olive"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 8,
+      "cpu": "Exynos 1580",
+      "screen": "6.7-inch AMOLED, 120 Hz"
+    },
+    "price_azn": 849,
+    "stock": 5,
+    "warranty_months": 12
+  },
+  {
+    "sku": "RN14-256-BLK",
+    "name": "Xiaomi Redmi Note 14",
+    "category": "phones",
+    "brand": "Xiaomi",
+    "storage": 256,
+    "color": "Midnight Black",
+    "colors": [
+      "Midnight Black"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 8,
+      "cpu": "MediaTek Helio G99-Ultra",
+      "screen": "6.67-inch AMOLED, 120 Hz"
+    },
+    "price_azn": 429,
+    "stock": 9,
+    "warranty_months": 12
+  },
+  {
+    "sku": "XM15-256-BLK",
+    "name": "Xiaomi 15",
+    "category": "phones",
+    "brand": "Xiaomi",
+    "storage": 256,
+    "color": "Black",
+    "colors": [
+      "Black"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 12,
+      "cpu": "Snapdragon 8 Elite",
+      "screen": "6.36-inch AMOLED, 120 Hz"
+    },
+    "price_azn": 1499,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "PX8A-128-BAY",
+    "name": "Google Pixel 8a",
+    "category": "phones",
+    "brand": "Google",
+    "storage": 128,
+    "color": "Bay",
+    "colors": [
+      "Bay"
+    ],
+    "specs": {
+      "storage_gb": 128,
+      "ram_gb": 8,
+      "cpu": "Google Tensor G3",
+      "screen": "6.1-inch OLED, 120 Hz"
+    },
+    "price_azn": 799,
+    "stock": 4,
+    "warranty_months": 12
+  },
+  {
+    "sku": "PX9-128-OBS",
+    "name": "Google Pixel 9",
+    "category": "phones",
+    "brand": "Google",
+    "storage": 128,
+    "color": "Obsidian",
+    "colors": [
+      "Obsidian"
+    ],
+    "specs": {
+      "storage_gb": 128,
+      "ram_gb": 12,
+      "cpu": "Google Tensor G4",
+      "screen": "6.3-inch OLED, 120 Hz"
+    },
+    "price_azn": 1199,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "PX9P-256-POR",
+    "name": "Google Pixel 9 Pro",
+    "category": "phones",
+    "brand": "Google",
+    "storage": 256,
+    "color": "Porcelain",
+    "colors": [
+      "Porcelain"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 16,
+      "cpu": "Google Tensor G4",
+      "screen": "6.3-inch OLED, 120 Hz"
+    },
+    "price_azn": 1749,
+    "stock": 0,
+    "warranty_months": 12
+  },
+  {
+    "sku": "MBA13-M2-256-MID",
+    "name": "MacBook Air 13 M2",
+    "category": "laptops",
+    "brand": "Apple",
+    "storage": 256,
+    "color": "Midnight",
+    "colors": [
+      "Midnight"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 8,
+      "cpu": "Apple M2",
+      "screen": "13.6-inch Liquid Retina"
+    },
+    "price_azn": 1899,
+    "stock": 4,
+    "warranty_months": 12
+  },
+  {
+    "sku": "MBA13-M3-256-SLV",
+    "name": "MacBook Air 13 M3",
+    "category": "laptops",
+    "brand": "Apple",
+    "storage": 256,
+    "color": "Silver",
+    "colors": [
+      "Silver"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 16,
+      "cpu": "Apple M3",
+      "screen": "13.6-inch Liquid Retina"
+    },
+    "price_azn": 2199,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "MBA13-M4-256-SKY",
+    "name": "MacBook Air 13 M4",
+    "category": "laptops",
+    "brand": "Apple",
+    "storage": 256,
+    "color": "Sky Blue",
+    "colors": [
+      "Sky Blue"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 16,
+      "cpu": "Apple M4",
+      "screen": "13.6-inch Liquid Retina"
+    },
+    "price_azn": 2499,
+    "stock": 5,
+    "warranty_months": 12
+  },
+  {
+    "sku": "MBA13-M4-512-MID",
+    "name": "MacBook Air 13 M4",
+    "category": "laptops",
+    "brand": "Apple",
+    "storage": 512,
+    "color": "Midnight",
+    "colors": [
+      "Midnight"
+    ],
+    "specs": {
+      "storage_gb": 512,
+      "ram_gb": 16,
+      "cpu": "Apple M4",
+      "screen": "13.6-inch Liquid Retina"
+    },
+    "price_azn": 2899,
+    "stock": 2,
+    "warranty_months": 12
+  },
+  {
+    "sku": "MBA15-M4-256-STR",
+    "name": "MacBook Air 15 M4",
+    "category": "laptops",
+    "brand": "Apple",
+    "storage": 256,
+    "color": "Starlight",
+    "colors": [
+      "Starlight"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 16,
+      "cpu": "Apple M4",
+      "screen": "15.3-inch Liquid Retina"
+    },
+    "price_azn": 2999,
+    "stock": 2,
+    "warranty_months": 12
+  },
+  {
+    "sku": "MBP14-M4-512-BLK",
+    "name": "MacBook Pro 14 M4",
+    "category": "laptops",
+    "brand": "Apple",
+    "storage": 512,
+    "color": "Space Black",
+    "colors": [
+      "Space Black"
+    ],
+    "specs": {
+      "storage_gb": 512,
+      "ram_gb": 16,
+      "cpu": "Apple M4",
+      "screen": "14.2-inch Liquid Retina XDR, 120 Hz"
+    },
+    "price_azn": 3699,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "MBP16-M4P-512-BLK",
+    "name": "MacBook Pro 16 M4 Pro",
+    "category": "laptops",
+    "brand": "Apple",
+    "storage": 512,
+    "color": "Space Black",
+    "colors": [
+      "Space Black"
+    ],
+    "specs": {
+      "storage_gb": 512,
+      "ram_gb": 24,
+      "cpu": "Apple M4 Pro",
+      "screen": "16.2-inch Liquid Retina XDR, 120 Hz"
+    },
+    "price_azn": 4999,
+    "stock": 0,
+    "warranty_months": 12
+  },
+  {
+    "sku": "TUF-A15-512-GRY",
+    "name": "Asus TUF Gaming A15 FA507NV",
+    "category": "laptops",
+    "brand": "Asus",
+    "storage": 512,
+    "color": "Mecha Gray",
+    "colors": [
+      "Mecha Gray"
+    ],
+    "specs": {
+      "storage_gb": 512,
+      "ram_gb": 16,
+      "cpu": "AMD Ryzen 7 7735HS",
+      "screen": "15.6-inch FHD IPS, 144 Hz"
+    },
+    "price_azn": 2199,
+    "stock": 4,
+    "warranty_months": 12
+  },
+  {
+    "sku": "ROG-G16-1024-GRY",
+    "name": "Asus ROG Strix G16 G614JV",
+    "category": "laptops",
+    "brand": "Asus",
+    "storage": 1024,
+    "color": "Eclipse Gray",
+    "colors": [
+      "Eclipse Gray"
+    ],
+    "specs": {
+      "storage_gb": 1024,
+      "ram_gb": 16,
+      "cpu": "Intel Core i7-13650HX",
+      "screen": "16-inch WUXGA IPS, 165 Hz"
+    },
+    "price_azn": 3299,
+    "stock": 2,
+    "warranty_months": 12
+  },
+  {
+    "sku": "ZEN14-512-BLU",
+    "name": "Asus Zenbook 14 OLED UX3405MA",
+    "category": "laptops",
+    "brand": "Asus",
+    "storage": 512,
+    "color": "Ponder Blue",
+    "colors": [
+      "Ponder Blue"
+    ],
+    "specs": {
+      "storage_gb": 512,
+      "ram_gb": 16,
+      "cpu": "Intel Core Ultra 5 125H",
+      "screen": "14-inch 3K OLED, 120 Hz"
+    },
+    "price_azn": 2399,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "LOQ15-512-GRY",
+    "name": "Lenovo LOQ 15IRX9",
+    "category": "laptops",
+    "brand": "Lenovo",
+    "storage": 512,
+    "color": "Luna Grey",
+    "colors": [
+      "Luna Grey"
+    ],
+    "specs": {
+      "storage_gb": 512,
+      "ram_gb": 16,
+      "cpu": "Intel Core i5-13450HX",
+      "screen": "15.6-inch FHD IPS, 144 Hz"
+    },
+    "price_azn": 2099,
+    "stock": 5,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IDEA3-512-GRY",
+    "name": "Lenovo IdeaPad Slim 3 15IRH8",
+    "category": "laptops",
+    "brand": "Lenovo",
+    "storage": 512,
+    "color": "Arctic Grey",
+    "colors": [
+      "Arctic Grey"
+    ],
+    "specs": {
+      "storage_gb": 512,
+      "ram_gb": 8,
+      "cpu": "Intel Core i5-13420H",
+      "screen": "15.6-inch FHD IPS"
+    },
+    "price_azn": 1099,
+    "stock": 7,
+    "warranty_months": 12
+  },
+  {
+    "sku": "TP-E14-512-BLK",
+    "name": "Lenovo ThinkPad E14 Gen 6 Intel",
+    "category": "laptops",
+    "brand": "Lenovo",
+    "storage": 512,
+    "color": "Black",
+    "colors": [
+      "Black"
+    ],
+    "specs": {
+      "storage_gb": 512,
+      "ram_gb": 16,
+      "cpu": "Intel Core Ultra 5 125U",
+      "screen": "14-inch WUXGA IPS"
+    },
+    "price_azn": 2299,
+    "stock": 2,
+    "warranty_months": 12
+  },
+  {
+    "sku": "HP15-512-SLV",
+    "name": "HP Laptop 15-fd0013dx",
+    "category": "laptops",
+    "brand": "HP",
+    "storage": 512,
+    "color": "Natural Silver",
+    "colors": [
+      "Natural Silver"
+    ],
+    "specs": {
+      "storage_gb": 512,
+      "ram_gb": 8,
+      "cpu": "Intel Core i5-1334U",
+      "screen": "15.6-inch FHD"
+    },
+    "price_azn": 1199,
+    "stock": 6,
+    "warranty_months": 12
+  },
+  {
+    "sku": "HPV15-512-BLK",
+    "name": "HP Victus 15-fa1093dx",
+    "category": "laptops",
+    "brand": "HP",
+    "storage": 512,
+    "color": "Performance Blue",
+    "colors": [
+      "Performance Blue"
+    ],
+    "specs": {
+      "storage_gb": 512,
+      "ram_gb": 8,
+      "cpu": "Intel Core i5-13420H",
+      "screen": "15.6-inch FHD IPS, 144 Hz"
+    },
+    "price_azn": 1899,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "DELL15-512-BLK",
+    "name": "Dell Inspiron 15 3530",
+    "category": "laptops",
+    "brand": "Dell",
+    "storage": 512,
+    "color": "Carbon Black",
+    "colors": [
+      "Carbon Black"
+    ],
+    "specs": {
+      "storage_gb": 512,
+      "ram_gb": 16,
+      "cpu": "Intel Core i5-1334U",
+      "screen": "15.6-inch FHD, 120 Hz"
+    },
+    "price_azn": 1399,
+    "stock": 4,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IPAD10-64-BLU",
+    "name": "iPad 10th generation",
+    "category": "tablets",
+    "brand": "Apple",
+    "storage": 64,
+    "color": "Blue",
+    "colors": [
+      "Blue"
+    ],
+    "specs": {
+      "storage_gb": 64,
+      "ram_gb": 4,
+      "cpu": "Apple A14 Bionic",
+      "screen": "10.9-inch Liquid Retina"
+    },
+    "price_azn": 749,
+    "stock": 5,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IPADA16-128-SLV",
+    "name": "iPad A16",
+    "category": "tablets",
+    "brand": "Apple",
+    "storage": 128,
+    "color": "Silver",
+    "colors": [
+      "Silver"
+    ],
+    "specs": {
+      "storage_gb": 128,
+      "ram_gb": null,
+      "cpu": "Apple A16",
+      "screen": "11-inch Liquid Retina"
+    },
+    "price_azn": 899,
+    "stock": 6,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IPADAIR11-M3-128-BLU",
+    "name": "iPad Air 11 M3",
+    "category": "tablets",
+    "brand": "Apple",
+    "storage": 128,
+    "color": "Blue",
+    "colors": [
+      "Blue"
+    ],
+    "specs": {
+      "storage_gb": 128,
+      "ram_gb": 8,
+      "cpu": "Apple M3",
+      "screen": "11-inch Liquid Retina"
+    },
+    "price_azn": 1399,
+    "stock": 4,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IPADAIR13-M3-128-PUR",
+    "name": "iPad Air 13 M3",
+    "category": "tablets",
+    "brand": "Apple",
+    "storage": 128,
+    "color": "Purple",
+    "colors": [
+      "Purple"
+    ],
+    "specs": {
+      "storage_gb": 128,
+      "ram_gb": 8,
+      "cpu": "Apple M3",
+      "screen": "13-inch Liquid Retina"
+    },
+    "price_azn": 1799,
+    "stock": 2,
+    "warranty_months": 12
+  },
+  {
+    "sku": "IPADPRO11-M4-256-BLK",
+    "name": "iPad Pro 11 M4",
+    "category": "tablets",
+    "brand": "Apple",
+    "storage": 256,
+    "color": "Space Black",
+    "colors": [
+      "Space Black"
+    ],
+    "specs": {
+      "storage_gb": 256,
+      "ram_gb": 8,
+      "cpu": "Apple M4",
+      "screen": "11-inch tandem OLED, 120 Hz"
+    },
+    "price_azn": 2399,
+    "stock": 0,
+    "warranty_months": 12
+  },
+  {
+    "sku": "TABA9P-128-GRY",
+    "name": "Samsung Galaxy Tab A9+",
+    "category": "tablets",
+    "brand": "Samsung",
+    "storage": 128,
+    "color": "Graphite",
+    "colors": [
+      "Graphite"
+    ],
+    "specs": {
+      "storage_gb": 128,
+      "ram_gb": 8,
+      "cpu": "Snapdragon 695",
+      "screen": "11-inch TFT, 90 Hz"
+    },
+    "price_azn": 499,
+    "stock": 7,
+    "warranty_months": 12
+  },
+  {
+    "sku": "TABS9FE-128-MNT",
+    "name": "Samsung Galaxy Tab S9 FE",
+    "category": "tablets",
+    "brand": "Samsung",
+    "storage": 128,
+    "color": "Mint",
+    "colors": [
+      "Mint"
+    ],
+    "specs": {
+      "storage_gb": 128,
+      "ram_gb": 6,
+      "cpu": "Exynos 1380",
+      "screen": "10.9-inch TFT, 90 Hz"
+    },
+    "price_azn": 849,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "TABS10FE-128-GRY",
+    "name": "Samsung Galaxy Tab S10 FE",
+    "category": "tablets",
+    "brand": "Samsung",
+    "storage": 128,
+    "color": "Gray",
+    "colors": [
+      "Gray"
+    ],
+    "specs": {
+      "storage_gb": 128,
+      "ram_gb": 8,
+      "cpu": "Exynos 1580",
+      "screen": "10.9-inch TFT, 90 Hz"
+    },
+    "price_azn": 1099,
+    "stock": 4,
+    "warranty_months": 12
+  },
+  {
+    "sku": "AWSE2-40-MID",
+    "name": "Apple Watch SE 2 40mm",
+    "category": "watches",
+    "brand": "Apple",
+    "storage": 32,
+    "color": "Midnight",
+    "colors": [
+      "Midnight"
+    ],
+    "specs": {
+      "storage_gb": 32,
+      "ram_gb": null,
+      "cpu": "Apple S8",
+      "screen": "40mm Retina LTPO OLED"
+    },
+    "price_azn": 499,
+    "stock": 5,
+    "warranty_months": 12
+  },
+  {
+    "sku": "AW10-42-JBL",
+    "name": "Apple Watch Series 10 42mm",
+    "category": "watches",
+    "brand": "Apple",
+    "storage": 64,
+    "color": "Jet Black",
+    "colors": [
+      "Jet Black"
+    ],
+    "specs": {
+      "storage_gb": 64,
+      "ram_gb": null,
+      "cpu": "Apple S10",
+      "screen": "42mm always-on LTPO3 OLED"
+    },
+    "price_azn": 849,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "GW7-44-GRN",
+    "name": "Samsung Galaxy Watch7 44mm",
+    "category": "watches",
+    "brand": "Samsung",
+    "storage": 32,
+    "color": "Green",
+    "colors": [
+      "Green"
+    ],
+    "specs": {
+      "storage_gb": 32,
+      "ram_gb": 2,
+      "cpu": "Exynos W1000",
+      "screen": "1.5-inch AMOLED"
+    },
+    "price_azn": 549,
+    "stock": 4,
+    "warranty_months": 12
+  },
+  {
+    "sku": "GFIT3-SLV",
+    "name": "Samsung Galaxy Fit3",
+    "category": "watches",
+    "brand": "Samsung",
+    "storage": 0,
+    "color": "Silver",
+    "colors": [
+      "Silver"
+    ],
+    "specs": {
+      "storage_gb": null,
+      "ram_gb": null,
+      "cpu": null,
+      "screen": "1.6-inch AMOLED"
+    },
+    "price_azn": 119,
+    "stock": 8,
+    "warranty_months": 12
+  },
+  {
+    "sku": "AP4-WHT",
+    "name": "Apple AirPods 4",
+    "category": "headphones",
+    "brand": "Apple",
+    "storage": 0,
+    "color": "White",
+    "colors": [
+      "White"
+    ],
+    "specs": {
+      "storage_gb": null,
+      "ram_gb": null,
+      "cpu": "Apple H2",
+      "screen": null
+    },
+    "price_azn": 299,
+    "stock": 8,
+    "warranty_months": 12
+  },
+  {
+    "sku": "APP2-USBC-WHT",
+    "name": "Apple AirPods Pro 2 USB-C",
+    "category": "headphones",
+    "brand": "Apple",
+    "storage": 0,
+    "color": "White",
+    "colors": [
+      "White"
+    ],
+    "specs": {
+      "storage_gb": null,
+      "ram_gb": null,
+      "cpu": "Apple H2",
+      "screen": null
+    },
+    "price_azn": 499,
+    "stock": 5,
+    "warranty_months": 12
+  },
+  {
+    "sku": "GB3-SLV",
+    "name": "Samsung Galaxy Buds3",
+    "category": "headphones",
+    "brand": "Samsung",
+    "storage": 0,
+    "color": "Silver",
+    "colors": [
+      "Silver"
+    ],
+    "specs": {
+      "storage_gb": null,
+      "ram_gb": null,
+      "cpu": null,
+      "screen": null
+    },
+    "price_azn": 249,
+    "stock": 5,
+    "warranty_months": 12
+  },
+  {
+    "sku": "GB3P-WHT",
+    "name": "Samsung Galaxy Buds3 Pro",
+    "category": "headphones",
+    "brand": "Samsung",
+    "storage": 0,
+    "color": "White",
+    "colors": [
+      "White"
+    ],
+    "specs": {
+      "storage_gb": null,
+      "ram_gb": null,
+      "cpu": null,
+      "screen": null
+    },
+    "price_azn": 399,
+    "stock": 4,
+    "warranty_months": 12
+  },
+  {
+    "sku": "SONY-XM5-BLK",
+    "name": "Sony WH-1000XM5",
+    "category": "headphones",
+    "brand": "Sony",
+    "storage": 0,
+    "color": "Black",
+    "colors": [
+      "Black"
+    ],
+    "specs": {
+      "storage_gb": null,
+      "ram_gb": null,
+      "cpu": "Sony HD Noise Cancelling Processor QN1",
+      "screen": null
+    },
+    "price_azn": 649,
+    "stock": 0,
+    "warranty_months": 12
+  },
+  {
+    "sku": "PS5-SLIM-DISC",
+    "name": "Sony PlayStation 5 Slim Disc",
+    "category": "consoles",
+    "brand": "Sony",
+    "storage": 1024,
+    "color": "White",
+    "colors": [
+      "White"
+    ],
+    "specs": {
+      "storage_gb": 1024,
+      "ram_gb": 16,
+      "cpu": "AMD Zen 2, 8-core",
+      "screen": "External display via HDMI"
+    },
+    "price_azn": 1449,
+    "stock": 4,
+    "warranty_months": 12
+  },
+  {
+    "sku": "PS5-SLIM-DIG",
+    "name": "Sony PlayStation 5 Slim Digital",
+    "category": "consoles",
+    "brand": "Sony",
+    "storage": 1024,
+    "color": "White",
+    "colors": [
+      "White"
+    ],
+    "specs": {
+      "storage_gb": 1024,
+      "ram_gb": 16,
+      "cpu": "AMD Zen 2, 8-core",
+      "screen": "External display via HDMI"
+    },
+    "price_azn": 1199,
+    "stock": 3,
+    "warranty_months": 12
+  },
+  {
+    "sku": "SW-OLED-WHT",
+    "name": "Nintendo Switch OLED",
+    "category": "consoles",
+    "brand": "Nintendo",
+    "storage": 64,
+    "color": "White",
+    "colors": [
+      "White"
+    ],
+    "specs": {
+      "storage_gb": 64,
+      "ram_gb": 4,
+      "cpu": "NVIDIA custom Tegra processor",
+      "screen": "7-inch OLED, 60 Hz"
+    },
+    "price_azn": 699,
+    "stock": 5,
+    "warranty_months": 12
   }
 ]

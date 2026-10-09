@@ -130,6 +130,52 @@ class Database:
             for item in pack.catalog + pack.accessories:
                 connection.execute("INSERT OR IGNORE INTO stock VALUES (?, ?, ?)",
                                    (pack.name, item["sku"], item.get("stock", 0)))
+            self._seed_orders(connection, pack)
+
+    @staticmethod
+    def _seed_orders(connection, pack):
+        """Import demo history once, without manufacturing paid payment records."""
+        from backend.tools.common import cents
+        from backend.tools.delivery import calculate_delivery
+
+        inventory = {item["sku"]: item for item in pack.catalog + pack.accessories}
+        for customer in pack.customers:
+            phone = normalize_phone(customer["phone"])
+            for record in customer.get("orders", []):
+                if connection.execute("SELECT 1 FROM orders WHERE id=?", (record["id"],)).fetchone():
+                    continue
+                status = record["status"]
+                if status not in ("awaiting_payment", "processing", "delivered", "returned"):
+                    raise ValueError("Seeded orders cannot manufacture a paid status")
+                delivery = calculate_delivery(record["address"], pack.delivery)
+                if delivery["needs_clarification"]:
+                    raise ValueError("Seeded order must have a known delivery district")
+                items, subtotal = [], 0
+                for requested in record["items"]:
+                    product = inventory[requested["sku"]]
+                    quantity = requested.get("quantity", 1)
+                    if isinstance(quantity, bool) or not isinstance(quantity, int) or quantity <= 0:
+                        raise ValueError("Seed quantity must be a positive integer")
+                    line = cents(product["price_azn"]) * quantity
+                    subtotal += line
+                    items.append({**product, "kind": "accessory" if "compatible_models" in product else
+                                  "phone" if product.get("category") == "phones" else "product",
+                                  "quantity": quantity, "line_total_azn": line / 100})
+                    if status in ("awaiting_payment", "processing"):
+                        updated = connection.execute("UPDATE stock SET quantity=quantity-? WHERE pack=? AND sku=? AND quantity>=?",
+                            (quantity, pack.name, product["sku"], quantity))
+                        if updated.rowcount != 1:
+                            raise ValueError("Not enough stock to seed an open demo order")
+                tradein = record.get("tradein")
+                if tradein:
+                    tradein = {**tradein, "offer": tradein["credit_azn"], "historical": True}
+                total = subtotal + cents(delivery["fee_azn"]) - cents(tradein["credit_azn"] if tradein else 0)
+                ts = iso_timestamp(record["ts"])
+                delivery["demo_history"] = True
+                connection.execute("INSERT INTO orders VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL)",
+                    (record["id"], phone, ts, dumps(items), dumps(tradein) if tradein else None, dumps(delivery), total, status))
+                if status == "awaiting_payment":
+                    connection.execute("INSERT INTO payments VALUES (?, 'pending', ?, NULL)", (record["id"], ts))
 
     def ensure_customer(self, phone: str) -> dict:
         phone = normalize_phone(phone)
@@ -245,6 +291,8 @@ class Database:
             order = connection.execute("SELECT * FROM orders WHERE id=?", (order_id,)).fetchone()
             if order is None:
                 raise LookupError("Order not found")
+            if order["status"] not in ("awaiting_payment", "paid"):
+                raise ValueError("Only orders awaiting payment can be paid")
             payment = connection.execute("SELECT * FROM payments WHERE order_id=?", (order_id,)).fetchone()
             if payment and payment["status"] == "paid":
                 return {"status": "paid"}

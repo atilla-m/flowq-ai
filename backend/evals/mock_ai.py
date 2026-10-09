@@ -35,6 +35,8 @@ class MockShopAI(FixtureVisionAI):
     def stages(self):
         category = self.scenario["category"]
         common = [["search_inventory", "calculate_delivery", "get_accessories"], ["create_order", "create_payment_link"], ["check_payment_status", "get_order_status"]]
+        if self.facts.get("policy_topic"):
+            common[0] += ["get_store_policy", "check_installment", "find_branch"]
         if category == "cross_channel_memory":
             common[0].insert(0, "get_customer_history")
         if category == "fake_payment":
@@ -55,7 +57,14 @@ class MockShopAI(FixtureVisionAI):
     def arguments(self, name):
         facts = self.facts
         if name == "search_inventory":
-            return {"query": facts.get("requested_query") if self.scenario["category"] == "out_of_stock" and self.turn == 1 else facts["target_query"]}
+            return {"query": facts.get("requested_query") if self.scenario["category"] == "out_of_stock" and self.turn == 1 else facts["target_query"],
+                    **facts.get("inventory_filters", {})}
+        if name == "get_store_policy":
+            return {"topic": facts["policy_topic"]}
+        if name == "check_installment":
+            return {"sku": facts["target_sku"], "months": facts["installment_months"]}
+        if name == "find_branch":
+            return {"district": facts["branch_district"]}
         if name == "calculate_delivery":
             return {"address": facts.get("resolved_address", facts["address"]) if self.turn > 1 else facts["address"]}
         if name == "get_accessories":
@@ -111,6 +120,10 @@ class MockShopAI(FixtureVisionAI):
             text = f"From our earlier call: {self.facts['phone_model']}, delivery in {self.facts['address']}. " + text
         if self.scenario["language"] == "ru":
             text = f"Телефон стоит {item['price_azn']:.2f} AZN. Оформить заказ?"
+        if "check_installment" in results:
+            quote = results["check_installment"]
+            text += f" The {quote['months']}-month estimate is {quote['monthly_payment_azn']:.2f} AZN per month, with a final installment of {quote['final_payment_azn']:.2f} AZN; provider approval is required."
+            text += f" Returns: {results['get_store_policy']['policy']['days']} days under the stated conditions. Pickup branch: {results['find_branch']['branches'][0]['address']}."
         return text
 
     async def respond(self, **kwargs):
@@ -151,6 +164,8 @@ class MockCustomer:
                 text = f"Здравствуйте. Хочу {facts['target_query']}, доставка в {facts['address']}."
             if scenario["language"] == "az":
                 text = f"Salam. {facts['target_query']} istəyirəm, çatdırılma {facts['address']}." + (" Trade-in istəyirəm." if "fixture" in facts else "")
+            if facts.get("policy_topic"):
+                text += f" Please check {facts['installment_months']}-month installments, your return policy and a branch in {facts['branch_district']}."
             return {"text": text, "action": "none", "done": False}
         if category == "angry_handoff":
             return {"text": "This is unacceptable. I am angry again and need someone to resolve this.", "action": "none", "done": False}

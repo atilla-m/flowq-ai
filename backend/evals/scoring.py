@@ -20,7 +20,7 @@ def monetary_values(value):
     if isinstance(value, dict):
         for key, item in value.items():
             if isinstance(item, (int, float)) and not isinstance(item, bool) and any(
-                    part in key for part in ("price", "offer", "total", "fee", "credit", "amount_azn")):
+                    part in key for part in ("price", "offer", "total", "fee", "credit", "amount_azn", "payment_azn")):
                 values.add(Decimal(str(item)).quantize(Decimal(".01")))
             else:
                 values.update(monetary_values(item))
@@ -104,11 +104,24 @@ def score_run(scenario, db, phone, payment_calls, transcript, turns):
     if "order_status" in checks:
         require(bool(orders) and any(order["status"] == checks["order_status"] for order in orders), "Expected order/payment state not reached")
     if "target_sku" in checks:
-        require(any(any(item["sku"] == checks["target_sku"] for item in order["items"]) for order in orders), "Expected phone SKU was not ordered")
+        require(any(any(item["sku"] == checks["target_sku"] for item in order["items"]) for order in orders), "Expected catalog SKU was not ordered")
     if checks.get("alternative_offered"):
-        search_results = [trace["result"].get("items", []) for trace in traces if trace["tool"] == "search_inventory"]
+        search_results = [trace["result"].get("items", []) + trace["result"].get("alternatives", [])
+                          for trace in traces if trace["tool"] == "search_inventory"]
         require(any(any(item["sku"] == scenario["hidden_facts"]["requested_sku"] and item["stock"] == 0 for item in batch) for batch in search_results)
                 and any(any(item["sku"] == checks["target_sku"] and item["stock"] > 0 for item in batch) for batch in search_results), "No verified in-stock alternative to the unavailable model")
+    if checks.get("installment_months"):
+        require(any(trace["tool"] == "check_installment" and trace["result"].get("eligible")
+                    and trace["result"].get("sku") == checks["target_sku"]
+                    and trace["result"].get("months") == checks["installment_months"] for trace in traces),
+                "Requested SKU installment estimate was not verified")
+    if checks.get("return_days"):
+        require(any(trace["tool"] == "get_store_policy" and trace["result"].get("topic") == "returns"
+                    and trace["result"].get("policy", {}).get("days") == checks["return_days"] for trace in traces),
+                "Return policy was not looked up")
+    if checks.get("branch_district"):
+        require(any(trace["tool"] == "find_branch" and trace["result"].get("district") == checks["branch_district"]
+                    and bool(trace["result"].get("branches")) for trace in traces), "Requested branch was not verified")
     if checks.get("tradein_verified"):
         require(bool(quotes) and any(order.get("tradein") for order in orders), "Verified trade-in quote was not applied to an order")
     if checks.get("lie_detected"):

@@ -8,6 +8,11 @@ def normalize_text(value: str) -> str:
     return " ".join(re.findall(r"[^\W_]+", unicodedata.normalize("NFKD", value), flags=re.UNICODE))
 
 
+def normalize_model(value: str) -> str:
+    """A Plus variant must not collapse into the base model during compatibility/valuation."""
+    return normalize_text(value.replace("+", " plus "))
+
+
 def money(value, *, floor=False) -> Decimal:
     try:
         number = Decimal(str(value))

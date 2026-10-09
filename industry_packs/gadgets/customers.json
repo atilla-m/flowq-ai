@@ -32,6 +32,25 @@
         "channel": "whatsapp",
         "summary": "Bought iPhone 14 previously. Asked about a pink iPhone 15 as a gift. Nəsimi.",
         "ts": "2026-10-01T10:00:00.000000Z"
+      },
+      {
+        "channel": "whatsapp",
+        "summary": "Demo order DEMO-03-01: iPhone 14; status delivered.",
+        "ts": "2026-09-29T12:00:00.000000Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "DEMO-03-01",
+        "ts": "2026-09-29T12:00:00.000000Z",
+        "items": [
+          {
+            "sku": "IP14-128-PUR",
+            "quantity": 1
+          }
+        ],
+        "status": "delivered",
+        "address": "pickup"
       }
     ]
   },
@@ -92,6 +111,337 @@
         "channel": "voice",
         "summary": "Wants to check a trade-in offer for Samsung Galaxy S23. Abşeron.",
         "ts": "2026-10-01T10:00:00.000000Z"
+      }
+    ]
+  },
+  {
+    "id": "cust_09",
+    "name": "Fərid Cəfərov",
+    "phone": "+994502220101",
+    "history": [
+      {
+        "channel": "voice",
+        "summary": "Bought a MacBook Air 13 M4 for university. Interested in a sleeve and USB-C hub. Yasamal.",
+        "ts": "2026-10-04T10:00:00.000000Z"
+      },
+      {
+        "channel": "whatsapp",
+        "summary": "Demo order DEMO-09-01: MacBook Air 13 M4; status delivered.",
+        "ts": "2026-09-29T12:00:00.000000Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "DEMO-09-01",
+        "ts": "2026-09-29T12:00:00.000000Z",
+        "items": [
+          {
+            "sku": "MBA13-M4-256-SKY",
+            "quantity": 1
+          }
+        ],
+        "status": "delivered",
+        "address": "pickup"
+      }
+    ]
+  },
+  {
+    "id": "cust_10",
+    "name": "Səbinə Əhmədova",
+    "phone": "+994552220102",
+    "history": [
+      {
+        "channel": "whatsapp",
+        "summary": "Open iPad Air 11 M3 order is being prepared; asks whether pickup at Nəsimi is possible.",
+        "ts": "2026-10-04T10:00:00.000000Z"
+      },
+      {
+        "channel": "whatsapp",
+        "summary": "Demo order DEMO-10-01: iPad Air 11 M3; status processing.",
+        "ts": "2026-10-08T12:00:00.000000Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "DEMO-10-01",
+        "ts": "2026-10-08T12:00:00.000000Z",
+        "items": [
+          {
+            "sku": "IPADAIR11-M3-128-BLU",
+            "quantity": 1
+          }
+        ],
+        "status": "processing",
+        "address": "pickup"
+      }
+    ]
+  },
+  {
+    "id": "cust_11",
+    "name": "Kamran Vəliyev",
+    "phone": "+994702220103",
+    "history": [
+      {
+        "channel": "voice",
+        "summary": "Unpaid Galaxy S25 order is awaiting payment. Asked to resend the payment link. Nərimanov.",
+        "ts": "2026-10-04T10:00:00.000000Z"
+      },
+      {
+        "channel": "whatsapp",
+        "summary": "Demo order DEMO-11-01: Samsung Galaxy S25; status awaiting_payment.",
+        "ts": "2026-10-08T13:00:00.000000Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "DEMO-11-01",
+        "ts": "2026-10-08T13:00:00.000000Z",
+        "items": [
+          {
+            "sku": "SS25-128-NAV",
+            "quantity": 1
+          }
+        ],
+        "status": "awaiting_payment",
+        "address": "pickup"
+      }
+    ]
+  },
+  {
+    "id": "cust_12",
+    "name": "Sevinc Sultanova",
+    "phone": "+994772220104",
+    "history": [
+      {
+        "channel": "whatsapp",
+        "summary": "Returned AirPods 4 within the demo return window after an unopened gift was duplicated. Prefers a store pickup.",
+        "ts": "2026-10-04T10:00:00.000000Z"
+      },
+      {
+        "channel": "whatsapp",
+        "summary": "Demo order DEMO-12-01: Apple AirPods 4; status returned.",
+        "ts": "2026-10-03T12:00:00.000000Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "DEMO-12-01",
+        "ts": "2026-10-03T12:00:00.000000Z",
+        "items": [
+          {
+            "sku": "AP4-WHT",
+            "quantity": 1
+          }
+        ],
+        "status": "returned",
+        "address": "pickup"
+      }
+    ]
+  },
+  {
+    "id": "cust_13",
+    "name": "Orxan Kərimov",
+    "phone": "+994502220105",
+    "history": [
+      {
+        "channel": "voice",
+        "summary": "Traded in a Galaxy S23 toward Galaxy S25 Ultra. Asked about warranty coverage. Xətai.",
+        "ts": "2026-10-04T10:00:00.000000Z"
+      },
+      {
+        "channel": "whatsapp",
+        "summary": "Demo order DEMO-13-01: Samsung Galaxy S25 Ultra; status delivered. Earlier trade-in: Samsung Galaxy S23, 615 AZN credit.",
+        "ts": "2026-09-28T12:00:00.000000Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "DEMO-13-01",
+        "ts": "2026-09-28T12:00:00.000000Z",
+        "items": [
+          {
+            "sku": "SS25U-256-BLK",
+            "quantity": 1
+          }
+        ],
+        "status": "delivered",
+        "address": "pickup",
+        "tradein": {
+          "model": "Samsung Galaxy S23",
+          "storage": 256,
+          "credit_azn": 615,
+          "battery_health": 86,
+          "screen_cracked": false,
+          "back_cracked": false
+        }
+      }
+    ]
+  },
+  {
+    "id": "cust_14",
+    "name": "Ləman Mirzəyeva",
+    "phone": "+994552220106",
+    "history": [
+      {
+        "channel": "whatsapp",
+        "summary": "Bought Lenovo LOQ 15IRX9 for gaming; interested in a cooling stand. Binəqədi.",
+        "ts": "2026-10-04T10:00:00.000000Z"
+      },
+      {
+        "channel": "whatsapp",
+        "summary": "Demo order DEMO-14-01: Lenovo LOQ 15IRX9; status delivered.",
+        "ts": "2026-09-29T12:00:00.000000Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "DEMO-14-01",
+        "ts": "2026-09-29T12:00:00.000000Z",
+        "items": [
+          {
+            "sku": "LOQ15-512-GRY",
+            "quantity": 1
+          }
+        ],
+        "status": "delivered",
+        "address": "pickup"
+      }
+    ]
+  },
+  {
+    "id": "cust_15",
+    "name": "Emin Səfərov",
+    "phone": "+994702220107",
+    "history": [
+      {
+        "channel": "voice",
+        "summary": "Uses Google Pixel 8a; wants a Pixel 9 Pro and understands it may be out of stock.",
+        "ts": "2026-10-04T10:00:00.000000Z"
+      }
+    ]
+  },
+  {
+    "id": "cust_16",
+    "name": "Zəhra Əsgərova",
+    "phone": "+994772220108",
+    "history": [
+      {
+        "channel": "whatsapp",
+        "summary": "Asked for a 12-month installment estimate on Asus Zenbook 14 OLED. Nəsimi.",
+        "ts": "2026-10-04T10:00:00.000000Z"
+      }
+    ]
+  },
+  {
+    "id": "cust_17",
+    "name": "Rauf Məlikov",
+    "phone": "+994502220109",
+    "history": [
+      {
+        "channel": "voice",
+        "summary": "Bought PlayStation 5 Slim Disc and wants an extra DualSense controller. Sabunçu.",
+        "ts": "2026-10-04T10:00:00.000000Z"
+      },
+      {
+        "channel": "whatsapp",
+        "summary": "Demo order DEMO-17-01: Sony PlayStation 5 Slim Disc; status delivered.",
+        "ts": "2026-09-29T12:00:00.000000Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "DEMO-17-01",
+        "ts": "2026-09-29T12:00:00.000000Z",
+        "items": [
+          {
+            "sku": "PS5-SLIM-DISC",
+            "quantity": 1
+          }
+        ],
+        "status": "delivered",
+        "address": "pickup"
+      }
+    ]
+  },
+  {
+    "id": "cust_18",
+    "name": "İlahə Nəcəfova",
+    "phone": "+994552220110",
+    "history": [
+      {
+        "channel": "whatsapp",
+        "summary": "Traded in iPhone 13 toward iPhone 16. Earlier quote noted battery health 85%. Yasamal.",
+        "ts": "2026-10-04T10:00:00.000000Z"
+      },
+      {
+        "channel": "whatsapp",
+        "summary": "Demo order DEMO-18-01: iPhone 16; status delivered. Earlier trade-in: iPhone 13, 445 AZN credit.",
+        "ts": "2026-09-30T12:00:00.000000Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "DEMO-18-01",
+        "ts": "2026-09-30T12:00:00.000000Z",
+        "items": [
+          {
+            "sku": "IP16-128-ULT",
+            "quantity": 1
+          }
+        ],
+        "status": "delivered",
+        "address": "pickup",
+        "tradein": {
+          "model": "iPhone 13",
+          "storage": 128,
+          "credit_azn": 445,
+          "battery_health": 85,
+          "screen_cracked": false,
+          "back_cracked": false
+        }
+      }
+    ]
+  },
+  {
+    "id": "cust_19",
+    "name": "Vüsal Ağayev",
+    "phone": "+994702220111",
+    "history": [
+      {
+        "channel": "voice",
+        "summary": "Asked about Galaxy Tab S10 FE for remote work and the 14-day return policy. Suraxanı.",
+        "ts": "2026-10-04T10:00:00.000000Z"
+      }
+    ]
+  },
+  {
+    "id": "cust_20",
+    "name": "Aida Süleymanova",
+    "phone": "+994772220112",
+    "history": [
+      {
+        "channel": "whatsapp",
+        "summary": "Prefers Russian. Bought Samsung Galaxy Watch7 44mm; asks for a compatible band. Abşeron.",
+        "ts": "2026-10-04T10:00:00.000000Z"
+      },
+      {
+        "channel": "whatsapp",
+        "summary": "Demo order DEMO-20-01: Samsung Galaxy Watch7 44mm; status delivered.",
+        "ts": "2026-09-29T12:00:00.000000Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "DEMO-20-01",
+        "ts": "2026-09-29T12:00:00.000000Z",
+        "items": [
+          {
+            "sku": "GW7-44-GRN",
+            "quantity": 1
+          }
+        ],
+        "status": "delivered",
+        "address": "pickup"
       }
     ]
   }

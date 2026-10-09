@@ -16,6 +16,7 @@ from backend.tools.common import cents, normalize_text
 from backend.tools.delivery import calculate_delivery
 from backend.tools.inventory import get_accessories, search_inventory
 from backend.tools.negotiation import negotiate_offer
+from backend.tools.policy import check_installment, find_branch, get_store_policy
 from backend.tools.schemas import SCHEMAS
 from backend.tools.tradein import calculate_tradein
 
@@ -68,15 +69,21 @@ class ToolService:
             return result
 
     def _items(self, kind: str) -> list[dict]:
-        source = self.pack.catalog if kind == "phone" else self.pack.accessories
+        source = self.pack.accessories if kind == "accessory" else self.pack.catalog
         with self.db.connection() as connection:
             stock = {row["sku"]: row["quantity"] for row in connection.execute(
                 "SELECT sku, quantity FROM stock WHERE pack=?", (self.pack.name,))}
-        items = [{**item, "stock": stock.get(item["sku"], 0), "kind": kind} for item in source]
+        items = [{**item, "stock": stock.get(item["sku"], 0),
+                  "kind": "accessory" if kind == "accessory" else self._kind(item)} for item in source]
         for item in items:
             if kind == "accessory":
                 item["image_url"] = f"{self.settings.backend_url}/api/assets/accessories/{item['sku']}.svg"
         return items
+
+    @staticmethod
+    def _kind(item):
+        # Preserve the existing phone kind; other devices use an explicit product kind.
+        return "phone" if item.get("category", "phones") == "phones" else "product"
 
     def _cards(self, phone, channel, items):
         if channel == "whatsapp":
@@ -87,10 +94,20 @@ class ToolService:
     def get_customer_history(self, *, phone, channel):
         return self.db.history(phone)
 
-    def search_inventory(self, *, phone, channel, query):
-        result = search_inventory(query, self._items("phone"))
-        self._cards(phone, channel, result["items"])
+    def search_inventory(self, *, phone, channel, query="", **filters):
+        result = search_inventory(query, self._items("catalog"), **filters)
+        cards = result["alternatives"] if result["out_of_stock"] else result["items"]
+        self._cards(phone, channel, cards)
         return result
+
+    def get_store_policy(self, *, phone, channel, topic):
+        return get_store_policy(topic, self.pack.policy)
+
+    def check_installment(self, *, phone, channel, sku, months):
+        return check_installment(sku, months, self._items("catalog"), self.pack.policy)
+
+    def find_branch(self, *, phone, channel, district):
+        return find_branch(district, self.pack.policy, self.pack.delivery)
 
     def request_media_whatsapp(self, *, phone, channel, what=""):
         instructions = self.pack.tradein_rules["media_instructions"]
@@ -205,18 +222,18 @@ class ToolService:
         delivery = calculate_delivery(address, self.pack.delivery)
         if delivery["needs_clarification"]:
             return delivery
-        inventory = {item["sku"]: {**item, "kind": "phone"} for item in self.pack.catalog}
+        inventory = {item["sku"]: {**item, "kind": self._kind(item)} for item in self.pack.catalog}
         inventory.update({item["sku"]: {**item, "kind": "accessory"} for item in self.pack.accessories})
         quantities = Counter()
         for item in items:
             if item["sku"] not in inventory:
                 raise ValueError(f"Unknown catalog SKU: {item['sku']}")
             quantities[item["sku"]] += item.get("quantity", 1)
-        phone_models = {inventory[sku]["name"] for sku in quantities if inventory[sku]["kind"] == "phone"}
+        device_models = {inventory[sku]["name"] for sku in quantities if inventory[sku]["kind"] != "accessory"}
         for sku in quantities:
             item = inventory[sku]
-            if item["kind"] == "accessory" and not any(model in item["compatible_models"] for model in phone_models):
-                raise ValueError(f"Accessory {sku} does not match the exact phone model in this order")
+            if item["kind"] == "accessory" and not any(model in item["compatible_models"] for model in device_models):
+                raise ValueError(f"Accessory {sku} does not match the exact device model in this order")
         with self.db.connection(write=True) as connection:
             if idempotency_key:
                 existing = connection.execute("SELECT * FROM orders WHERE phone=? AND idempotency_key=?",
@@ -235,7 +252,9 @@ class ToolService:
                 subtotal += line_total
                 order_items.append({"sku": sku, "name": item["name"], "kind": item["kind"], "quantity": quantity,
                                     "price_azn": item["price_azn"], "line_total_azn": line_total / 100,
-                                    **({"storage": item["storage"], "color": item["color"]} if item["kind"] == "phone" else {})})
+                                    "warranty_months": item.get("warranty_months", 0),
+                                    **({key: item[key] for key in ("storage", "color", "category", "brand", "specs") if key in item}
+                                       if item["kind"] != "accessory" else {})})
             tradein, analysis_id, credit = None, None, 0
             if tradein_quote_id:
                 row = self._quote_row(connection, phone, tradein_quote_id)
@@ -264,7 +283,9 @@ class ToolService:
         return order
 
     def create_payment_link(self, *, phone, channel, order_id):
-        self.db.order(order_id, phone)
+        order = self.db.order(order_id, phone)
+        if order["status"] not in ("awaiting_payment", "paid"):
+            raise ValueError("This order is not awaiting payment; ask a shop assistant about its history.")
         status = self.check_payment_status(phone=phone, channel=channel, order_id=order_id)
         if status["status"] == "paid":
             return {"order_id": order_id, "status": "paid", "message": "This order has already been paid."}
@@ -277,7 +298,7 @@ class ToolService:
         order = self.db.order(order_id, phone)
         with self.db.connection() as connection:
             row = connection.execute("SELECT status, paid_at FROM payments WHERE order_id=?", (order_id,)).fetchone()
-        return {"order_id": order_id, "status": row["status"] if row else "pending",
+        return {"order_id": order_id, "status": row["status"] if row else "not_recorded",
                 "paid_at": row["paid_at"] if row else None, "total_azn": order["total"]}
 
     def get_order_status(self, *, phone, channel, order_id=None):

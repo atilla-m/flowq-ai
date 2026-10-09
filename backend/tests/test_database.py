@@ -3,7 +3,7 @@ PHONE = "+994501234567"
 
 def test_seed_is_idempotent_and_memory_crosses_channels(db, pack):
     db.initialize(pack)
-    assert len(db.customers()) == 8
+    assert len(db.customers()) == 20
     assert len(db.history(PHONE)["conversations"]) == 1
     db.add_conversation(PHONE, "whatsapp", "iPhone 15, çatdırılma Yasamal.")
     history = db.history(PHONE)

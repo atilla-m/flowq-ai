@@ -2,7 +2,7 @@
 
 DRY RUN — scripted providers; pipeline validation only
 
-Created: 2026-10-09T10:40:13.025537Z
+Created: 2026-10-09T11:50:55.668561Z
 
 Dry-run success is not evidence of LLM sales quality. Live behavior scores measure the chat agent; real-image accuracy is measured separately by vision_eval.py.
 
@@ -19,8 +19,8 @@ Dry-run success is not evidence of LLM sales quality. Live behavior scores measu
 | Correct handoff | 100.0% |
 | Wrong tool / invented price flags | 0 |
 | Median customer turns | 4.00 |
-| Median tool latency (ms) | 22.60 |
-| p90 tool latency (ms) | 44.59 |
+| Median tool latency (ms) | 22.49 |
+| p90 tool latency (ms) | 44.75 |
 | Estimated API cost (USD) | 0.000000 |
 | Cost cap / stopped | 5.00 / False |
 

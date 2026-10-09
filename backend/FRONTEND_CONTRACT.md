@@ -73,18 +73,49 @@ type Event = {
 type Order = {
   id: string; order_id: string; phone: string; ts: string;
   items: Array<{
-    sku: string; name: string; kind: "phone" | "accessory"; quantity: number;
+    sku: string; name: string; kind: "phone" | "product" | "accessory"; quantity: number;
     price_azn: number; line_total_azn: number; storage?: number; color?: string;
+    category?: "phones" | "laptops" | "tablets" | "watches" | "headphones" | "consoles";
+    brand?: string; warranty_months?: number;
+    specs?: {storage_gb: number | null; ram_gb: number | null; cpu: string | null; screen: string | null};
   }>;
-  tradein: null | {quote_id: string; offer: number; credit_azn: number; [key: string]: unknown};
+  tradein: null | {quote_id?: string; offer: number; credit_azn: number; historical?: boolean; [key: string]: unknown};
   delivery: {address: string; district: string; fee_azn: number};
   total: number; total_azn: number; currency: "AZN";
-  status: "awaiting_payment" | "paid";
+  status: "awaiting_payment" | "paid" | "processing" | "delivered" | "returned";
 };
 ```
 
 At `/pay/{order_id}`, fetch `GET /api/orders/{order_id}` and display its backend total. The mock button calls `POST /api/payments/{order_id}/pay` (no body required), which returns `{status:"paid"}`. That endpoint is the only way payment becomes paid; a chat message or function call cannot do it. Repeated payment clicks are idempotent. The inbox receives confirmation and an `order_update` when payment is first recorded.
 
-Order-tool arguments use **catalog SKUs** and `tradein_quote_id`, never client-side prices/totals. Quote IDs and uploaded media are bound to the customer's phone. Unknown districts require clarification. Purchase accessories must match an exact phone model in the same order. The negotiation baseline is the condition-adjusted `final_offer`, and backend quote state wins over model-supplied base/current amounts.
+Order-tool arguments use **catalog SKUs** and `tradein_quote_id`, never client-side prices/totals. Quote IDs and uploaded media are bound to the customer's phone. Unknown districts require clarification. Purchase accessories must match an exact device model in the same order. The negotiation baseline is the condition-adjusted `final_offer`, and backend quote state wins over model-supplied base/current amounts.
 
 HTTP 503 on chat/session means no OpenAI key; HTTP 502 means a provider request failed. These endpoints return FastAPI `{detail: string}` error bodies. Tool business/validation failures are `{result:{error,message}}` at HTTP 200. Preserve and display a clear error state so a failed provider call does not leave the call/chat UI loading indefinitely.
+
+## Expanded catalog and customer history
+
+The pack now contains 80 SKUs across six categories, 40 accessories and 20 demo customers. Phone cards keep `kind:"phone"`; other catalog products use `kind:"product"`. Catalog cards and order items also carry `category`, `brand`, `specs` and `warranty_months`. Cards include `colors`, listing the color variant represented by that SKU. Existing top-level `storage` and `color` fields remain available. `specs.storage_gb` is null for devices without storage (top-level `storage` is then 0). Other null specs are undisclosed or not applicable; do not display invented values.
+
+Customer history includes seeded processing, unpaid, delivered and returned orders. Read them through the existing history/order tools and `GET /api/orders/{id}`. Seed IDs start with `DEMO-`; delivery data has `demo_history:true`. Seed records never manufacture `paid`: `check_payment_status` returns `not_recorded` if no payment ledger exists. The unpaid `DEMO-11-01` is pending and can use the normal mock payment endpoint. The endpoint returns HTTP 409 for processing/delivered/returned orders; a human handles their historical payment or refund questions.
+
+## New tools and inventory filters
+
+Both Realtime and chat advertise **17 tools** through the shared registry. Existing names are unchanged. Dispatch the three new names through `/api/tools/{tool_name}` using the existing envelope; no new routes are needed.
+
+| Tool | Arguments | Result |
+| --- | --- | --- |
+| `get_store_policy` | `{topic}` | Topics: all/branches/returns/warranty/installments. `{topic,policy,...}` or a clarification. Branch addresses are synthetic demo locations |
+| `check_installment` | `{sku,months}` | Single-SKU estimate for 3/6/12 months: `{eligible,price_azn,monthly_payment_azn,final_payment_azn,total_azn,down_payment_azn,interest_pct,fee_azn,approval_required,...}`. Ineligible results include `reason` and `available_months` |
+| `find_branch` | `{district}` | `{district,branches:[{id,name,district,address,hours,serves_districts,...}],timezone,needs_clarification,...}`. Selection uses a configured district assignment, not live distance or opening status |
+
+`search_inventory` now accepts flat arguments `{query?,category?,brand?,min_price?,max_price?,in_stock?,limit?}`. At least a query or filter is required. The limit is 1–20 (default 6); bounds are inclusive AZN prices. Canonical categories are phones/laptops/tablets/watches/headphones/consoles; singular forms are also accepted. The result is `{items,alternatives,out_of_stock,currency,query,filters}`. When every query match is unavailable, `items` preserves unavailable matches and `alternatives` contains up to three available SKUs of the same category, preferring the same brand and closest price. Explicit brand and price filters also constrain alternatives. With `in_stock:true`, unavailable matches are omitted from `items`, while availability and alternatives are still returned. WhatsApp receives up to two matching cards, or alternative cards when the requested item is unavailable.
+
+```json
+{"phone":"+994501234567","channel":"voice","args":{"category":"laptops","brand":"Apple","min_price":2000,"max_price":3000}}
+```
+
+The existing `get_accessories({phone_model})` also accepts laptop/tablet/watch/console/headphone model names. Its argument name stays unchanged; compatibility and images still match the exact model, including Plus variants.
+
+For `check_installment`, `{"sku":"MBA13-M4-256-SKY","months":6}` estimates a 2499 AZN purchase at 416.50 AZN per month (the final payment is also 416.50). It reads current DB stock; quotes exclude delivery and trade-in and require card/provider approval. It never creates a payment or financing agreement. The first installments round down to cents; the final one settles the remainder. Returns are 14 days under the tool-provided conditions; warranty duration comes from each SKU.
+
+Additional asset routes remain `GET /api/media/{media_id}` and `GET /api/assets/accessories/{sku}.svg`.
