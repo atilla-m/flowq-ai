@@ -12,7 +12,7 @@ interface Props {
 
 function Meta({ ts, mine }: { ts: string; mine: boolean }) {
   return (
-    <span className="float-right mt-1 ml-3 flex items-center gap-0.5 text-[11px] leading-none text-wa-meta select-none">
+    <span className="float-right mt-1 ml-3 flex items-center gap-0.5 text-xs leading-none text-wa-meta select-none">
       {clock(ts)}
       {mine && (
         <span className="flex text-sky-500">
@@ -32,14 +32,14 @@ function ProductCard({ m }: { m: Message }) {
   const compatible = pickArr(d, 'compatible_models').filter((x): x is string => typeof x === 'string')
   const variant = [storage ? `${storage} GB` : undefined, pickStr(d, 'color')].filter(Boolean).join(' · ')
   return (
-    <div className="message-card w-60">
+    <div className="message-card product-card">
       {img && <img src={img} alt={pickStr(d, 'name', 'title') ?? 'Product photo'} width={240} height={144} loading="lazy" className="h-36 w-full rounded-md bg-slate-100 object-cover" />}
       <div className="px-1 pt-2">
         <div className="text-sm font-semibold">{pickStr(d, 'name', 'title') ?? m.text ?? 'Product'}</div>
         {variant && <div className="text-xs text-wa-meta">{variant}</div>}
         {compatible.length > 0 && <div className="text-xs text-wa-meta">Fits: {compatible.join(', ')}</div>}
         <div className="mt-0.5 flex items-baseline justify-between">
-          <span className="text-base font-bold text-emerald-700">{azn(pickNum(d, 'price_azn', 'price'))}</span>
+          <span className="text-sm font-semibold text-wa-ink">{azn(pickNum(d, 'price_azn', 'price'))}</span>
           {stock !== undefined && <span className="text-xs text-wa-meta">In stock: {stock}</span>}
         </div>
       </div>
@@ -54,14 +54,14 @@ function MediaRequest({ m, onUploadPhotos }: { m: Message; onUploadPhotos(): voi
   // The backend sends the instructions as one paragraph (also folded into `text`).
   const body = m.text ?? pickStr(m.data, 'text', 'message', 'instructions')
   return (
-    <div className="message-card w-72 rounded-md border border-amber-300 bg-amber-50 p-3">
-      <div className="flex items-center gap-2 text-sm font-semibold text-amber-900">
+    <div className="message-card media-request">
+      <div className="flex items-center gap-2 text-sm font-semibold text-wa-ink">
         <CameraIcon className="h-4 w-4" />
         Photo request
       </div>
-      {body && <Markdown text={body} className="mt-1.5 text-sm text-amber-950" />}
+      {body && <Markdown text={body} className="mt-1.5 text-sm text-wa-ink" />}
       {steps.length > 0 && (
-        <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-amber-950">
+        <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-wa-ink">
           {steps.filter(Boolean).map((s, i) => (
             <li key={i}><Markdown text={s} /></li>
           ))}
@@ -69,7 +69,7 @@ function MediaRequest({ m, onUploadPhotos }: { m: Message; onUploadPhotos(): voi
       )}
       <button
         onClick={onUploadPhotos}
-        className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-amber-200 px-3 py-2 text-sm font-semibold text-amber-950 transition hover:bg-amber-300"
+        className="message-action"
       >
         <CameraIcon className="h-4 w-4" />
         Upload photos
@@ -112,17 +112,17 @@ function PaymentLink({ m }: { m: Message }) {
   const amount = order?.total ?? pickNum(m.data, 'amount_azn', 'amount', 'total_azn', 'total')
   const paid = order?.paid ?? pickStr(m.data, 'status') === 'paid'
   return (
-    <div className="message-card w-64">
-      <div className="rounded-md bg-emerald-50 p-3">
-        <div className="text-xs font-medium text-emerald-800">Payment link</div>
-        <div className="mt-1 text-2xl font-bold text-emerald-900">{amount === undefined ? '…' : azn(amount)}</div>
+    <div className="message-card payment-card">
+      <div className="payment-details">
+        <div className="text-xs font-medium text-wa-meta">Payment link</div>
+        <div className="payment-amount">{amount === undefined ? '…' : azn(amount)}</div>
         {orderId && <div className="text-xs text-wa-meta">Order {orderId}</div>}
       </div>
       {m.text && <Markdown text={m.text} className="px-1 pt-2 text-sm" />}
       <button
         disabled={!orderId || paid}
         onClick={() => window.open(`/pay/${encodeURIComponent(orderId!)}`, '_blank')}
-        className="mt-2 w-full cursor-pointer rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-default disabled:opacity-50"
+        className="message-action"
       >
         {paid ? 'Paid ✓' : amount === undefined ? 'Pay' : `Pay ${azn(amount)}`}
       </button>
@@ -133,7 +133,7 @@ function PaymentLink({ m }: { m: Message }) {
 function OrderSummary({ m }: { m: Message }) {
   const o = toOrderView(m.data)
   return (
-    <div className="message-card w-72">
+    <div className="message-card order-card">
       {/* A snapshot from when the order was created, so no live status here: the payment card has it. */}
       <div className="border-b border-black/10 px-1 pb-2 text-sm font-semibold">Order {o.id ?? ''}</div>
       <dl className="space-y-1 px-1 py-2 text-sm">
@@ -147,7 +147,7 @@ function OrderSummary({ m }: { m: Message }) {
           </div>
         ))}
         {o.tradeIn !== undefined && o.tradeIn > 0 && (
-          <div className="flex justify-between gap-3 text-emerald-700">
+          <div className="flex justify-between gap-3 text-wa-ink">
             <dt>Trade-in</dt>
             <dd className="shrink-0 tabular-nums">−{azn(o.tradeIn)}</dd>
           </div>
@@ -200,7 +200,7 @@ export function MessageBubble({ message: m, onUploadPhotos }: Props) {
   return (
     <div className={`message-row flex ${mine ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`message-bubble max-w-[88%] rounded-lg p-1.5 text-wa-ink shadow-sm ${mine ? 'rounded-tr-none bg-wa-out' : 'rounded-tl-none bg-white'}`}
+        className={`message-bubble ${mine ? 'is-customer' : 'is-agent'}`}
       >
         {body}
         <Meta ts={m.ts} mine={mine} />

@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { CloseIcon, HangupIcon, Logo, PhoneIcon, UserIcon } from './icons'
+import { CloseIcon, HangupIcon, PhoneIcon, UserIcon } from './icons'
 
 /** Soft two-tone ring while the incoming-call screen is up. Silently skipped if audio is blocked. */
 function useRingtone() {
@@ -42,32 +42,23 @@ export function IncomingCall({ onAccept, onDecline }: { onAccept(): void; onDecl
   useRingtone()
   return (
     <div
-      className="fixed inset-0 z-50 flex animate-rise flex-col items-center justify-between bg-[#1252ee] px-6 py-16 text-center text-white"
+      className="incoming-call"
       role="dialog"
       aria-modal="true"
       aria-label="Incoming call from FlowQ"
     >
-      <div>
-        <p className="text-sm font-medium text-white/90">Incoming call</p>
-        <h2 className="mt-3 text-4xl font-semibold tracking-tight">FlowQ is calling you back</h2>
-        <p className="mt-2 text-white/80">FlowQ Store · AI sales agent</p>
-      </div>
+      <div><p>Incoming call</p><h2>Shop assistant</h2></div>
+      <div className="incoming-avatar" aria-hidden><UserIcon className="h-8 w-8" /></div>
 
-      <div className="relative">
-        <span className="absolute inset-0 animate-ring rounded-full bg-white/25" />
-        <span className="absolute inset-0 animate-ring rounded-full bg-white/20 [animation-delay:0.6s]" />
-        <Logo className="relative h-32 w-32 rounded-full ring-4 ring-white/15" />
-      </div>
-
-      <div className="flex gap-20">
-        <button onClick={onDecline} className="group flex cursor-pointer flex-col items-center gap-2 text-sm text-white/80">
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 text-white shadow-lg shadow-red-900/40 transition group-hover:bg-red-400">
+      <div className="incoming-actions">
+        <button onClick={onDecline} className="incoming-action">
+          <span className="call-button call-button-end">
             <HangupIcon className="h-7 w-7" />
           </span>
           Decline
         </button>
-        <button onClick={onAccept} autoFocus className="group flex cursor-pointer flex-col items-center gap-2 text-sm text-white/80">
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-900/40 transition group-hover:bg-emerald-400">
+        <button onClick={onAccept} autoFocus className="incoming-action">
+          <span className="call-button">
             <PhoneIcon className="h-7 w-7" />
           </span>
           Accept
@@ -79,12 +70,12 @@ export function IncomingCall({ onAccept, onDecline }: { onAccept(): void; onDecl
 
 export function HandoffBanner({ summary, onClose }: { summary: string; onClose(): void }) {
   return (
-    <div className="mx-4 mt-3 flex animate-rise items-start gap-3 rounded-2xl border border-accent/25 bg-accent-soft px-4 py-3" role="status">
-      <span className="mt-0.5 rounded-full bg-accent p-1.5 text-on-accent">
+    <div className="handoff-banner" role="status">
+      <span className="mt-0.5 text-ink-2">
         <UserIcon className="h-4 w-4" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-accent-ink">Transferred to a human agent with summary</p>
+        <p className="text-sm font-semibold text-ink">Transferred to a human agent with summary</p>
         <p className="mt-0.5 text-sm whitespace-pre-wrap text-ink-2">{summary}</p>
       </div>
       <button onClick={onClose} className="cursor-pointer rounded-lg p-1 text-ink-3 hover:text-ink" aria-label="Dismiss">

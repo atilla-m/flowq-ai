@@ -3,7 +3,9 @@ import { IS_MOCK } from '../api/client'
 import type { Customer } from '../api/types'
 import { mmss } from '../lib/pick'
 import type { CallState } from '../voice/useCall'
-import { BoltIcon, HangupIcon, Logo, MicIcon, PhoneIcon, WrenchIcon } from './icons'
+import { toolLabel } from '../lib/toolLabels'
+import { PhoneFrame } from './PhoneFrame'
+import { BoltIcon, HangupIcon, MicIcon, PhoneIcon, UserIcon, WrenchIcon } from './icons'
 
 function median(xs: number[]): number | undefined {
   if (!xs.length) return undefined
@@ -16,13 +18,11 @@ const ms = (n: number | undefined) => (n === undefined ? '—' : `${n} ms`)
 
 function LatencyChip({ samples }: { samples: number[] }) {
   const last = samples.at(-1)
-  const tone = last === undefined ? 'text-ink' : last < 1200 ? 'text-ok' : 'text-warn'
   return (
-    <div className="call-latency" title="Time from the customer finishing speaking to the first agent audio. Includes silence detection and any tool round-trip.">
-      <BoltIcon className="h-4 w-4" />
-      <span>Response time</span>
-      <strong className={tone}>{ms(last)}</strong>
-      <span className="latency-secondary">Median {ms(median(samples))} over {samples.length} turns</span>
+    <div className="call-latency" title={`Response time: ${ms(last)}. Median ${ms(median(samples))} over ${samples.length} turns. Includes silence detection and any tool round-trip.`}>
+      <BoltIcon className="h-3.5 w-3.5" />
+      <span>Response</span><strong>{ms(last)}</strong>
+      <span className="latency-secondary">Median {ms(median(samples))}</span>
     </div>
   )
 }
@@ -35,7 +35,7 @@ function Waveform({ level, agentSpeaking, live }: { level: number; agentSpeaking
   const bars = 28
   return (
     <div className="call-waveform" role="img" aria-label="Microphone level">
-      <MicIcon className={`h-4 w-4 shrink-0 ${live ? 'text-white' : 'text-white/70'}`} />
+      <MicIcon className={`h-4 w-4 shrink-0 text-accent`} />
       <div className="flex h-8 flex-1 items-center justify-between">
         {Array.from({ length: bars }, (_, i) => {
           // A soft bell curve so the wave is tallest in the middle.
@@ -44,7 +44,7 @@ function Waveform({ level, agentSpeaking, live }: { level: number; agentSpeaking
             return (
               <span
                 key={i}
-                className="w-[3px] origin-center animate-wave rounded-full bg-white"
+                className="w-[3px] origin-center animate-wave rounded-full bg-accent"
                 style={{ height: `${shape * 100}%`, animationDelay: `${(i % 7) * -0.13}s` }}
               />
             )
@@ -52,8 +52,8 @@ function Waveform({ level, agentSpeaking, live }: { level: number; agentSpeaking
           return (
             <span
               key={i}
-              className={`w-[3px] rounded-full transition-[height] duration-100 ${live && level > 0.06 ? 'bg-white' : 'bg-white/40'}`}
-              style={{ height: `${h * 100}%` }}
+              className={`h-full w-[3px] origin-center rounded-full transition-transform duration-100 ${live && level > 0.06 ? 'bg-accent' : 'bg-accent/30'}`}
+              style={{ transform: `scaleY(${h})` }}
             />
           )
         })}
@@ -63,9 +63,9 @@ function Waveform({ level, agentSpeaking, live }: { level: number; agentSpeaking
 }
 
 const END_TEXT: Record<string, string> = {
-  callback: 'Call ended — FlowQ will call you back',
+  callback: 'Callback scheduled',
   error: 'Call ended unexpectedly',
-  remote: 'Call ended by FlowQ',
+  remote: 'Call ended by agent',
   user: 'Call ended',
 }
 
@@ -88,86 +88,68 @@ export function PhonePanel({ customer, call }: { customer: Customer; call: CallS
       ? 'Calling…'
       : live
         ? call.agentSpeaking
-          ? 'FlowQ is speaking'
+          ? 'Agent speaking'
           : call.userSpeaking
             ? 'Listening…'
             : 'Connected'
         : status === 'ended'
           ? END_TEXT[call.endReason ?? 'user']
-          : 'Ready to call'
-
-  const dot = live ? 'bg-emerald-300' : status === 'ringing' ? 'animate-pulse bg-amber-200' : 'bg-white/60'
+          : 'Ready'
 
   return (
-    <section className="call-panel" aria-label="Voice call">
+    <PhoneFrame label="Voice call" className={`call-phone ${active ? 'is-active' : ''}`}>
       <header className="call-header">
-        <div className="call-channel"><PhoneIcon className="h-4 w-4" /><h2>Voice call</h2></div>
-        <p className="call-status" role="status"><span className={`status-dot ${dot}`} />{statusText}</p>
+        <span className={`call-avatar ${status === 'ringing' ? 'is-ringing' : ''}`} aria-hidden><UserIcon /></span>
+        <h3>{customer.name}</h3>
+        <p className="call-number">{customer.phone}</p>
+        <div className="call-status-time">
+          <span className={`call-status ${live ? 'is-live' : ''}`} role="status">{statusText}</span>
+          {(live || status === 'ended') && <span className="call-clock" aria-label={`Call duration ${mmss(call.seconds)}`}>{mmss(call.seconds)}</span>}
+        </div>
+        {IS_MOCK && <span className="call-mode">Mock call</span>}
       </header>
 
-      <div className="call-stage">
-        <div className="call-identity">
-          <div className="store-identity">
-            <Logo className="store-mark" />
-            <h3>FlowQ<br />Store</h3>
-            <p className="store-promise">Your AI shop assistant.<br />Answers instantly.</p>
+      <div className="call-transcript scroll-thin" role="log" aria-label="Call transcript" aria-live="polite" aria-relevant="additions">
+        {call.error && (
+          <div className="call-error" role="alert">
+            <p className="font-semibold">{call.error.kind === 'mic' ? 'Microphone unavailable' : 'Voice call unavailable'}</p>
+            <p>{call.error.message}</p>
+            <p>Continue in WhatsApp or retry the call.</p>
+            <button onClick={call.dismissError}>Dismiss</button>
           </div>
-          <div className="caller-identity">
-            <span>{active ? 'On the line with' : 'Call as'}</span>
-            <strong title={customer.name}>{customer.name}</strong>
-            <span className="caller-number">{customer.phone}</span>
+        )}
+        {lines.map((l) => l.role === 'tool' ? (
+          <div key={l.id} className="transcript-tool">
+            <WrenchIcon className={`h-3 w-3 ${l.pending ? 'animate-spin' : ''}`} />
+            <span>{toolLabel(l.text, l.pending)}</span>
           </div>
-          <div className="call-clock" aria-label={`Call duration ${mmss(call.seconds)}`}>{mmss(call.seconds)}</div>
-          <div className="call-controls">
-            <Waveform level={call.micLevel} agentSpeaking={call.agentSpeaking} live={live} />
-            {active ? (
-              <button onClick={call.end} className="call-button call-button-end">
-                <HangupIcon className="h-5 w-5" /><span>End call</span>
-              </button>
-            ) : (
-              <button onClick={call.start} className="call-button">
-                <PhoneIcon className="h-5 w-5" /><span>{status === 'ended' ? 'Call again' : 'Call FlowQ'}</span>
-              </button>
-            )}
-            <p className="call-control-hint">{IS_MOCK ? 'Mock call · scripted simulation' : 'Speak naturally. FlowQ is listening.'}</p>
+        ) : (
+          <div key={l.id} className={`transcript-turn ${l.role === 'customer' ? 'transcript-customer' : 'transcript-agent'}`}>
+            <span className="transcript-speaker">{l.role === 'customer' ? customer.name.split(' ')[0] : 'Agent'}</span>
+            <p>{l.text || <span className="opacity-60">…</span>}
+              {l.interrupted && <span className="interrupted"> — interrupted</span>}
+            </p>
           </div>
-        </div>
-
-        <div className="call-conversation">
-          <div className="transcript-heading"><h3>Live transcript</h3><span>Voice &amp; WhatsApp, together</span></div>
-          <div className="call-transcript scroll-thin" role="log" aria-label="Call transcript" aria-live="polite" aria-relevant="additions">
-            {call.error && (
-              <div className="call-error" role="alert">
-                <p className="font-semibold">{call.error.kind === 'mic' ? 'Microphone unavailable' : 'Voice call unavailable'}</p>
-                <p>{call.error.message}</p>
-                <p>You can keep going in the WhatsApp panel — it works without voice.</p>
-                <button onClick={call.dismissError} className="cursor-pointer underline">Dismiss</button>
-              </div>
-            )}
-            {lines.length === 0 && !call.error && (
-              <div className="transcript-empty">
-                <span className="empty-call-symbol" aria-hidden><PhoneIcon /></span>
-                <p>{status === 'idle' ? 'Good conversations start here.' : status === 'ringing' ? 'Connecting to the agent…' : 'FlowQ is listening.'}</p>
-                <span>{status === 'idle' ? 'Ask about stock, trade-ins or delivery. Your conversation appears here as you talk.' : 'Your words and the agent’s answers appear here live.'}</span>
-              </div>
-            )}
-            {lines.map((l) => l.role === 'tool' ? (
-              <div key={l.id} className="transcript-tool">
-                <WrenchIcon className={`h-3.5 w-3.5 ${l.pending ? 'animate-spin' : ''}`} /><span>{l.text.replace(/_/g, ' ')}</span>
-              </div>
-            ) : (
-              <div key={l.id} className={`transcript-turn ${l.role === 'customer' ? 'transcript-customer' : 'transcript-agent'}`}>
-                <span className="transcript-speaker">{l.role === 'customer' ? customer.name.split(' ')[0] : 'FlowQ'}</span>
-                <p>{l.text || <span className="opacity-60">…</span>}
-                  {l.interrupted && <span className="interrupted"> — interrupted</span>}
-                </p>
-              </div>
-            ))}
-            <div ref={bottom} />
-          </div>
-          <LatencyChip samples={call.latencies} />
-        </div>
+        ))}
+        <div ref={bottom} />
       </div>
-    </section>
+
+      <div className="call-controls">
+        <div className="call-waveform-slot">
+          {live && (call.agentSpeaking || call.userSpeaking) && <Waveform level={call.micLevel} agentSpeaking={call.agentSpeaking} live={live} />}
+        </div>
+        {active ? (
+          <button onClick={call.end} className="call-button call-button-end" aria-label="End call" title="End call">
+            <HangupIcon />
+          </button>
+        ) : (
+          <button onClick={call.start} className="call-button" aria-label={status === 'ended' ? 'Call again' : 'Call FlowQ'} title={status === 'ended' ? 'Call again' : 'Start call'}>
+            <PhoneIcon />
+          </button>
+        )}
+        <span className="call-button-label">{active ? 'End call' : status === 'ended' ? 'Call again' : 'Call'}</span>
+        {(live || status === 'ended') && <LatencyChip samples={call.latencies} />}
+      </div>
+    </PhoneFrame>
   )
 }

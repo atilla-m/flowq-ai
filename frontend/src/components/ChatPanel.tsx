@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../api/client'
 import type { Customer, Message } from '../api/types'
-import { ClipIcon, CloseIcon, Logo, SendIcon, WhatsAppIcon } from './icons'
+import { ChevronIcon, ClipIcon, CloseIcon, SendIcon, UserIcon } from './icons'
 import { MessageBubble } from './MessageBubble'
+import { PhoneFrame } from './PhoneFrame'
 
 interface Props {
   customer: Customer
@@ -93,30 +94,20 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
   }
 
   return (
-    <section className="chat-panel" aria-label="WhatsApp chat">
-      <div className="chat-channel">
-        <WhatsAppIcon className="h-4 w-4" />
-        <h2>WhatsApp</h2>
-        <span>Conversation &amp; orders</span>
-      </div>
+    <PhoneFrame label="WhatsApp chat" className="whatsapp-phone">
       <header className="chat-header">
-        <Logo className="h-9 w-9 rounded-full" />
+        <ChevronIcon className="h-5 w-5 rotate-90 shrink-0" />
+        <span className="chat-avatar" aria-hidden><UserIcon className="h-5 w-5" /></span>
         <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-semibold">FlowQ Store</div>
-          <div className="truncate text-xs text-emerald-100">
-            {!online ? 'reconnecting…' : callActive ? 'on a call with you · messages arrive live' : 'online'}
-          </div>
+          <h3>Shop assistant</h3>
+          <p>{!online ? 'reconnecting…' : callActive ? 'on a call' : 'online'}</p>
         </div>
-        <div className="chat-customer text-right text-xs text-emerald-100">
-          <div className="font-medium text-white">{customer.name}</div>
-          <div>{customer.phone}</div>
-        </div>
+        <span className="chat-menu" aria-hidden>⋮</span>
       </header>
-
       <div className="wa-wallpaper chat-messages scroll-thin min-h-0 flex-1 overflow-y-auto" role="log" aria-label="WhatsApp messages" aria-live="polite" aria-relevant="additions">
         {visible.length === 0 && (
           <div className="chat-empty">
-            <strong>Your call continues here.</strong><span>Photos, product details and payment links arrive in this conversation.</span><span>Try “Hi, do you have the iPhone 15?”</span>
+            No messages
           </div>
         )}
         {visible.map((m) => (
@@ -141,7 +132,7 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
       </div>
 
       {error && (
-        <div className="flex items-center justify-between gap-3 bg-red-50 px-4 py-1.5 text-xs text-red-700" role="alert">
+        <div className="chat-error" role="alert">
           <span className="min-w-0 break-words">{error}</span>
           <button onClick={() => setError(null)} className="cursor-pointer" aria-label="Dismiss">
             <CloseIcon className="h-3.5 w-3.5" />
@@ -201,7 +192,7 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
           aria-label={drafts.length ? 'Message or photo caption' : 'Message FlowQ'}
           name="message"
           autoComplete="off"
-          placeholder={drafts.length ? 'Add a caption…' : 'Message, e.g. “iPhone 15 in stock?”…'}
+          placeholder={drafts.length ? 'Add a caption…' : 'Message…'}
           className="min-w-0 flex-1 rounded-full bg-white px-4 py-2 text-sm text-wa-ink placeholder:text-wa-meta"
         />
         <button
@@ -213,6 +204,6 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
           <SendIcon className="h-4 w-4" />
         </button>
       </form>
-    </section>
+    </PhoneFrame>
   )
 }

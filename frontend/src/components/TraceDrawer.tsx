@@ -51,19 +51,6 @@ const PILL: Record<Kind, string> = {
   mismatch: 'bg-mis-soft text-mis',
   error: 'bg-err-soft text-err',
 }
-const NODE: Record<Kind, string> = {
-  ok: 'border-line bg-surface text-ink-2',
-  policy: 'border-warn/40 bg-warn-soft text-warn',
-  mismatch: 'border-mis/40 bg-mis-soft text-mis',
-  error: 'border-err/40 bg-err-soft text-err',
-}
-const DETAIL: Record<Kind, string> = {
-  ok: 'text-ink-3',
-  policy: 'text-warn',
-  mismatch: 'text-mis',
-  error: 'text-err',
-}
-
 function time(ts: string) {
   const d = new Date(ts)
   return Number.isNaN(d.getTime()) ? '' : d.toLocaleTimeString([], { hour12: false })
@@ -78,17 +65,12 @@ function median(xs: number[]): number | undefined {
 
 const ms = (n: number | undefined) => (n === undefined ? '—' : `${Math.round(n)} ms`)
 
-function Kpi({ label, value, note, dot }: { label: string; value: string | number; note?: string; dot?: string }) {
+function Kpi({ label, value, note }: { label: string; value: string | number; note?: string }) {
   return (
-    <div className="trace-metric">
-      <div className="trace-metric-label">
-        {dot && <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />}
-        {label}
-      </div>
-      <div className="trace-metric-value">
-        <span className="font-semibold text-ink tabular-nums">{value}</span>
-        {note && <span className="text-xs text-ink-3 tabular-nums">{note}</span>}
-      </div>
+    <div className="trace-metric" title={note}>
+      <span className="trace-metric-label">{label}</span>
+      <strong className="trace-metric-value">{value}</strong>
+      {note && <span className="trace-metric-note">{note}</span>}
     </div>
   )
 }
@@ -102,10 +84,8 @@ interface Props {
 
 export function TraceDrawer({ phone, reset, onShowHistory }: Props) {
   const [entries, setEntries] = useState<TraceEntry[]>([])
-  // Short screens start with just the latest step so the call and chat keep their room.
-  const [size, setSize] = useState<Size>(() =>
-    window.innerHeight >= 880 && window.innerWidth >= 1024 ? 'open' : 'compact',
-  )
+  // A dedicated console can show the full timeline at every desktop height.
+  const [size, setSize] = useState<Size>('open')
   const [large, setLarge] = useState(() => {
     try {
       return localStorage.getItem(LARGE_KEY) === '1'
@@ -160,57 +140,40 @@ export function TraceDrawer({ phone, reset, onShowHistory }: Props) {
   const mismatches = session.reduce((n, { v }) => n + v.mismatches, 0)
   const errors = count('error')
 
-  const text = large ? 'text-base' : 'text-sm'
+  const text = large ? 'trace-large' : ''
   const listHeight = `trace-list-${size}`
-  const iconBtn =
-    'flex h-8 cursor-pointer items-center justify-center rounded-lg border border-line bg-surface px-2 text-ink-2 transition hover:text-ink'
+  const iconBtn = 'console-icon-button'
 
   return (
     <section
       className={`trace-panel ${size === 'tall' ? 'is-tall' : ''}`}
       aria-label="Agent trace"
     >
-      {/* Title, KPI cards and controls. Always visible. */}
+      <div className="trace-kpis" aria-label="Agent metrics">
+        <Kpi label="Tool calls" value={session.length} note={errors ? `${errors} error${errors === 1 ? '' : 's'}` : undefined} />
+        <Kpi label="Median latency" value={ms(median(latencies))} note={latencies.length ? `Latest ${ms(latencies.at(-1))}` : undefined} />
+        <Kpi label="Policy blocks" value={count('policy')} />
+        <Kpi label="Mismatches" value={mismatches} />
+      </div>
       <div className="trace-header">
         <button
           onClick={() => setSize((s) => (s === 'compact' ? 'open' : 'compact'))}
           className="trace-toggle"
           aria-expanded={size !== 'compact'}
         >
-          <ChevronIcon className={`h-4 w-4 text-ink-3 transition ${size === 'compact' ? '-rotate-90' : ''}`} />
-          <span>
-            <span className="block text-sm font-semibold text-ink">Agent trace</span>
-            <span className="block text-xs text-ink-3">Every action, as it happens</span>
-          </span>
+          <ChevronIcon className={`h-4 w-4 ${size === 'compact' ? '-rotate-90' : ''}`} />
+          <h3>Live actions</h3>
+          <span className="action-count">{session.length}</span>
         </button>
-
-        <Kpi
-          label="Tool calls"
-          value={session.length}
-          note={errors ? `${errors} error${errors === 1 ? '' : 's'}` : undefined}
-        />
-        <Kpi label="Tool latency" value={ms(latencies.at(-1))} note={`median ${ms(median(latencies))}`} />
-        <Kpi label="Policy blocks" value={count('policy')} dot="bg-warn" />
-        <Kpi label="Mismatches detected" value={mismatches} dot="bg-mis" />
-
         <div className="trace-controls">
-          {failed && <span className="text-err">trace unavailable</span>}
-          {reset && (
-            <span className="whitespace-nowrap">
-              since reset {clock(reset.at)} ·{' '}
-              <button onClick={onShowHistory} className="cursor-pointer underline hover:text-ink">
-                show history
-              </button>
-            </span>
-          )}
+          {failed && <span className="status-pill bg-err-soft text-err">Unavailable</span>}
           <button
             onClick={toggleLarge}
             aria-pressed={large}
             title="Larger trace text for screen recordings"
-            className={`${iconBtn} font-semibold ${large ? 'border-accent/40 bg-accent-soft text-accent-ink' : ''}`}
+            className={`${iconBtn} ${large ? 'is-active' : ''}`}
           >
-            <span className="text-[0.6875rem]">A</span>
-            <span className="text-sm">A</span>
+            <span className="text-xs">A</span><span className="text-sm">A</span>
             <span className="sr-only"> Large text</span>
           </button>
           <button
@@ -218,34 +181,48 @@ export function TraceDrawer({ phone, reset, onShowHistory }: Props) {
             aria-label={size === 'tall' ? 'Shrink trace' : 'Expand trace'}
             aria-pressed={size === 'tall'}
             title={size === 'tall' ? 'Shrink the trace' : 'Expand the trace'}
-            className={`${iconBtn} w-8 ${size === 'tall' ? 'border-accent/40 bg-accent-soft text-accent-ink' : ''}`}
+            className={`${iconBtn} ${size === 'tall' ? 'is-active' : ''}`}
           >
             <ExpandIcon className="h-4 w-4" />
             <span className="sr-only">Expand trace</span>
           </button>
         </div>
+        {reset && (
+          <span className="trace-reset">
+            since reset {clock(reset.at)} ·{' '}
+            <button onClick={onShowHistory} className="cursor-pointer underline hover:text-ink">
+              show history
+            </button>
+          </span>
+        )}
       </div>
 
       {/* Timeline: newest first. Compact shows only the latest step. */}
-      <ol className={`scroll-thin overflow-y-auto border-t border-line ${listHeight} ${text}`}>
+      <ol className={`trace-list scroll-thin ${listHeight} ${text}`} aria-label="Agent action timeline">
         {rows.length === 0 && (
           <li className="px-4 py-3 text-sm text-ink-3">
-            Start a call or send a message to see FlowQ’s actions here. Select any action to inspect its details.
+            No actions
           </li>
         )}
-        {rows.map(({ e, key, v }) => {
+        {rows.map(({ e, key, v }, i) => {
           const isOpen = expanded === key
           const Icon = TOOL_ICON[e.tool] ?? WrenchIcon
           return (
-            <li key={key} className="trace-entry">
+            <li key={key} className={`trace-entry ${i === 0 ? 'is-newest' : ''}`}>
               <button
                 onClick={() => setExpanded(isOpen ? null : key)}
                 aria-expanded={isOpen}
                 title={`${e.tool} · ${e.channel === 'voice' ? 'Voice' : 'WhatsApp'} · ${KIND_LABEL[v.kind]} · ${ms(e.latency_ms ?? 0)} · ${time(e.ts)}${v.detail ? ` · ${v.detail}` : ''}`}
                 className="trace-action"
               >
-                <span className={`trace-node ${NODE[v.kind]}`}><Icon className="h-3.5 w-3.5" /></span>
-                <span className="trace-title">{v.title}</span>
+                <span className="trace-node"><Icon className="h-4 w-4" /></span>
+                <span className="trace-action-body">
+                  <span className="trace-title">{v.title}</span>
+                  <span className="trace-action-meta">
+                    <span className={`status-pill ${PILL[v.kind]}`}>{KIND_LABEL[v.kind]}</span>
+                    <span className="trace-latency">{ms(e.latency_ms ?? 0)}</span>
+                  </span>
+                </span>
                 <ChevronIcon className={`h-4 w-4 shrink-0 text-ink-3 ${isOpen ? 'rotate-180' : ''}`} />
               </button>
               {isOpen && (
@@ -253,16 +230,16 @@ export function TraceDrawer({ phone, reset, onShowHistory }: Props) {
                   <dl className="trace-metadata">
                     <div><dt>Tool</dt><dd>{e.tool}</dd></div>
                     <div><dt>Channel</dt><dd>{e.channel === 'voice' ? 'Voice' : 'WhatsApp'}</dd></div>
-                    <div><dt>Result</dt><dd><span className={`rounded-full px-2 py-0.5 ${PILL[v.kind]}`}>{KIND_LABEL[v.kind]}</span></dd></div>
+                    <div><dt>Result</dt><dd><span className={`status-pill ${PILL[v.kind]}`}>{KIND_LABEL[v.kind]}</span></dd></div>
                     <div><dt>Latency</dt><dd>{ms(e.latency_ms ?? 0)}</dd></div>
                     <div><dt>Time</dt><dd>{time(e.ts)}</dd></div>
                   </dl>
-                  {v.detail && <p className={`trace-detail-text ${DETAIL[v.kind]}`}>{v.detail}</p>}
+                  {v.detail && <p className="trace-detail-text">{v.detail}</p>}
                   <div className="trace-payloads">
                     {(['args', 'result'] as const).map((k) => (
                       <div key={k}>
                         <div className="mb-1 text-xs font-medium text-ink-3">{k === 'args' ? 'Arguments' : 'Result'}</div>
-                        <pre className="scroll-thin max-h-48 overflow-auto rounded-xl border border-line bg-surface-2 p-2.5 font-mono text-xs whitespace-pre-wrap text-ink-2">{JSON.stringify(e[k], null, 2) ?? '—'}</pre>
+                        <pre className="trace-json scroll-thin">{JSON.stringify(e[k], null, 2) ?? '—'}</pre>
                       </div>
                     ))}
                   </div>

@@ -106,7 +106,7 @@ export function DemoScript({ open, onClose }: { open: boolean; onClose(): void }
     >
       <header className="flex items-center justify-between border-b border-line px-5 py-4">
         <div>
-          <h2 className="text-base font-semibold text-ink">Demo script</h2>
+          <h2 className="text-lg font-semibold text-ink">Demo script</h2>
           <p className="text-xs text-ink-3">
             {done.size} of {STEPS.length} steps done · core scenario
           </p>
@@ -129,10 +129,10 @@ export function DemoScript({ open, onClose }: { open: boolean; onClose(): void }
                 <button
                   onClick={() => toggleDone(i)}
                   aria-label={isDone ? 'Mark step not done' : 'Mark step done'}
-                  className={`mt-0.5 flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-full border text-[0.625rem] font-semibold transition ${
+                  className={`mt-0.5 flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-full border text-xs font-semibold transition ${
                     isDone
-                      ? 'border-accent bg-accent text-on-accent'
-                      : 'border-line bg-surface text-ink-3 hover:border-accent'
+                      ? 'border-ink bg-ink text-bg'
+                      : 'border-line bg-surface text-ink-3 hover:border-ink'
                   }`}
                 >
                   {isDone ? <CheckIcon className="h-3 w-3" /> : i + 1}
@@ -153,9 +153,9 @@ export function DemoScript({ open, onClose }: { open: boolean; onClose(): void }
                 </button>
               </div>
               {isOpen && (
-                <div className="space-y-2 px-3 pb-3 pl-[2.6rem] text-[0.8125rem]">
+                <div className="space-y-2 px-3 pb-3 pl-[2.6rem] text-sm">
                   {s.say && (
-                    <p className="rounded-lg bg-accent-soft px-3 py-2 text-accent-ink">
+                    <p className="rounded-lg bg-surface-2 px-3 py-2 text-ink">
                       <span className="mb-0.5 block text-xs font-medium opacity-70">
                         Say
                       </span>

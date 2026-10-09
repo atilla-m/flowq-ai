@@ -1,61 +1,63 @@
-# FlowQ shop switchboard
-
-Direction: a cobalt-blue shop switchboard where the live call is the hero and WhatsApp is its familiar companion.
+# Customer phones and agent console
 
 ## Design plan
 
-- Palette: switchboard cobalt `#1252ee`, midnight blue `#102743`, porcelain blue `#e9eff7`, brushed silver `#cdd9e8`, call-control yellow `#ffe48e`, WhatsApp green `#008069`.
-- Type: locally hosted Barlow for the interface and Barlow Condensed for the store identity and call clock. The condensed display recalls signage on a gadget shop; body text remains open and readable.
-- Layout: left-aligned controls and facts, a wide call surface containing caller identity and transcript, a narrower WhatsApp panel, and a low-profile trace drawer beneath both.
+The screen is a live product workspace: two realistic customer phone screens on the left, the agent's live console on the right.
+
+- Palette: near-white `#f8f9fa`, gray-900 `#111827`, secondary gray `#4b5563`, borders `#d1d5db`, primary/live green `#15803d`. WhatsApp uses its own green inside its phone only. Semantic status colors appear only in small pills.
+- Type: Inter throughout. Each panel uses 12 px metadata, 14 px body/controls, and 18 px headings or KPI values. Timers and latency use tabular numbers.
+- Layout: one-row header, two matching phone frames with status bars/notches, and a full-height console with flat facts, four compact metrics and a scrolling newest-first action timeline.
 
 ```text
-FlowQ AI                           Customer / demo controls
-Customer       Last device       Interest       District       Last order
-┌───────────────────────────────────────┐ ┌────────────────────┐
-│ FlowQ Store    Live transcript         │ │ WhatsApp           │
-│ Call state     Conversation            │ │ Familiar bubbles   │
-│ Clock          Conversation            │ │ Product / payment  │
-│ Waveform       Conversation            │ │                    │
-│ Call control   Response latency        │ │ Message composer   │
-└───────────────────────────────────────┘ └────────────────────┘
-Agent trace / compact metrics / readable expandable actions
+Logo/name       Customer              Reset demo / Demo script / theme
+                         Customer view                 FlowQ Agent
+              Voice call          WhatsApp            Customer facts
+            ┌───────────┐       ┌───────────┐         2 × 2 facts
+            │ status bar│       │ status bar│         4 KPIs
+            │ caller    │       │ contact   │         Live actions
+            │ transcript│       │ messages  │         title / pill / ms
+            │           │       │ cards     │         expand for JSON
+            │ Call / End│       │ composer  │         scroll
+            └───────────┘       └───────────┘
 ```
 
-## Review before implementation
+## Review before building
 
-An initial phone-in-a-card approach would repeat the current empty stage and give call and chat equal visual weight. Replace the decorative phone frame with a full-width call surface. Spend the bold color and display typography on the call; keep memory and trace as structured, quiet information. Use yellow solely for the primary call control. Keep WhatsApp's established green, beige and bubble shapes.
+The specified phone frames are the only visual containers on the customer side. The console uses separators rather than nested cards. There is no display typography, promotional copy, full-panel accent fill, idle timer or idle waveform. Phone controls remain fixed while transcripts/chat/timeline scroll internally. The desktop composition scales through CSS; the underlying calls, messages, orders and event handlers retain their behavior.
 
-API clients, inbox polling, call hooks, realtime audio, mock scenarios and action handlers retain their existing behavior. Memory extraction and markdown rendering are presentation helpers only.
+## Screenshot critique and corrections
 
-## Guidelines review
+Reviewed idle, speaking mock call, and full trace at both 1920×1080 and 1366×768. Reduced the connected-call header so transcript bubbles retain usable space at 768 px height. Arranged identity, device, district and order into exactly four facts. Kept all phone controls and the chat composer pinned inside the frames. Trace rows wrap their titles and reveal channel, timestamp, tool and raw JSON on click. Expanding the console leaves the call control accessible.
 
-Reviewed the changed UI against the freshly fetched [Web Interface Guidelines](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md).
+The six final screenshots have no page overflow at either desktop size. Both phone frames, the console, call control and message composer are above the fold. The busy trace contains 18 actions, all four semantic status categories, a live call, order and payment cards. Additional checks cover dark mode, 390 px mobile width and expanded JSON.
 
-Top findings resolved:
+## Web Interface Guidelines review
 
-```text
-src/components/ChatPanel.tsx:201 - composer label, name and autocomplete added; focus suppression removed
-src/components/ChatPanel.tsx:156 - photo preview dimensions and descriptive alt added
-src/components/ChatPanel.tsx:183 - hidden photo chooser labeled
-src/components/ChatPanel.tsx:144 - sending errors announced and allowed to wrap
-src/components/MessageBubble.tsx:36 - product image dimensions, description and lazy loading added
-src/components/MessageBubble.tsx:179 - customer photo dimensions and lazy loading added
-src/components/PhonePanel.tsx:78 - transcript scrolling respects reduced motion
-src/pages/Home.tsx:180 - keyboard skip link added
-src/index.css:333 - scroll containment added to transcript, messages and drawers
-src/lib/theme.ts:18 - browser theme color follows the active palette
-```
+Reviewed against the [fresh guidelines](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md) after the screenshot critique. Top findings resolved:
 
-Also verified visible focus, semantic controls, live updates, contrast of the main controls, reduced motion, safe areas and long-content wrapping. Expanded trace opens over the transcript/chat side, leaving desktop call controls available. Long trace and message lists use CSS content visibility.
+- `src/index.css:240` — newest-action/order highlight used background animation; replaced with an opacity-only overlay.
+- `src/components/PhonePanel.tsx:55` — microphone bars transitioned height; replaced with scaleY while preserving the level formula and speaking state.
+- `src/index.css:191` and `src/index.css:258` — long message/action lists lacked render containment; added content-visibility and intrinsic sizing, verified with 80 items each.
+- `src/index.css:279` — demo drawer lacked scroll containment; added overscroll-behavior.
+- `src/pages/PayPage.tsx:7` — payment inputs suppressed focus outlines; restored visible keyboard focus and added input names/autocomplete metadata.
+- `src/components/PhoneFrame.tsx:14` — decorative status icons now explicitly hide from assistive technology.
+- `src/components/icons.tsx:195` — white logo strokes disappeared in dark mode; strokes now use the theme surface color.
+- `src/components/TraceDrawer.tsx:190` — reset/history metadata could crowd the console toolbar; moved to a wrapping second line.
 
-Existing send/payment handlers, route navigation, disabled-button conditions and callback audio are retained under the visual-only requirement.
+Verified semantic buttons, control labels, image alt/dimensions, reduced motion, tabular numbers, theme metadata and the single 12/14/18 px Inter type scale. Existing event, navigation and API behavior remains intact to honor the visual-only scope.
 
 ## Validation
 
-- Production TypeScript/Vite build and Oxlint pass.
-- Playwright screenshots and layout checks pass at 1920×1080, 1366×768, 1024×768 and 390×844: no horizontal overflow; both requested desktop sizes fit the viewport; call controls remain visible. Both light and dark themes reviewed.
-- Mock demo flow passes: stock lookup, photo request/upload/removal, photo mismatch, negotiation, accessories, delivery, order creation, unverified payment claim, payment popup, paid confirmation, customer switching, reset/history restoration, human handoff and callback acceptance followed by call start/end.
-- Markdown checks pass for bold, italic, unordered/ordered lists, inline code, safe links and escaped HTML.
-- Memory checks cover the real seed summaries, laptops and phones, saved orders, unknown facts, ownership versus interest/language, and precedence of newer summaries. Extraction is deliberately conservative because the API supplies prose.
-- AST comparisons confirm every API call expression in changed components is unchanged. `src/api`, `src/hooks` and `src/voice` have no modifications. Real microphone/WebRTC behavior was not exercised; the integration checks used the existing mock implementation.
-- Preview used port 4174; no server was started on 5173.
+- Production build and lint pass; git diff whitespace check passes.
+- Browser checks pass for markdown (including escaped HTML and safe links), theme/focus, demo-script controls, stock, photo attachment/removal/upload, mismatch, trade-in, negotiation, accessories, delivery, order creation, unpaid claims, payment and paid confirmation.
+- Reset/history, trace JSON, customer switching, human handoff and callback accept/start/end pass without browser exceptions.
+- AST comparison confirms unchanged API call expressions and functional handlers. No changes in src/api, src/voice or src/hooks; ringtone implementation is unchanged. Real microphone/WebRTC audio was not exercised; call verification uses the existing mock mode.
+- Preview ran on 127.0.0.1:4174; no server was started on 5173.
+
+Screenshots:
+
+| State | 1920×1080 | 1366×768 |
+| --- | --- | --- |
+| Idle | `/tmp/flowq-second-redesign/idle-1920x1080.png` | `/tmp/flowq-second-redesign/idle-1366x768.png` |
+| Mock call | `/tmp/flowq-second-redesign/mock-call-1920x1080.png` | `/tmp/flowq-second-redesign/mock-call-1366x768.png` |
+| Full trace | `/tmp/flowq-second-redesign/full-trace-1920x1080.png` | `/tmp/flowq-second-redesign/full-trace-1366x768.png` |

@@ -82,26 +82,39 @@ function Workspace({ customer, showScript, onHideScript, reset, onShowHistory }:
     <>
       {handoff && <HandoffBanner summary={handoff} onClose={() => setHandoff(null)} />}
 
-      <CustomerCard customer={customer} memory={memory} lastOrder={inbox.lastOrder} orderNews={toast} />
-
       <main id="workspace" tabIndex={-1} className="workspace">
-        <div className="workspace-call">
-          <PhonePanel customer={customer} call={call} />
+        <div className="customer-view">
+          <h2 className="workspace-label">Customer view</h2>
+          <div className="customer-phones">
+            <div className="phone-column">
+              <h3 className="phone-label">Voice call</h3>
+              <PhonePanel customer={customer} call={call} />
+            </div>
+            <div className="phone-column">
+              <h3 className="phone-label">WhatsApp</h3>
+              <ChatPanel
+                customer={customer}
+                messages={inbox.messages}
+                online={inbox.online}
+                callActive={call.status === 'connected'}
+                onUploadDuringCall={call.notifyUpload}
+                addLocal={inbox.addLocal}
+                mergeServer={inbox.mergeServer}
+              />
+            </div>
+          </div>
         </div>
-        <div className="workspace-chat">
-          <ChatPanel
-            customer={customer}
-            messages={inbox.messages}
-            online={inbox.online}
-            callActive={call.status === 'connected'}
-            onUploadDuringCall={call.notifyUpload}
-            addLocal={inbox.addLocal}
-            mergeServer={inbox.mergeServer}
-          />
-        </div>
+        <aside className="agent-console" aria-label="FlowQ Agent console">
+          <header className="console-heading">
+            <h2>FlowQ Agent</h2>
+            <span className={`console-live ${inbox.online ? 'is-live' : ''}`}>
+              <span aria-hidden />{inbox.online ? 'Live' : 'Reconnecting…'}
+            </span>
+          </header>
+          <CustomerCard customer={customer} memory={memory} lastOrder={inbox.lastOrder} orderNews={toast} />
+          <TraceDrawer phone={phone} reset={reset} onShowHistory={onShowHistory} />
+        </aside>
       </main>
-
-      <TraceDrawer phone={phone} reset={reset} onShowHistory={onShowHistory} />
 
       <DemoScript open={showScript} onClose={onHideScript} />
 
@@ -183,13 +196,9 @@ export default function Home() {
           <Logo className="brand-mark" />
           <div className="leading-tight">
             <h1 className="brand-name">FlowQ AI</h1>
-            <p className="brand-description">Your shop, always answering</p>
           </div>
         </div>
 
-        <span className="industry-label">
-          <span className="industry-dot" aria-hidden /> Gadget shop
-        </span>
         {IS_MOCK && (
           <button
             onClick={() => {
@@ -197,9 +206,9 @@ export default function Home() {
               location.reload()
             }}
             title="Mock mode: data is faked in the browser. Click to reset it."
-            className="cursor-pointer rounded-full bg-warn-soft px-2.5 py-1 text-xs font-medium text-warn"
+            className="mock-mode"
           >
-            Mock data · reset
+            Mock
           </button>
         )}
 
@@ -264,7 +273,7 @@ export default function Home() {
         <div className="flex flex-1 items-center justify-center p-6">
           {error ? (
             <div className="max-w-md space-y-3 rounded-2xl border border-line bg-surface p-6 shadow-card">
-              <h2 className="text-lg font-semibold text-ink">Can’t reach the FlowQ backend</h2>
+              <h2 className="text-lg font-semibold text-ink">Backend unavailable</h2>
               <p className="text-sm text-ink-2">{error}</p>
               <ul className="list-disc space-y-1.5 pl-5 text-sm text-ink-2">
                 <li>
@@ -276,7 +285,7 @@ export default function Home() {
                   <code className="text-ink">{window.location.origin}</code>.
                 </li>
                 {window.location.protocol === 'https:' && API_BASE.startsWith('http://') && (
-                  <li className="text-warn">
+                  <li className="text-ink-2">
                     This page is on HTTPS but <code>VITE_API_BASE</code> is plain HTTP, which browsers block. Point it
                     at the backend’s https:// URL and rebuild.
                   </li>

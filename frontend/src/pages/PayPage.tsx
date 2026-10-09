@@ -4,7 +4,7 @@ import { CheckIcon, Logo } from '../components/icons'
 import { azn, toOrderView, type OrderView } from '../lib/pick'
 
 const field =
-  'w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink outline-none focus:border-accent'
+  'w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink focus-visible:border-ink'
 
 export default function PayPage({ orderId }: { orderId: string }) {
   const [order, setOrder] = useState<OrderView | null>(null)
@@ -83,7 +83,7 @@ export default function PayPage({ orderId }: { orderId: string }) {
                     </div>
                   ))}
                   {order.tradeIn !== undefined && order.tradeIn > 0 && (
-                    <div className="flex justify-between gap-3 text-ok">
+                    <div className="flex justify-between gap-3 text-ink-2">
                       <dt>Trade-in</dt>
                       <dd className="shrink-0 tabular-nums">−{azn(order.tradeIn)}</dd>
                     </div>
@@ -103,7 +103,7 @@ export default function PayPage({ orderId }: { orderId: string }) {
 
               {paid ? (
                 <div className="flex flex-col items-center p-8 text-center" role="status">
-                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ok-soft text-ok">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-surface-2 text-ink">
                     <CheckIcon className="h-7 w-7" />
                   </span>
                   <h2 className="mt-3 text-lg font-semibold">Payment successful</h2>
@@ -131,23 +131,23 @@ export default function PayPage({ orderId }: { orderId: string }) {
                 >
                   <label className="block text-xs font-medium text-ink-2">
                     Card number
-                    <input className={`${field} mt-1 font-mono`} defaultValue="4242 4242 4242 4242" inputMode="numeric" />
+                    <input className={`${field} mt-1 tabular-nums`} name="card-number" autoComplete="cc-number" spellCheck={false} defaultValue="4242 4242 4242 4242" inputMode="numeric" />
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     <label className="block text-xs font-medium text-ink-2">
                       Expiry
-                      <input className={`${field} mt-1 font-mono`} defaultValue="12/28" />
+                      <input className={`${field} mt-1 tabular-nums`} name="card-expiry" autoComplete="cc-exp" spellCheck={false} defaultValue="12/28" inputMode="numeric" />
                     </label>
                     <label className="block text-xs font-medium text-ink-2">
                       CVC
-                      <input className={`${field} mt-1 font-mono`} defaultValue="123" inputMode="numeric" />
+                      <input className={`${field} mt-1 tabular-nums`} name="card-cvc" autoComplete="cc-csc" spellCheck={false} defaultValue="123" inputMode="numeric" />
                     </label>
                   </div>
                   <label className="block text-xs font-medium text-ink-2">
                     Name on card
-                    <input className={`${field} mt-1`} defaultValue="DEMO CUSTOMER" />
+                    <input className={`${field} mt-1`} name="card-name" autoComplete="cc-name" defaultValue="DEMO CUSTOMER" />
                   </label>
-                  {error && <p className="text-sm text-err">Payment didn’t go through: {error}</p>}
+                  {error && <p className="text-sm text-ink" role="alert">Payment didn’t go through: {error}</p>}
                   <button
                     type="submit"
                     disabled={paying}

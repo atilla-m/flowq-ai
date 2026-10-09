@@ -191,8 +191,8 @@ export const BoltIcon = (p: P) => (
 export function Logo({ className = '' }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden>
-      <rect width="32" height="32" rx="10" fill="#1252ee" />
-      <path d="M8 16h2.500M13 11v10M16.500 7.500v17M20 12v8M24 14.500v3" stroke="#fff" strokeWidth="2.400" strokeLinecap="round" fill="none" />
+      <rect width="32" height="32" rx="10" fill="currentColor" />
+      <path d="M8 16h2.500M13 11v10M16.500 7.500v17M20 12v8M24 14.500v3" stroke="var(--surface)" strokeWidth="2.400" strokeLinecap="round" fill="none" />
     </svg>
   )
 }
