@@ -34,6 +34,13 @@ export const SendIcon = (p: P) => (
   </svg>
 )
 
+export const WhatsAppIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M20.5 11.5a8.5 8.5 0 0 1-12.6 7.4L3 21l1.5-5A8.5 8.5 0 1 1 20.5 11.5Z" />
+    <path d="M8 7.5c-.7 2.9 2.2 6.4 5.6 7.9l1.9-1.5-2.3-1.5-1.1 1-2.7-2.8.8-1.3Z" />
+  </svg>
+)
+
 export const ClipIcon = (p: P) => (
   <svg {...base(p)}>
     <path d="m21.400 11.100-9.200 9.200a6 6 0 0 1-8.500-8.500l9.200-9.200a4 4 0 0 1 5.700 5.700l-9.200 9.200a2 2 0 0 1-2.800-2.800l8.500-8.500" />
@@ -184,13 +191,7 @@ export const BoltIcon = (p: P) => (
 export function Logo({ className = '' }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden>
-      <defs>
-        <linearGradient id="flowq-g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#6366f1" />
-          <stop offset="1" stopColor="#4338ca" />
-        </linearGradient>
-      </defs>
-      <rect width="32" height="32" rx="9" fill="url(#flowq-g)" />
+      <rect width="32" height="32" rx="10" fill="#1252ee" />
       <path d="M8 16h2.500M13 11v10M16.500 7.500v17M20 12v8M24 14.500v3" stroke="#fff" strokeWidth="2.400" strokeLinecap="round" fill="none" />
     </svg>
   )

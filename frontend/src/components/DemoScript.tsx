@@ -156,14 +156,14 @@ export function DemoScript({ open, onClose }: { open: boolean; onClose(): void }
                 <div className="space-y-2 px-3 pb-3 pl-[2.6rem] text-[0.8125rem]">
                   {s.say && (
                     <p className="rounded-lg bg-accent-soft px-3 py-2 text-accent-ink">
-                      <span className="mb-0.5 block text-[0.6875rem] font-medium tracking-wide uppercase opacity-70">
+                      <span className="mb-0.5 block text-xs font-medium opacity-70">
                         Say
                       </span>
                       “{s.say}”
                     </p>
                   )}
                   <p className="leading-relaxed text-ink-2">
-                    <span className="mb-0.5 block text-[0.6875rem] font-medium tracking-wide text-ink-3 uppercase">
+                    <span className="mb-0.5 block text-xs font-medium text-ink-3">
                       Expect
                     </span>
                     {s.expect}

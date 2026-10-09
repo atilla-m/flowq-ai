@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../api/client'
 import type { Customer, Message } from '../api/types'
-import { ClipIcon, CloseIcon, Logo, SendIcon } from './icons'
+import { ClipIcon, CloseIcon, Logo, SendIcon, WhatsAppIcon } from './icons'
 import { MessageBubble } from './MessageBubble'
 
 interface Props {
@@ -36,7 +36,10 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
   const visible = messages.filter((m) => m.type !== 'text' || m.text?.trim())
 
   useEffect(() => {
-    bottom.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    bottom.current?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+      block: 'end',
+    })
   }, [visible.length, busy])
 
   const send = async (body: string, files: File[]) => {
@@ -90,8 +93,13 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
   }
 
   return (
-    <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-card" aria-label="WhatsApp chat">
-      <header className="flex items-center gap-3 bg-wa-header px-4 py-2.5 text-white">
+    <section className="chat-panel" aria-label="WhatsApp chat">
+      <div className="chat-channel">
+        <WhatsAppIcon className="h-4 w-4" />
+        <h2>WhatsApp</h2>
+        <span>Conversation &amp; orders</span>
+      </div>
+      <header className="chat-header">
         <Logo className="h-9 w-9 rounded-full" />
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-semibold">FlowQ Store</div>
@@ -99,16 +107,16 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
             {!online ? 'reconnecting…' : callActive ? 'on a call with you · messages arrive live' : 'online'}
           </div>
         </div>
-        <div className="text-right text-xs text-emerald-100">
+        <div className="chat-customer text-right text-xs text-emerald-100">
           <div className="font-medium text-white">{customer.name}</div>
           <div>{customer.phone}</div>
         </div>
       </header>
 
-      <div className="wa-wallpaper scroll-thin min-h-0 flex-1 space-y-1.5 overflow-y-auto px-4 py-3">
+      <div className="wa-wallpaper chat-messages scroll-thin min-h-0 flex-1 overflow-y-auto" role="log" aria-label="WhatsApp messages" aria-live="polite" aria-relevant="additions">
         {visible.length === 0 && (
-          <div className="mx-auto mt-6 max-w-xs rounded-lg bg-[#fff5c4] px-3 py-2 text-center text-xs text-wa-ink shadow-sm">
-            Message FlowQ, for example “Hi, do you have the iPhone 15?”
+          <div className="chat-empty">
+            <strong>Your call continues here.</strong><span>Photos, product details and payment links arrive in this conversation.</span><span>Try “Hi, do you have the iPhone 15?”</span>
           </div>
         )}
         {visible.map((m) => (
@@ -133,8 +141,8 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
       </div>
 
       {error && (
-        <div className="flex items-center justify-between gap-3 bg-red-50 px-4 py-1.5 text-xs text-red-700">
-          <span className="truncate">{error}</span>
+        <div className="flex items-center justify-between gap-3 bg-red-50 px-4 py-1.5 text-xs text-red-700" role="alert">
+          <span className="min-w-0 break-words">{error}</span>
           <button onClick={() => setError(null)} className="cursor-pointer" aria-label="Dismiss">
             <CloseIcon className="h-3.5 w-3.5" />
           </button>
@@ -145,7 +153,7 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
         <div className="flex gap-2 overflow-x-auto bg-[#f0f2f5] px-4 pt-2">
           {drafts.map((d, i) => (
             <div key={d.preview} className="relative shrink-0">
-              <img src={d.preview} alt="" className="h-16 w-16 rounded-md object-cover" />
+              <img src={d.preview} alt={`Photo ${i + 1} to send`} width={64} height={64} className="h-16 w-16 rounded-md object-cover" />
               <button
                 onClick={() => {
                   URL.revokeObjectURL(d.preview)
@@ -162,7 +170,7 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
       )}
 
       <form
-        className="flex items-center gap-2 bg-[#f0f2f5] px-3 py-2"
+        className="chat-composer"
         onSubmit={(e) => {
           e.preventDefault()
           submit()
@@ -171,6 +179,8 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
         <input
           ref={fileInput}
           type="file"
+          name="photos"
+          aria-label="Choose photos to send"
           accept={ACCEPT}
           multiple
           hidden
@@ -188,8 +198,11 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder={drafts.length ? 'Add a caption (optional)' : 'Type a message'}
-          className="min-w-0 flex-1 rounded-full bg-white px-4 py-2 text-sm text-wa-ink outline-none placeholder:text-wa-meta"
+          aria-label={drafts.length ? 'Message or photo caption' : 'Message FlowQ'}
+          name="message"
+          autoComplete="off"
+          placeholder={drafts.length ? 'Add a caption…' : 'Message, e.g. “iPhone 15 in stock?”…'}
+          className="min-w-0 flex-1 rounded-full bg-white px-4 py-2 text-sm text-wa-ink placeholder:text-wa-meta"
         />
         <button
           type="submit"

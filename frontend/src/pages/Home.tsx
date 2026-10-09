@@ -17,8 +17,7 @@ import { useCall } from '../voice/useCall'
 
 const PHONE_KEY = 'flowq-selected-phone'
 
-const ghostBtn =
-  'cursor-pointer rounded-lg border border-line bg-surface px-3 py-1.5 text-sm font-medium text-ink-2 transition hover:border-ink-3/50 hover:text-ink disabled:cursor-default disabled:opacity-50'
+const ghostBtn = 'toolbar-button'
 
 interface WorkspaceProps {
   customer: Customer
@@ -85,11 +84,11 @@ function Workspace({ customer, showScript, onHideScript, reset, onShowHistory }:
 
       <CustomerCard customer={customer} memory={memory} lastOrder={inbox.lastOrder} orderNews={toast} />
 
-      <main className="grid min-h-0 flex-1 gap-4 overflow-y-auto p-4 lg:grid-cols-2 lg:overflow-hidden">
-        <div className="h-[40rem] min-h-0 lg:h-full">
+      <main id="workspace" tabIndex={-1} className="workspace">
+        <div className="workspace-call">
           <PhonePanel customer={customer} call={call} />
         </div>
-        <div className="h-[38rem] min-h-0 lg:h-full">
+        <div className="workspace-chat">
           <ChatPanel
             customer={customer}
             messages={inbox.messages}
@@ -177,18 +176,19 @@ export default function Home() {
   const hideScript = useCallback(() => setShowScript(false), [])
 
   return (
-    <div className="flex h-full flex-col bg-bg text-ink">
-      <header className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b border-line bg-surface px-5 py-2.5">
-        <div className="flex items-center gap-3">
-          <Logo className="h-9 w-9" />
+    <div className="app-shell">
+      <a href="#workspace" className="skip-link">Skip to conversation</a>
+      <header className="app-header">
+        <div className="brand">
+          <Logo className="brand-mark" />
           <div className="leading-tight">
-            <h1 className="text-base font-semibold tracking-tight text-ink">FlowQ AI</h1>
-            <p className="hidden text-xs text-ink-3 sm:block">AI sales agent — voice + WhatsApp</p>
+            <h1 className="brand-name">FlowQ AI</h1>
+            <p className="brand-description">Your shop, always answering</p>
           </div>
         </div>
 
-        <span className="rounded-full border border-line bg-surface-2 px-2.5 py-1 text-xs text-ink-2">
-          Industry: <span className="font-semibold text-ink">Gadgets</span>
+        <span className="industry-label">
+          <span className="industry-dot" aria-hidden /> Gadget shop
         </span>
         {IS_MOCK && (
           <button
@@ -203,17 +203,19 @@ export default function Home() {
           </button>
         )}
 
-        <div className="ml-auto flex items-center gap-2">
-          <label className="flex items-center gap-2 text-xs text-ink-3">
-            <span className="hidden md:inline">Customer</span>
+        <div className="header-actions">
+          <label className="customer-select">
+            <span>Customer</span>
             <select
+              name="customer"
+              autoComplete="off"
               value={customer?.phone ?? ''}
               disabled={!customers?.length}
               onChange={(e) => {
                 setPhone(e.target.value)
                 localStorage.setItem(PHONE_KEY, e.target.value)
               }}
-              className="max-w-60 cursor-pointer rounded-lg border border-line bg-surface px-3 py-1.5 text-sm font-medium text-ink outline-none focus:border-accent"
+              className="customer-picker"
             >
               {customers?.map((c) => (
                 <option key={c.id} value={c.phone}>
@@ -233,9 +235,7 @@ export default function Home() {
           <button
             onClick={() => setShowScript((s) => !s)}
             aria-pressed={showScript}
-            className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-              showScript ? 'bg-accent-soft text-accent-ink' : 'bg-accent text-on-accent hover:bg-accent-hover'
-            }`}
+            className={`toolbar-button script-button ${showScript ? 'is-active' : ''}`}
           >
             <ListIcon className="h-4 w-4" />
             Demo script
@@ -244,7 +244,7 @@ export default function Home() {
             onClick={toggleTheme}
             aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
             title={theme === 'dark' ? 'Light theme' : 'Dark theme'}
-            className="flex h-[2.125rem] w-[2.125rem] cursor-pointer items-center justify-center rounded-lg border border-line bg-surface text-ink-2 transition hover:text-ink"
+            className="toolbar-button theme-button"
           >
             {theme === 'dark' ? <SunIcon className="h-4 w-4" /> : <MoonIcon className="h-4 w-4" />}
           </button>

@@ -42,20 +42,20 @@ export function IncomingCall({ onAccept, onDecline }: { onAccept(): void; onDecl
   useRingtone()
   return (
     <div
-      className="fixed inset-0 z-50 flex animate-rise flex-col items-center justify-between bg-gradient-to-b from-[#1e1b4b] via-[#11132a] to-[#07080d] px-6 py-16 text-center text-white"
+      className="fixed inset-0 z-50 flex animate-rise flex-col items-center justify-between bg-[#1252ee] px-6 py-16 text-center text-white"
       role="dialog"
       aria-modal="true"
       aria-label="Incoming call from FlowQ"
     >
       <div>
-        <p className="text-sm font-medium tracking-[0.2em] text-indigo-200 uppercase">Incoming call</p>
+        <p className="text-sm font-medium text-white/90">Incoming call</p>
         <h2 className="mt-3 text-4xl font-semibold tracking-tight">FlowQ is calling you back</h2>
-        <p className="mt-2 text-indigo-200/70">FlowQ Store · AI sales agent</p>
+        <p className="mt-2 text-white/80">FlowQ Store · AI sales agent</p>
       </div>
 
       <div className="relative">
-        <span className="absolute inset-0 animate-ring rounded-full bg-indigo-400/40" />
-        <span className="absolute inset-0 animate-ring rounded-full bg-indigo-400/30 [animation-delay:0.6s]" />
+        <span className="absolute inset-0 animate-ring rounded-full bg-white/25" />
+        <span className="absolute inset-0 animate-ring rounded-full bg-white/20 [animation-delay:0.6s]" />
         <Logo className="relative h-32 w-32 rounded-full ring-4 ring-white/15" />
       </div>
 

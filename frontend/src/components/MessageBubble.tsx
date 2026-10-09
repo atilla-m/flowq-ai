@@ -3,6 +3,7 @@ import { absUrl, api } from '../api/client'
 import type { Message } from '../api/types'
 import { asObj, azn, clock, pickArr, pickNum, pickStr, toOrderView } from '../lib/pick'
 import { CameraIcon, CheckIcon } from './icons'
+import { Markdown } from './Markdown'
 
 interface Props {
   message: Message
@@ -31,8 +32,8 @@ function ProductCard({ m }: { m: Message }) {
   const compatible = pickArr(d, 'compatible_models').filter((x): x is string => typeof x === 'string')
   const variant = [storage ? `${storage} GB` : undefined, pickStr(d, 'color')].filter(Boolean).join(' · ')
   return (
-    <div className="w-60">
-      {img && <img src={img} alt="" className="h-36 w-full rounded-md bg-slate-100 object-cover" />}
+    <div className="message-card w-60">
+      {img && <img src={img} alt={pickStr(d, 'name', 'title') ?? 'Product photo'} width={240} height={144} loading="lazy" className="h-36 w-full rounded-md bg-slate-100 object-cover" />}
       <div className="px-1 pt-2">
         <div className="text-sm font-semibold">{pickStr(d, 'name', 'title') ?? m.text ?? 'Product'}</div>
         {variant && <div className="text-xs text-wa-meta">{variant}</div>}
@@ -53,22 +54,22 @@ function MediaRequest({ m, onUploadPhotos }: { m: Message; onUploadPhotos(): voi
   // The backend sends the instructions as one paragraph (also folded into `text`).
   const body = m.text ?? pickStr(m.data, 'text', 'message', 'instructions')
   return (
-    <div className="w-72 rounded-md border border-amber-300 bg-amber-50 p-3">
+    <div className="message-card w-72 rounded-md border border-amber-300 bg-amber-50 p-3">
       <div className="flex items-center gap-2 text-sm font-semibold text-amber-900">
         <CameraIcon className="h-4 w-4" />
         Photo request
       </div>
-      {body && <p className="mt-1.5 text-sm whitespace-pre-wrap text-amber-950">{body}</p>}
+      {body && <Markdown text={body} className="mt-1.5 text-sm text-amber-950" />}
       {steps.length > 0 && (
         <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-amber-950">
           {steps.filter(Boolean).map((s, i) => (
-            <li key={i}>{s}</li>
+            <li key={i}><Markdown text={s} /></li>
           ))}
         </ol>
       )}
       <button
         onClick={onUploadPhotos}
-        className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-amber-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-amber-600"
+        className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-amber-200 px-3 py-2 text-sm font-semibold text-amber-950 transition hover:bg-amber-300"
       >
         <CameraIcon className="h-4 w-4" />
         Upload photos
@@ -111,13 +112,13 @@ function PaymentLink({ m }: { m: Message }) {
   const amount = order?.total ?? pickNum(m.data, 'amount_azn', 'amount', 'total_azn', 'total')
   const paid = order?.paid ?? pickStr(m.data, 'status') === 'paid'
   return (
-    <div className="w-64">
+    <div className="message-card w-64">
       <div className="rounded-md bg-emerald-50 p-3">
-        <div className="text-xs font-medium tracking-wide text-emerald-800 uppercase">Payment link</div>
+        <div className="text-xs font-medium text-emerald-800">Payment link</div>
         <div className="mt-1 text-2xl font-bold text-emerald-900">{amount === undefined ? '…' : azn(amount)}</div>
         {orderId && <div className="text-xs text-wa-meta">Order {orderId}</div>}
       </div>
-      {m.text && <p className="px-1 pt-2 text-sm">{m.text}</p>}
+      {m.text && <Markdown text={m.text} className="px-1 pt-2 text-sm" />}
       <button
         disabled={!orderId || paid}
         onClick={() => window.open(`/pay/${encodeURIComponent(orderId!)}`, '_blank')}
@@ -132,7 +133,7 @@ function PaymentLink({ m }: { m: Message }) {
 function OrderSummary({ m }: { m: Message }) {
   const o = toOrderView(m.data)
   return (
-    <div className="w-72">
+    <div className="message-card w-72">
       {/* A snapshot from when the order was created, so no live status here: the payment card has it. */}
       <div className="border-b border-black/10 px-1 pb-2 text-sm font-semibold">Order {o.id ?? ''}</div>
       <dl className="space-y-1 px-1 py-2 text-sm">
@@ -175,8 +176,8 @@ export function MessageBubble({ message: m, onUploadPhotos }: Props) {
     case 'image':
       body = (
         <>
-          {img && <img src={img} alt="Photo" className="max-h-64 max-w-60 rounded-md object-cover" />}
-          {m.text && <p className="px-1 pt-1.5 text-sm whitespace-pre-wrap">{m.text}</p>}
+          {img && <img src={img} alt="Customer photo" width={240} height={240} loading="lazy" className="h-auto max-h-64 max-w-full rounded-md object-contain" />}
+          {m.text && <Markdown text={m.text} className="px-1 pt-1.5 text-sm" />}
         </>
       )
       break
@@ -193,13 +194,13 @@ export function MessageBubble({ message: m, onUploadPhotos }: Props) {
       body = <OrderSummary m={m} />
       break
     default:
-      body = <span className="px-1 text-sm whitespace-pre-wrap">{m.text}</span>
+      body = <Markdown text={m.text} className="px-1 text-sm" />
   }
 
   return (
-    <div className={`flex animate-rise ${mine ? 'justify-end' : 'justify-start'}`}>
+    <div className={`message-row flex ${mine ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`max-w-[85%] rounded-lg p-1.5 text-wa-ink shadow-sm ${mine ? 'rounded-tr-none bg-wa-out' : 'rounded-tl-none bg-white'}`}
+        className={`message-bubble max-w-[88%] rounded-lg p-1.5 text-wa-ink shadow-sm ${mine ? 'rounded-tr-none bg-wa-out' : 'rounded-tl-none bg-white'}`}
       >
         {body}
         <Meta ts={m.ts} mine={mine} />
