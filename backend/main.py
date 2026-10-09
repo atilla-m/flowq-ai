@@ -11,6 +11,8 @@ from fastapi.responses import FileResponse
 from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel, Field, field_validator
 
+from backend.ai import AIClient, AIProviderError, AIUnavailable
+from backend.agent import ChatAgent
 from backend.config import Settings
 from backend.db import Database, normalize_phone, now_iso
 from backend.pack import IndustryPack
@@ -51,17 +53,22 @@ def create_app(settings: Settings | None = None, ai=None) -> FastAPI:
     settings = settings or Settings.from_env()
     pack = IndustryPack.load(settings.industry_pack)
     db = Database(settings.database_path)
+    ai = ai if ai is not None else AIClient(settings)
     tools = ToolService(db, pack, settings, ai)
+    agent = ChatAgent(db, tools, pack, ai)
 
     @asynccontextmanager
     async def lifespan(app):
         db.initialize(pack)
         settings.upload_dir.mkdir(parents=True, exist_ok=True)
         yield
+        if hasattr(ai, "close"):
+            await ai.close()
 
     app = FastAPI(title="FlowQ AI", version="0.1.0", lifespan=lifespan)
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
     app.state.settings, app.state.pack, app.state.db, app.state.tools, app.state.ai = settings, pack, db, tools, ai
+    app.state.agent = agent
 
     @app.get("/api/health")
     def health():
@@ -79,6 +86,21 @@ def create_app(settings: Settings | None = None, ai=None) -> FastAPI:
     @app.post("/api/tools/{tool_name}")
     async def execute_tool(tool_name: str, body: ToolBody):
         return {"result": await tools.execute(tool_name, body.phone, body.channel, body.args)}
+
+    @app.post("/api/chat")
+    async def chat(body: ChatBody):
+        try:
+            return await agent.turn(body.phone, body.text, body.media_ids)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from error
+        except AIUnavailable as error:
+            raise HTTPException(503, str(error)) from error
+        except AIProviderError as error:
+            raise HTTPException(502, str(error)) from error
+
+    @app.post("/api/call/end")
+    async def call_end(body: CallEndBody):
+        return await agent.end_call(body.phone, body.transcript)
 
     @app.get("/api/inbox")
     def inbox(phone: str, since: str | None = None):
