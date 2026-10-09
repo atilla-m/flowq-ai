@@ -6,3 +6,12 @@ backend/*.db
 __pycache__/
 /evals/output/
 /backend/evals/output/
+
+# Never publish local state, dependencies or build output
+*.db
+*.sqlite3
+*.sqlite3-*
+node_modules/
+.venv/
+dist/
+.vercel/

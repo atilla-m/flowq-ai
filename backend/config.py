@@ -33,6 +33,8 @@ class Settings:
     twilio_auth_token: str = ""
     twilio_phone_number: str = ""
     twilio_whatsapp_from: str = ""
+    frontend_dist: Path | None = None
+    voice_sessions_per_ip_hour: int = 0
     public_base_url: str = ""
     demo_caller_phone: str = ""
 
@@ -50,6 +52,8 @@ class Settings:
             twilio_auth_token=os.getenv("TWILIO_AUTH_TOKEN", ""),
             twilio_phone_number=os.getenv("TWILIO_PHONE_NUMBER", ""),
             twilio_whatsapp_from=os.getenv("TWILIO_WHATSAPP_FROM", "").strip(),
+            frontend_dist=rooted_path(os.environ["FRONTEND_DIST"]) if os.getenv("FRONTEND_DIST") else None,
+            voice_sessions_per_ip_hour=int(os.getenv("VOICE_SESSIONS_PER_IP_HOUR") or 0),
             public_base_url=os.getenv("PUBLIC_BASE_URL", "").rstrip("/"),
             demo_caller_phone=os.getenv("DEMO_CALLER_PHONE", ""),
             database_path=rooted_path(os.getenv("DATABASE_PATH", "backend/data/flowq.sqlite3")),

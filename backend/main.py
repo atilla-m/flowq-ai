@@ -1,8 +1,9 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
+import time
 from typing import Any, Literal
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, field_validator
@@ -112,8 +113,25 @@ def create_app(settings: Settings | None = None, ai=None, *, twilio_gateway=None
         except AIProviderError as error:
             raise HTTPException(502, str(error)) from error
 
+    voice_starts: dict[str, list[float]] = {}
+
+    def limit_voice_sessions(request: Request):
+        """Each browser voice session spends real model budget; cap them per visitor on a public demo."""
+        limit = settings.voice_sessions_per_ip_hour
+        if limit <= 0:
+            return
+        # Behind Cloudflare Tunnel the visitor's address arrives in CF-Connecting-IP.
+        visitor = request.headers.get("cf-connecting-ip") or (request.client.host if request.client else "unknown")
+        now = time.monotonic()
+        recent = [started for started in voice_starts.get(visitor, []) if now - started < 3600]
+        voice_starts[visitor] = recent
+        if len(recent) >= limit:
+            raise HTTPException(429, f"Voice call limit reached ({limit} per hour). Please use the chat, or try again later.")
+        recent.append(now)
+
     @app.post("/api/realtime/session")
-    async def realtime_session(body: PhoneBody):
+    async def realtime_session(body: PhoneBody, request: Request):
+        limit_voice_sessions(request)
         instructions = memory_instructions(pack.voice_prompt, db.history(body.phone))
         try:
             return await ai.realtime_session(instructions, realtime_tools())
@@ -177,6 +195,21 @@ def create_app(settings: Settings | None = None, ai=None, *, twilio_gateway=None
         if filename not in valid:
             raise HTTPException(404, "Accessory image not found")
         return FileResponse(pack.directory / "assets" / filename, media_type="image/svg+xml")
+
+    # Optional: serve the built frontend from this same origin, so one public URL runs the whole demo.
+    dist = settings.frontend_dist
+    if dist and (dist / "index.html").is_file():
+        root = dist.resolve()
+
+        @app.get("/{path:path}", include_in_schema=False)
+        def frontend(path: str):
+            if path.startswith("api/"):
+                raise HTTPException(404, "Not found")
+            file = (root / path).resolve()
+            if path and file.is_file() and file.is_relative_to(root):
+                return FileResponse(file)
+            # Single-page app: "/" and "/pay/<order>" both load index.html.
+            return FileResponse(root / "index.html", headers={"Cache-Control": "no-cache"})
 
     return app
 
