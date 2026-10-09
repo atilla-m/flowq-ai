@@ -1,17 +1,66 @@
 # FlowQ AI
 
-**An AI sales agent for gadget shops that answers the phone and WhatsApp instantly, remembers the
-customer across both, and completes the whole sale** — stock and price, trade-in with photo
-verification, negotiation inside hard limits, accessory upsell, delivery, payment and order
-tracking — while every price, limit and payment check is enforced in backend code, not by the model.
+**An AI sales agent for any business that sells over the phone and in chats: WhatsApp today, and
+built so other messaging and social channels can be plugged in. It answers instantly, remembers
+the customer across channels, and completes the whole sale** — stock and
+price, trade-in with photo verification, negotiation inside hard limits, upsell, delivery, payment
+and order tracking — while every price, limit and payment check is enforced in backend code, not by
+the model.
+
+Everything specific to one business — catalog, prices, policies, limits and the agent's
+instructions — lives in an **industry pack**. This repository ships one pack, a gadget shop, and
+the demo runs on it. The same agent and rules engine are meant to serve other businesses by
+swapping the pack.
 
 ## Who it is for, and the problem
 
-Small gadget shops in Azerbaijan sell mostly over phone calls and WhatsApp. Calls go unanswered
-after hours, the same customer has to repeat everything when they switch from a call to a chat, and
-trade-in prices and discounts depend on whoever picks up. FlowQ gives the shop one agent that is
-always available, speaks to the customer on the channel they chose, and cannot be talked into a
-price the shop's rules do not allow.
+Small and mid-sized businesses that sell through calls and chats rather than a web checkout:
+electronics and gadget shops, home appliance and furniture stores, auto parts, building materials,
+cosmetics, flowers and gifts, and resellers of used goods that take trade-ins. In markets like
+Azerbaijan most of these sales happen on a phone call, on WhatsApp or in social media direct
+messages.
+
+They share the same problems. Calls go unanswered after hours. A customer who moves from a call to
+a chat has to repeat everything. Prices, discounts and trade-in offers depend on whoever picks up.
+FlowQ gives the business one agent that is always available, talks to the customer on the channel
+they chose, and cannot be talked into a price the business's own rules do not allow.
+
+## One agent, many businesses
+
+What stays the same for every business is in the core: the voice and chat agent, shared customer
+memory, the order and payment flow, callbacks, handoff to a person, and the rule that money
+decisions are computed in code. What changes is the pack:
+
+| In the pack | Gadget shop (included) | Another business would supply |
+| --- | --- | --- |
+| Catalog and stock | Phones, laptops, tablets, accessories | Its own products and variants |
+| Pricing rules | Trade-in values and deductions | Its own buy-back, discount or bundle rules |
+| Negotiation limits | Trade-in offer may rise at most 5% | Its own ceiling and step |
+| Delivery and branches | Baku districts, fees, three branches | Its own zones, fees and locations |
+| Policies | Returns, warranty, installments | Its own terms |
+| Agent instructions | Voice and WhatsApp prompts for a gadget shop | Prompts in its own tone and language |
+
+### …and many channels
+
+The agent is not tied to WhatsApp. A chat turn is just text and photos in, messages out, and the
+voice agent and the chat agent share one tool registry and one customer memory. A channel is a thin
+adapter around that: it receives the customer's message, runs the same chat turn, and delivers the
+agent's replies, photo requests, order summaries and payment links as that channel's messages.
+`backend/whatsapp.py` is that adapter for WhatsApp. Instagram and Facebook Messenger direct
+messages, Telegram or a website chat widget would each be another adapter of the same shape, with
+no change to the agent or the rules.
+
+Built today: browser voice calls, the WhatsApp-style chat panel, real WhatsApp through the Twilio
+sandbox, and a telephone bridge. No other social or messaging channel has an adapter yet.
+
+### How far this goes today
+
+Only the gadget pack exists, and four of the 17 tools are written with
+devices in mind. Photo verification and trade-in pricing describe a device (model, storage,
+battery, cracks), accessories are matched to a phone model, and product search is tuned for device
+specs. Another business would adapt or drop those. Delivery, negotiation limits, orders, payment,
+order status, store policy, installments, branches, callbacks, handoff, customer memory and the
+tool trace do not depend on what is being sold.
 
 ## Try it
 
@@ -20,7 +69,7 @@ price the shop's rules do not allow.
 | **Mock demo (always on)** | https://flowq-ai.vercel.app | Runs entirely in the browser on scripted data. No backend, no AI, no keys. |
 | **Live demo (real AI)** | https://distance-qui-ver-partition.trycloudflare.com | Real voice and chat agent. Works while our laptop is online. |
 
-Things to say (voice call) or type (WhatsApp panel):
+Both demos run the gadget shop pack. Things to say (voice call) or type (WhatsApp panel):
 
 1. "Hi, do you have the iPhone 15?"
 2. "I want to trade in my iPhone 13. It is in perfect condition." — then upload a photo of a phone
@@ -59,8 +108,10 @@ per hour. Payment is a demo page: no card is charged.
 
 - **One customer, two channels.** A photo request made during a voice call arrives in the chat
   while the call continues; the next call or chat starts from what was already said.
-- **Industry pack.** Catalog, trade-in rules, delivery fees, negotiation limits and prompts live in
-  `industry_packs/gadgets/` as JSON and Markdown; the core code is not gadget-specific.
+- **Industry pack.** Catalog, pricing rules, delivery fees, negotiation limits, policies and prompts
+  live in `industry_packs/<name>/` as JSON and Markdown, selected with `INDUSTRY_PACK`. The core
+  loads them as data and imports no business-specific code; `industry_packs/gadgets/` is the one
+  pack included.
 - **Real channels (optional).** With Twilio configured, the one registered demo number also gets
   real WhatsApp messages through the Twilio sandbox, and a telephone bridge exists for real calls.
 
@@ -116,7 +167,7 @@ not real customers, and the agent evals mock image analysis.
 | **Backend** | Python, FastAPI, SQLite |
 | **Frontend** | React, Vite, TypeScript, Tailwind CSS |
 | **Channels and hosting** | OpenAI Realtime over WebRTC, Twilio WhatsApp Sandbox, Cloudflare Tunnel (live demo), Vercel (mock demo) |
-| **Data** | Synthetic demo data only: fictional customers, catalog, prices and trade-in values in AZN. No real customer data. |
+| **Data** | Synthetic demo data only, for a fictional gadget shop: customers, catalog, prices and trade-in values in AZN. No real customer data. |
 | **Built with** | OpenAI Codex and Claude Code. |
 
 ## Known limitations
@@ -126,6 +177,11 @@ not real customers, and the agent evals mock image analysis.
   mocked providers, but there is no working public phone number; use the browser voice call.
 - **WhatsApp is a simulated panel** in the demo. Real WhatsApp works only through the Twilio
   sandbox, for one registered demo number.
+- **Channels.** Voice and WhatsApp are the only channels built. The design allows other messaging
+  and social channels, but no Instagram, Messenger or Telegram adapter exists yet.
+- **One industry pack so far.** Only the gadget shop pack is built and tested. Serving another kind
+  of business needs a new pack, and the four device-oriented tools (photo verification, trade-in
+  pricing, accessory matching, product search) would need adapting. No second pack has been tried.
 - **Demo data.** Customers, stock, prices and orders are fictional; orders are not fulfilled.
 - **The live demo runs on a laptop** behind a temporary tunnel. If it is offline, use the mock demo.
 - **No accounts or authentication.** The customer picker stands in for caller identity; this is a
