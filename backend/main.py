@@ -17,6 +17,7 @@ from backend.db import Database, normalize_phone, now_iso
 from backend.pack import IndustryPack
 from backend.tools.service import ToolService
 from backend.tools.schemas import realtime_tools
+from backend.telephony import Telephony
 
 
 class PhoneBody(BaseModel):
@@ -49,27 +50,34 @@ def checked_phone(value: str) -> str:
         raise HTTPException(422, str(error)) from error
 
 
-def create_app(settings: Settings | None = None, ai=None) -> FastAPI:
+def create_app(settings: Settings | None = None, ai=None, *, twilio_gateway=None, realtime_connector=None) -> FastAPI:
     settings = settings or Settings.from_env()
     pack = IndustryPack.load(settings.industry_pack)
     db = Database(settings.database_path)
     ai = ai if ai is not None else AIClient(settings)
     tools = ToolService(db, pack, settings, ai)
     agent = ChatAgent(db, tools, pack, ai)
+    telephony = Telephony(settings, db, pack, tools, agent, gateway=twilio_gateway, connector=realtime_connector)
 
     @asynccontextmanager
     async def lifespan(app):
         db.initialize(pack)
         settings.upload_dir.mkdir(parents=True, exist_ok=True)
-        yield
-        if hasattr(ai, "close"):
-            await ai.close()
+        await telephony.start()
+        try:
+            yield
+        finally:
+            await telephony.close()
+            if hasattr(ai, "close"):
+                await ai.close()
 
     app = FastAPI(title="FlowQ AI", version="0.1.0", lifespan=lifespan)
     app.add_middleware(CORSMiddleware, allow_origins=list(settings.allowed_origins),
                        allow_methods=["*"], allow_headers=["*"])
     app.state.settings, app.state.pack, app.state.db, app.state.tools, app.state.ai = settings, pack, db, tools, ai
     app.state.agent = agent
+    app.state.telephony = telephony
+    app.include_router(telephony.router())
 
     @app.get("/api/health")
     def health():

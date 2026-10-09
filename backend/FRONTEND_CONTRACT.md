@@ -121,3 +121,13 @@ Inventory queries ignore conversational filler such as “do you have”, “in 
 For `check_installment`, `{"sku":"MBA13-M4-256-SKY","months":6}` estimates a 2499 AZN purchase at 416.50 AZN per month (the final payment is also 416.50). It reads current DB stock; quotes exclude delivery and trade-in and require card/provider approval. It never creates a payment or financing agreement. The first installments round down to cents; the final one settles the remainder. Returns are 14 days under the tool-provided conditions; warranty duration comes from each SKU.
 
 Additional asset routes remain `GET /api/media/{media_id}` and `GET /api/assets/accessories/{sku}.svg`.
+
+## Real telephone calls
+
+Browser voice endpoints, ephemeral keys and tool dispatch stay unchanged. Twilio adds signed `POST /api/twilio/voice`, `WS /api/twilio/media`, and `POST /api/twilio/status`; the frontend does not connect to these routes or execute phone tools. The server binds telephone tools to the caller's customer with `channel:"phone"`. Public `/api/tools` still takes only `voice` or `whatsapp`.
+
+When `DEMO_CALLER_PHONE` matches the actual caller, memory and inbox use Aysel Məmmədova's demo number `+994501234567`. Select Aysel in the customer picker to see requests, upload photos, open payment links and receive handoff/order events during the real call. Keep existing inbox polling and upload behavior. The server forwards new upload IDs to telephone Realtime automatically. Other real callers use their own normalized phone number; the customer list includes them after their first call.
+
+Phone `schedule_callback` dials the actual caller through Twilio after the delay and current call ends; it does not emit an `incoming_callback` browser event. Browser/chat callbacks keep the existing event. Human handoff remains a panel notification; it does not transfer a phone line. No real WhatsApp transport is added.
+
+Phone tools and diagnostic `realtime_turn`/`twilio_callback` records appear in `/api/trace` with `channel:"phone"`; diagnostics are not additional callable tools. Call summaries appear in customer history with conversation channel `phone`. A single telephone call is allowed at a time and each is limited to five minutes; browser calls use their existing flow independently. See [Twilio setup](README.md#real-telephone-calls-with-twilio) for tunnel and environment steps; that example uses backend port 8001, so configure the frontend's API base URL accordingly.

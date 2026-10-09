@@ -29,6 +29,11 @@ class Settings:
     frontend_url: str = "http://localhost:5173"
     allowed_origins: tuple[str, ...] = ("http://localhost:5173",)
     max_upload_bytes: int = 10 * 1024 * 1024
+    twilio_account_sid: str = ""
+    twilio_auth_token: str = ""
+    twilio_phone_number: str = ""
+    public_base_url: str = ""
+    demo_caller_phone: str = ""
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -40,6 +45,11 @@ class Settings:
             realtime_voice=os.getenv("REALTIME_VOICE", cls.realtime_voice),
             transcription_model=os.getenv("TRANSCRIPTION_MODEL", cls.transcription_model),
             industry_pack=os.getenv("INDUSTRY_PACK", cls.industry_pack),
+            twilio_account_sid=os.getenv("TWILIO_ACCOUNT_SID", ""),
+            twilio_auth_token=os.getenv("TWILIO_AUTH_TOKEN", ""),
+            twilio_phone_number=os.getenv("TWILIO_PHONE_NUMBER", ""),
+            public_base_url=os.getenv("PUBLIC_BASE_URL", "").rstrip("/"),
+            demo_caller_phone=os.getenv("DEMO_CALLER_PHONE", ""),
             database_path=rooted_path(os.getenv("DATABASE_PATH", "backend/data/flowq.sqlite3")),
             upload_dir=rooted_path(os.getenv("UPLOAD_DIR", "backend/data/media")),
             backend_url=os.getenv("BACKEND_PUBLIC_URL", cls.backend_url).rstrip("/"),

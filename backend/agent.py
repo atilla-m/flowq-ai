@@ -85,15 +85,19 @@ class ChatAgent:
             self.db.add_conversation(phone, "whatsapp", summary)
             return {"messages": self.db.inbox(phone, cursor)["messages"]}
 
-    async def end_call(self, phone: str, transcript: str) -> dict:
+    async def end_call(self, phone: str, transcript: str, *, channel="voice") -> dict:
         self.db.ensure_customer(phone)
         if not transcript.strip():
             return {"ok": True}
+        # Preserve memory immediately, including if the process/provider fails mid-summary.
+        # A fast telephone callback can already read this factual fallback.
+        conversation_id = self.db.add_conversation(phone, channel,
+            "Call transcript (unverified customer statements): " + transcript[:6000])
         try:
             summary = await self.ai.summarize(transcript)
         except (AIUnavailable, AIProviderError):
             # Keep memory even during a provider outage, explicitly as unverified transcript.
             logger.warning("Call summary unavailable; preserving transcript excerpt")
-            summary = "Call transcript (unverified customer statements): " + transcript[:6000]
-        self.db.add_conversation(phone, "voice", summary)
+        else:
+            self.db.update_conversation(conversation_id, summary)
         return {"ok": True}

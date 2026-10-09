@@ -24,6 +24,22 @@ def reasoning_options(model: str) -> dict:
     return {}
 
 
+def realtime_config(settings, instructions: str, tools: list[dict], *, phone=False) -> dict:
+    """Shared GA session settings. Telephone streams use raw G.711 mu-law at 8 kHz."""
+    session = {
+        "type": "realtime", "model": settings.realtime_model,
+        "instructions": instructions, "tools": tools, "tool_choice": "auto",
+        "output_modalities": ["audio"],
+        "audio": {"input": {"transcription": {"model": settings.transcription_model},
+                            "turn_detection": {"type": "server_vad", "create_response": True, "interrupt_response": True}},
+                  "output": {"voice": settings.realtime_voice}},
+    }
+    if phone:
+        session["audio"]["input"]["format"] = {"type": "audio/pcmu"}
+        session["audio"]["output"]["format"] = {"type": "audio/pcmu"}
+    return session
+
+
 class AIClient:
     def __init__(self, settings, client=None):
         self.settings = settings
@@ -91,14 +107,7 @@ class AIClient:
 
     async def realtime_session(self, instructions: str, tools: list[dict]) -> dict:
         client = self.require_client()
-        session = {
-            "type": "realtime", "model": self.settings.realtime_model,
-            "instructions": instructions, "tools": tools, "tool_choice": "auto",
-            "output_modalities": ["audio"],
-            "audio": {"input": {"transcription": {"model": self.settings.transcription_model},
-                                "turn_detection": {"type": "server_vad", "create_response": True, "interrupt_response": True}},
-                      "output": {"voice": self.settings.realtime_voice}},
-        }
+        session = realtime_config(self.settings, instructions, tools)
         try:
             secret = await client.realtime.client_secrets.create(
                 expires_after={"anchor": "created_at", "seconds": 600}, session=session)

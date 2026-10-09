@@ -88,6 +88,26 @@ CREATE TABLE IF NOT EXISTS tool_calls (
     latency_ms REAL NOT NULL
 );
 CREATE INDEX IF NOT EXISTS tool_calls_phone_ts ON tool_calls(phone, ts);
+CREATE TABLE IF NOT EXISTS phone_calls (
+    call_sid TEXT PRIMARY KEY, phone TEXT NOT NULL REFERENCES customers(phone),
+    caller TEXT NOT NULL, token TEXT NOT NULL, phase TEXT NOT NULL,
+    created_at REAL NOT NULL, deadline REAL NOT NULL, end_reason TEXT,
+    transcript TEXT NOT NULL DEFAULT ''
+);
+CREATE TABLE IF NOT EXISTS phone_call_slot (
+    id INTEGER PRIMARY KEY CHECK(id=1), call_sid TEXT NOT NULL, expires REAL NOT NULL
+);
+CREATE TABLE IF NOT EXISTS phone_callbacks (
+    id TEXT PRIMARY KEY, source_call_sid TEXT NOT NULL UNIQUE REFERENCES phone_calls(call_sid),
+    phone TEXT NOT NULL REFERENCES customers(phone), caller TEXT NOT NULL,
+    due_at REAL NOT NULL, status TEXT NOT NULL, call_sid TEXT, error TEXT
+);
+CREATE TABLE IF NOT EXISTS phone_turns (
+    id TEXT PRIMARY KEY, call_sid TEXT NOT NULL REFERENCES phone_calls(call_sid),
+    phone TEXT NOT NULL REFERENCES customers(phone), ts TEXT NOT NULL,
+    response_id TEXT NOT NULL, speech_to_first_audio_ms REAL,
+    response_ms REAL NOT NULL, status TEXT NOT NULL
+);
 """
 
 
@@ -207,9 +227,15 @@ class Database:
                 "recent_media_ids": media_ids, "latest_tradein_quote": quotes[0] if quotes else None}
 
     def add_conversation(self, phone: str, channel: str, summary: str):
+        conversation_id = uuid4().hex
         with self.connection(write=True) as connection:
             connection.execute("INSERT INTO conversations VALUES (?, ?, ?, ?, ?)",
-                               (uuid4().hex, phone, channel, summary, now_iso()))
+                               (conversation_id, phone, channel, summary, now_iso()))
+        return conversation_id
+
+    def update_conversation(self, conversation_id: str, summary: str):
+        with self.connection(write=True) as connection:
+            connection.execute("UPDATE conversations SET summary=? WHERE id=?", (summary, conversation_id))
 
     @staticmethod
     def message_dict(row) -> dict:

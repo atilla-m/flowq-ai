@@ -37,6 +37,7 @@ class ToolService:
     def __init__(self, db: Database, pack, settings, ai=None):
         self.db, self.pack, self.settings, self.ai = db, pack, settings, ai
         self.locks: dict[str, asyncio.Lock] = {}
+        self.phone_callback = None
 
     async def execute(self, name: str, phone: str, channel: str, args: dict) -> dict:
         phone = self.db.ensure_customer(phone)["phone"]
@@ -309,6 +310,10 @@ class ToolService:
                 "SELECT * FROM orders WHERE phone=? ORDER BY ts DESC LIMIT 10", (phone,))]}
 
     def schedule_callback(self, *, phone, channel, delay_seconds=15):
+        if channel == "phone":
+            if self.phone_callback is None:
+                raise ValueError("Telephone callbacks are not configured")
+            return self.phone_callback(phone, delay_seconds)
         ts = (datetime.now(timezone.utc) + timedelta(seconds=delay_seconds)).isoformat(timespec="microseconds").replace("+00:00", "Z")
         event = self.db.add_event(phone, "incoming_callback", {"phone": phone, "delay_seconds": delay_seconds,
             "scheduled_at": ts, "name": self.db.history(phone)["name"]}, ts=ts)

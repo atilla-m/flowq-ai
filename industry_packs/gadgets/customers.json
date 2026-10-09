@@ -3,6 +3,7 @@
     "id": "cust_01",
     "name": "Aysel Məmmədova",
     "phone": "+994501234567",
+    "telephony_demo_target": true,
     "history": [
       {
         "channel": "voice",

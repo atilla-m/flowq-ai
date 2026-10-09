@@ -30,7 +30,7 @@ Interactive API docs: <http://localhost:8000/docs>. Frontend integration details
 | `OPENAI_API_KEY` | empty | Server-side key; never returned to the frontend |
 | `CHAT_MODEL` | `gpt-6.1-sol` | Responses agent and call summaries |
 | `VISION_MODEL` | `gpt-6.1-sol` | Structured image observations |
-| `REALTIME_MODEL` | `gpt-realtime-2.1` | Browser voice session |
+| `REALTIME_MODEL` | `gpt-realtime-2.1` | Browser and telephone voice sessions |
 | `REALTIME_VOICE` | `marin` | Realtime output voice |
 | `TRANSCRIPTION_MODEL` | `gpt-live-transcribe` | Realtime customer transcript events |
 | `INDUSTRY_PACK` | `gadgets` | Directory under `industry_packs/` |
@@ -40,6 +40,11 @@ Interactive API docs: <http://localhost:8000/docs>. Frontend integration details
 | `FRONTEND_URL` | `http://localhost:5173` | Payment-link destination |
 | `ALLOWED_ORIGINS` | `http://localhost:5173` | Comma-separated CORS origins; set the deployed frontend origin |
 | `PORT` | `8000` | Port used by `python -m backend` and the Docker health check |
+| `TWILIO_ACCOUNT_SID` | empty | Account owning the voice number; optional telephone integration |
+| `TWILIO_AUTH_TOKEN` | empty | Server-side webhook/WebSocket signature validation and outbound calls |
+| `TWILIO_PHONE_NUMBER` | empty | Voice-capable Twilio number, in E.164 format, e.g. `+12025550123` |
+| `PUBLIC_BASE_URL` | empty | Public HTTPS backend origin, e.g. `https://name.trycloudflare.com`; no path/query |
+| `DEMO_CALLER_PHONE` | empty | Your actual E.164 caller number; maps to Aysel's demo customer memory/inbox |
 | `EVAL_INPUT_USD_PER_MILLION` | `2` for default chat model | Optional behavior-eval input rate for model overrides |
 | `EVAL_OUTPUT_USD_PER_MILLION` | `10` for default chat model | Optional behavior-eval output rate for model overrides |
 
@@ -125,7 +130,7 @@ Every request has `{phone, channel:"voice"|"whatsapp", args:{...}}` and returns 
 | `create_payment_link` | `{order_id}` | Pending URL at `/pay/{order_id}` + `payment_link`; paid orders stay paid |
 | `check_payment_status` | `{order_id}` | DB-only pending/paid status, or `not_recorded` for historical orders without payment evidence |
 | `get_order_status` | `{order_id?}` | One order or `{orders:[]}` for this phone |
-| `schedule_callback` | `{delay_seconds?:15}` | Due `incoming_callback` inbox event; no background timer needed |
+| `schedule_callback` | `{delay_seconds?:15}` | Browser/chat: due `incoming_callback` inbox event. Telephone: durable outbound Twilio job after the delay and after hangup |
 | `handoff_to_human` | `{summary}` | `handoff` event and an agent inbox message |
 | `get_store_policy` | `{topic}` | Read all/branches/returns/warranty/installments from `policy.json`; unknown topics ask for clarification |
 | `check_installment` | `{sku,months}` | 3/6/12-month single-SKU quote from current stock and policy: eligibility, monthly/final amounts, total and approval requirement. No payment state changes |
@@ -147,7 +152,89 @@ backend/.venv/bin/python -m pytest backend/tests -q
 
 Tests cover deterministic trade-in deductions/battery bands, 1,000 random negotiation asks, tampered quote arguments, photo-over-claim pricing, payment status changes only via the payment endpoint, exact accessory compatibility and labels, delivery lookup, stock reservation/idempotency, customer isolation, durable callback timing, inbox cursors, bounded agent loops, OpenAI request payloads, key secrecy, and missing-key behavior. OpenAI calls are mocked, so the suite needs no key or API spend.
 
-This is a hackathon demo: the WhatsApp panel, callback, handoff and payment are browser/SQLite effects. No real WhatsApp transport, telephone callback, courier booking or financial charge is made. New orders progress from `awaiting_payment` to `paid`; seeded history also includes processing/delivered/returned states. The customer-picker app has no authentication; the CORS allowlist controls browser access, not API authentication.
+This is a hackathon demo: the WhatsApp panel, browser callback, human handoff and payment are browser/SQLite effects. With Twilio configured, telephone calls and callbacks use the real phone network. There is no real WhatsApp transport, live human telephone transfer, courier booking or financial charge. New orders progress from `awaiting_payment` to `paid`; seeded history also includes processing/delivered/returned states. The customer-picker app has no authentication; the CORS allowlist controls browser access, not API authentication. Twilio entry points require valid signatures.
+
+## Real telephone calls with Twilio
+
+The existing browser WebRTC session and HTTP tool envelope remain unchanged. Telephone tools run server-side with `channel:"phone"`; the public `/api/tools` envelope still accepts only `voice` and `whatsapp`. No Twilio secret or permanent OpenAI key is sent to the browser.
+
+1. Create a Twilio account and get a **Voice-capable** phone number. Copy its Account SID, primary Auth Token and E.164 phone number from the console. Use real account credentials for network calls; Twilio test credentials do not place them. Check [trial recipient/account restrictions](https://www.twilio.com/docs/usage/trials) and verify your caller/destination number when required. For Azerbaijan callbacks, check the destination in the console's **Voice → Settings → Geo Permissions**; account/trial restrictions may require an upgrade. See [Twilio dialing permissions](https://www.twilio.com/docs/voice/api/dialing-permissions-resources).
+
+2. From the repo root, install the updated requirements into the backend environment:
+
+   ```bash
+   source backend/.venv/bin/activate
+   pip install -r backend/requirements.txt
+   # For a uv-managed environment without pip:
+   # uv pip install --python backend/.venv/bin/python -r backend/requirements.txt
+   ```
+
+3. Install [`cloudflared`](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/) and start a temporary HTTPS tunnel in a separate terminal:
+
+   ```bash
+   cloudflared tunnel --url http://localhost:8001
+   ```
+
+   Copy the printed `https://…trycloudflare.com` origin. A [Quick Tunnel](https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/) needs no Cloudflare account. Keep this terminal running; its random hostname changes when restarted. The backend starts in step 5.
+
+4. Edit the existing `backend/.env` (copy `.env.example` only if it does not exist). Set these values:
+
+   ```dotenv
+   OPENAI_API_KEY=your-server-side-openai-key
+   TWILIO_ACCOUNT_SID=AC...
+   TWILIO_AUTH_TOKEN=your-primary-twilio-auth-token
+   TWILIO_PHONE_NUMBER=+12025550123
+   PUBLIC_BASE_URL=https://your-name.trycloudflare.com
+   BACKEND_PUBLIC_URL=https://your-name.trycloudflare.com
+   DEMO_CALLER_PHONE=+99455XXXXXXX
+   PORT=8001
+   ```
+
+   `PUBLIC_BASE_URL` is the exact external origin used to validate signatures and build the WSS URL. Do not add `/api/twilio/voice` to it. Model/voice variables retain their existing defaults. Keep `FRONTEND_URL` and `ALLOWED_ORIGINS` pointed at the actual frontend. For a browser panel on this laptop, they can remain `http://localhost:5173`; set the frontend's existing API base URL to `http://localhost:8001` for this run.
+
+5. Start a single backend worker, without reload, in another terminal:
+
+   ```bash
+   backend/.venv/bin/python -m backend
+   # PORT=8001 in .env; alternatively:
+   # backend/.venv/bin/uvicorn backend.main:app --host 0.0.0.0 --port 8001 --workers 1
+   curl -s https://your-name.trycloudflare.com/api/health
+   ```
+
+6. In Twilio Console, open the number's configuration. Under **A call comes in**, choose **Webhook**, enter `https://your-name.trycloudflare.com/api/twilio/voice`, and select **HTTP POST**. Configure the call status callback as `https://your-name.trycloudflare.com/api/twilio/status` with **POST** if the console exposes it. Save. See [Twilio incoming-call setup](https://www.twilio.com/docs/voice/tutorials/how-to-respond-to-incoming-phone-calls). Outbound callbacks attach their status webhook automatically.
+
+7. Select **Aysel Məmmədova** (`+994501234567`) in the browser demo, then dial the Twilio number from the phone configured as `DEMO_CALLER_PHONE`. Only that caller maps to Aysel; other callers use their normalized own number. Azerbaijani local forms such as `0501234567` normalize to `+994501234567`; existing international E.164 numbers retain their country code. The target demo customer is marked with `telephony_demo_target:true` in the pack's customer data. A photo request during the phone call appears in Aysel's WhatsApp-style panel. Upload there; the server notifies Realtime of the new media IDs automatically. Orders, payment links and handoff notices appear in the same inbox. They are panel messages, not messages on the real WhatsApp network.
+
+8. Say “Please call me back in 15 seconds.” The agent schedules a durable job, says goodbye, and ends the telephone leg after its goodbye audio is acknowledged. Twilio then dials **your actual number**, not Aysel's synthetic number, after the requested delay and once the original call has ended. Callback requests made in browser voice or chat still generate the original browser event.
+
+Routes:
+
+| Route | Purpose |
+| --- | --- |
+| `POST /api/twilio/voice` | Signed form webhook → `<Connect><Stream>` TwiML with caller `phone` and a single-use `stream_token`, followed by `<Hangup>` |
+| `WS /api/twilio/media` | Signed WSS handshake + account/call/caller/token/codec verification → server-side Realtime bridge |
+| `POST /api/twilio/status` | Signed terminal call-status webhook; releases ringing reservations or stops an active bridge |
+
+The bridge uses the same voice prompt, customer memory and 17 function schemas as browser voice. GA audio configuration is `audio.input.format:{type:"audio/pcmu"}` and `audio.output.format:{type:"audio/pcmu"}`. Audio passes through as raw base64 G.711 μ-law, mono, 8 kHz; there is no resampling or audio file header. The server authenticates its OpenAI WebSocket with the permanent key. See [OpenAI WebSockets](https://developers.openai.com/api/docs/guides/realtime-websocket), [GA audio formats](https://developers.openai.com/api/reference/resources/realtime/client-events), and [Twilio media messages](https://www.twilio.com/docs/voice/media-streams/websocket-messages).
+
+On detected caller speech, the server sends Twilio `clear` and OpenAI `conversation.item.truncate` at the estimated played position. Mark acknowledgments and stream timestamps bound that position; marks flushed by `clear` do not count as heard audio. Interrupted/unacknowledged generated text is omitted from memory because partial audio cannot be aligned reliably to text. Tool execution runs separately from audio reception, so slow vision/tools do not block interruption handling. See [OpenAI interruption handling](https://developers.openai.com/api/docs/guides/realtime-conversations).
+
+There is **one concurrent telephone call**. A SQLite lease reserves the slot before streaming or dialing; additional incoming calls hear a short busy message and end. Each telephone leg ends after at most **300 seconds from its voice webhook reservation**. Browser voice does not occupy this slot. Use one service instance and one worker for the callback worker/bridge lifecycle. In Docker/Render, keep the existing persistent SQLite disk, configure `PUBLIC_BASE_URL` to the backend HTTPS origin, and use that origin in Twilio instead of a tunnel.
+
+Every phone tool is logged in `tool_calls` with its latency. `phone_turns` stores each model response's `speech_to_first_audio_ms` (from detected end of customer speech), `response_ms` (generation/tool-call response duration), and status. Greeting/tool-only responses have null speech-to-audio latency when no audio follows. `/api/trace?phone=%2B994501234567` includes `channel:"phone"` tools and diagnostic `realtime_turn` / `twilio_callback` records; these diagnostic names are not model tools. `phone_calls` retains the transcript/end reason. On hangup, cross-channel memory is saved immediately as an unverified transcript fallback, then replaced by a `CHAT_MODEL` summary when available. There is no audio recording.
+
+Pending callback jobs survive restart. An interrupted/failed placement is **not automatically retried**, because its remote outcome can be uncertain; check Twilio call logs before requesting another callback. At most one callback job is scheduled per source telephone call.
+
+Troubleshooting: HTTP 403 means the signature/account failed; check the primary Auth Token and exact public URL. Never disable validation. The webhook and WSS signatures use configured public URLs, including Twilio's documented WSS trailing-slash variant, rather than trusting forwarded headers. HTTP 503 means telephone env configuration is missing/invalid. With no OpenAI key, a signed incoming call receives a polite unavailable message and hangs up. Silence/provider failures end the stream; check Realtime model access and Twilio Debugger. If the tunnel hostname changes, update `.env`, restart the backend, and update the Twilio webhook URLs. Reference: [Twilio signature validation](https://www.twilio.com/docs/usage/security).
+
+Run the integration checks without a server, credentials or paid calls:
+
+```bash
+backend/.venv/bin/python -m pytest backend/tests/test_telephony.py -q
+backend/.venv/bin/python -m pytest backend/tests -q
+```
+
+These tests mock both provider sockets/REST calls. A real network audio/callback check still requires your credentials, destination permissions and public tunnel.
 
 Data lives under ignored `backend/data/`. To start a fresh demo without deleting history, choose another `DATABASE_PATH` and `UPLOAD_DIR` before restarting. Existing databases preserve stock and history when reseeded. A new industry pack implements the same JSON files and prompts; the core loader does not import industry-specific Python code.
 
