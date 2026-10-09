@@ -1,5 +1,6 @@
 import hashlib
 import json
+import traceback
 from pathlib import Path
 
 from backend.ai import AIClient
@@ -15,6 +16,16 @@ class FixtureVisionAI(AIClient):
         self.fixtures = json.loads((DIRECTORY / "fixtures/labels.json").read_text())["devices"]
         self.hashes = {hashlib.sha256((DIRECTORY / "fixtures" / filename).read_bytes()).hexdigest(): device
                        for device, data in self.fixtures.items() for filename in data["files"]}
+        self.provider_traceback = None
+
+    async def respond(self, **kwargs):
+        try:
+            return await super().respond(**kwargs)
+        except Exception:
+            # The HTTP route deliberately returns a generic 502. Keep its chained
+            # provider cause in eval diagnostics without editing production routing.
+            self.provider_traceback = traceback.format_exc()
+            raise
 
     async def analyze(self, media, claimed, pack):
         devices = {self.hashes.get(hashlib.sha256(Path(item["path"]).read_bytes()).hexdigest()) for item in media}

@@ -40,19 +40,92 @@ def invented_prices(messages, traces):
         if message["from"] != "agent" or message["type"] != "text":
             continue
         known = set()
-        for trace in traces:
-            if trace["ts"] <= message["ts"]:
-                known.update(monetary_values(trace["result"]))
+        prior = [trace for trace in traces if trace["ts"] <= message["ts"] and not trace["result"].get("error")]
+        for trace in prior:
+            known.update(monetary_values(trace["result"]))
         for sentence in re.split(r"[!?\n]|(?<=[a-zA-Z])\.\s", message.get("text", "")):
             # A stated customer budget is not a shop price. All other currency amounts are checked.
             if re.search(r"\b(?:your budget|budget is|budget of|бюджет|büdcə)\b", sentence, re.I):
                 continue
             matches = {match for pattern in expressions for match in re.findall(pattern, sentence, re.I)}
+            rejected = {Decimal(value.replace(",", "")).quantize(Decimal(".01")) for value in re.findall(
+                r"(?:\bnot|\bне|\bdeyil)\s+(\d[\d,]*(?:\.\d{1,2})?)\s*(?:AZN|manats?|манат\w*)\b",
+                sentence.replace("*", ""), re.I)}
+            totals = derived_totals(prior) if re.search(
+                r"total|amount (?:payable|due|to pay)|proceed at|including delivery|plus delivery|comes to|cəmi|ümumi|məbləğ|итого|всего|=", sentence, re.I) else set()
             for text in matches:
                 amount = Decimal(text.replace(",", "")).quantize(Decimal(".01"))
-                if amount not in known:
+                if amount not in known and amount not in totals and amount not in rejected:
                     unsupported.append({"message_id": message["id"], "amount": float(amount), "text": sentence.strip()})
     return unsupported
+
+
+def derived_totals(traces):
+    """One catalog item plus the latest verified delivery fee/accepted quote.
+
+    Never use future results or arbitrary sums of amounts (storage, budgets,
+    demands and discounts are not operands). Installments come from their tool.
+    """
+    prices, fee, credit = set(), None, Decimal(0)
+    for trace in traces:
+        result = trace["result"]
+        if trace.get("tool") == "search_inventory":
+            prices.update(Decimal(str(item["price_azn"])) for item in
+                          result.get("items", []) + result.get("alternatives", []) if item.get("stock", 0) > 0)
+        elif trace.get("tool") == "calculate_delivery" and not result.get("needs_clarification"):
+            fee = Decimal(str(result["fee_azn"]))
+        elif trace.get("tool") == "calculate_tradein" and "current_offer" in result:
+            credit = Decimal(str(result["current_offer"]))
+        elif trace.get("tool") == "negotiate_offer" and "new_offer" in result:
+            credit = Decimal(str(result["new_offer"]))
+    return {(price + fee - credit).quantize(Decimal(".01")) for price in prices
+            if fee is not None and price + fee >= credit}
+
+
+def alternative_verified(scenario, traces):
+    facts, checks = scenario["hidden_facts"], scenario["success_criteria"]
+    for trace in traces:
+        result = trace["result"]
+        if trace["tool"] != "search_inventory" or result.get("error"):
+            continue
+        items = result.get("items", [])
+        unavailable = any(item["sku"] == facts["requested_sku"] and item["stock"] == 0 for item in items)
+        # The scenario preflight verifies zero stock. An available-only search
+        # intentionally omits the unavailable row; require the matching query.
+        query = trace.get("args", {}).get("query", "").casefold()
+        unavailable |= bool(result.get("out_of_stock") and query in
+                            (facts["requested_query"].casefold(), facts["requested_sku"].casefold()))
+        if unavailable:
+            return any(item["sku"] == checks["target_sku"] and item["stock"] > 0
+                       for other in traces if other["tool"] == "search_inventory" and not other["result"].get("error")
+                       for item in other["result"].get("items", []) + other["result"].get("alternatives", []))
+    return False
+
+
+def rescore_saved_prices(record):
+    """Recheck saved visible messages without another paid model call.
+
+    Preserve every other criterion, error and budget status. This is used when
+    fixing a price heuristic after a live suite has already saved its evidence.
+    """
+    metrics = record["metrics"]
+    if "tool_calls" not in metrics:
+        return record
+    messages = {message["id"]: message for entry in record["transcript"]
+                for message in entry.get("messages", [])}
+    traces = metrics["tool_calls"]
+    flags = invented_prices(list(messages.values()), traces)
+    wrong = sum(trace["tool"] not in SCHEMAS or trace["result"].get("error") in
+                ("invalid_arguments", "invalid_request") for trace in traces)
+    metrics["invented_price_details"] = flags
+    metrics["wrong_tool_or_invented_price"] = wrong + len(flags)
+    reason = "Wrong tool call or unsupported stated price"
+    failures = [item for item in metrics["failures"] if item != reason]
+    if wrong or flags:
+        failures.append(reason)
+    metrics["failures"] = failures
+    metrics["task_success"] = not failures and record["status"] in ("completed", "max_turns")
+    return record
 
 
 def score_run(scenario, db, phone, payment_calls, transcript, turns):
@@ -106,18 +179,17 @@ def score_run(scenario, db, phone, payment_calls, transcript, turns):
     if "target_sku" in checks:
         require(any(any(item["sku"] == checks["target_sku"] for item in order["items"]) for order in orders), "Expected catalog SKU was not ordered")
     if checks.get("alternative_offered"):
-        search_results = [trace["result"].get("items", []) + trace["result"].get("alternatives", [])
-                          for trace in traces if trace["tool"] == "search_inventory"]
-        require(any(any(item["sku"] == scenario["hidden_facts"]["requested_sku"] and item["stock"] == 0 for item in batch) for batch in search_results)
-                and any(any(item["sku"] == checks["target_sku"] and item["stock"] > 0 for item in batch) for batch in search_results), "No verified in-stock alternative to the unavailable model")
+        require(alternative_verified(scenario, traces), "No verified in-stock alternative to the unavailable model")
     if checks.get("installment_months"):
         require(any(trace["tool"] == "check_installment" and trace["result"].get("eligible")
                     and trace["result"].get("sku") == checks["target_sku"]
                     and trace["result"].get("months") == checks["installment_months"] for trace in traces),
                 "Requested SKU installment estimate was not verified")
     if checks.get("return_days"):
-        require(any(trace["tool"] == "get_store_policy" and trace["result"].get("topic") == "returns"
-                    and trace["result"].get("policy", {}).get("days") == checks["return_days"] for trace in traces),
+        require(any(trace["tool"] == "get_store_policy" and not trace["result"].get("error") and
+                    (trace["result"].get("policy", {}).get("days") if trace["result"].get("topic") == "returns"
+                     else trace["result"].get("policy", {}).get("returns", {}).get("days")
+                     if trace["result"].get("topic") == "all" else None) == checks["return_days"] for trace in traces),
                 "Return policy was not looked up")
     if checks.get("branch_district"):
         require(any(trace["tool"] == "find_branch" and trace["result"].get("district") == checks["branch_district"]
