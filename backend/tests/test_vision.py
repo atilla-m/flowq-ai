@@ -1,13 +1,8 @@
 from copy import deepcopy
 from io import BytesIO
-from types import SimpleNamespace
 
 from fastapi.testclient import TestClient
 from PIL import Image
-import pytest
-
-from backend.ai import AIClient
-from backend.config import Settings
 from backend.tests.test_agent import app_with_ai
 from backend.tests.test_api import PHONE, OTHER, call
 from backend.vision import normalize_observation

@@ -6,7 +6,7 @@ from PIL import Image
 import pytest
 
 from backend.config import Settings
-from backend.db import Database, dumps, now_iso
+from backend.db import dumps, now_iso
 from backend.main import create_app
 
 

@@ -6,7 +6,6 @@ from unittest.mock import AsyncMock
 
 from fastapi.testclient import TestClient
 from PIL import Image
-import pytest
 
 from backend.ai import AIClient
 from backend.config import Settings

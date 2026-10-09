@@ -1,6 +1,3 @@
-from backend.db import now_iso
-
-
 PHONE = "+994501234567"
 
 

@@ -1,5 +1,4 @@
 from difflib import SequenceMatcher
-import re
 
 from backend.tools.common import normalize_text
 

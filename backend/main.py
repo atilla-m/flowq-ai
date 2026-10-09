@@ -1,6 +1,5 @@
 from contextlib import asynccontextmanager
 from io import BytesIO
-import logging
 from pathlib import Path
 from typing import Any, Literal
 from uuid import uuid4

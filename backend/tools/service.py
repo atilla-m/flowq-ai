@@ -10,6 +10,7 @@ from uuid import uuid4
 
 from jsonschema import Draft202012Validator, ValidationError
 
+from backend.ai import AIProviderError, AIUnavailable
 from backend.db import Database, dumps, normalize_phone, now_iso
 from backend.tools.common import cents, normalize_text
 from backend.tools.delivery import calculate_delivery
@@ -55,6 +56,10 @@ class ToolService:
                 result = {"error": "invalid_arguments", "message": error.message}
             except (ValueError, LookupError) as error:
                 result = {"error": "invalid_request", "message": str(error)}
+            except AIUnavailable as error:
+                result = {"error": "ai_not_configured", "message": str(error)}
+            except AIProviderError as error:
+                result = {"error": "provider_error", "message": str(error)}
             except Exception:
                 logger.exception("Tool failed: %s", name)
                 result = {"error": "tool_unavailable", "message": "Bu əməliyyat hazırda mümkün deyil. Yenidən yoxlayın və ya əməkdaşa müraciət edin."}
