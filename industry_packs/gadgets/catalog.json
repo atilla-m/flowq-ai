@@ -1,0 +1,202 @@
+[
+  {
+    "sku": "IP11-64-BLK",
+    "name": "iPhone 11",
+    "storage": 64,
+    "color": "Black",
+    "price_azn": 499,
+    "stock": 4
+  },
+  {
+    "sku": "IP11-128-WHT",
+    "name": "iPhone 11",
+    "storage": 128,
+    "color": "White",
+    "price_azn": 549,
+    "stock": 3
+  },
+  {
+    "sku": "IP12-64-BLK",
+    "name": "iPhone 12",
+    "storage": 64,
+    "color": "Black",
+    "price_azn": 649,
+    "stock": 5
+  },
+  {
+    "sku": "IP12-128-BLU",
+    "name": "iPhone 12",
+    "storage": 128,
+    "color": "Blue",
+    "price_azn": 699,
+    "stock": 3
+  },
+  {
+    "sku": "IP13-128-MID",
+    "name": "iPhone 13",
+    "storage": 128,
+    "color": "Midnight",
+    "price_azn": 899,
+    "stock": 6
+  },
+  {
+    "sku": "IP13-256-STR",
+    "name": "iPhone 13",
+    "storage": 256,
+    "color": "Starlight",
+    "price_azn": 999,
+    "stock": 2
+  },
+  {
+    "sku": "IP14-128-PUR",
+    "name": "iPhone 14",
+    "storage": 128,
+    "color": "Purple",
+    "price_azn": 1099,
+    "stock": 4
+  },
+  {
+    "sku": "IP14-256-BLU",
+    "name": "iPhone 14",
+    "storage": 256,
+    "color": "Blue",
+    "price_azn": 1199,
+    "stock": 2
+  },
+  {
+    "sku": "IP15-128-BLK",
+    "name": "iPhone 15",
+    "storage": 128,
+    "color": "Black",
+    "price_azn": 1399,
+    "stock": 5
+  },
+  {
+    "sku": "IP15-256-PNK",
+    "name": "iPhone 15",
+    "storage": 256,
+    "color": "Pink",
+    "price_azn": 1549,
+    "stock": 3
+  },
+  {
+    "sku": "IP16-128-ULT",
+    "name": "iPhone 16",
+    "storage": 128,
+    "color": "Ultramarine",
+    "price_azn": 1699,
+    "stock": 4
+  },
+  {
+    "sku": "IP16-256-TEL",
+    "name": "iPhone 16",
+    "storage": 256,
+    "color": "Teal",
+    "price_azn": 1899,
+    "stock": 2
+  },
+  {
+    "sku": "IP13P-128-GRA",
+    "name": "iPhone 13 Pro",
+    "storage": 128,
+    "color": "Graphite",
+    "price_azn": 1149,
+    "stock": 2
+  },
+  {
+    "sku": "IP14P-128-SLV",
+    "name": "iPhone 14 Pro",
+    "storage": 128,
+    "color": "Silver",
+    "price_azn": 1399,
+    "stock": 1
+  },
+  {
+    "sku": "IP15P-256-NAT",
+    "name": "iPhone 15 Pro",
+    "storage": 256,
+    "color": "Natural Titanium",
+    "price_azn": 1999,
+    "stock": 2
+  },
+  {
+    "sku": "IP16P-256-BLK",
+    "name": "iPhone 16 Pro",
+    "storage": 256,
+    "color": "Black Titanium",
+    "price_azn": 2399,
+    "stock": 0
+  },
+  {
+    "sku": "SS21-128-GRY",
+    "name": "Samsung Galaxy S21",
+    "storage": 128,
+    "color": "Phantom Gray",
+    "price_azn": 649,
+    "stock": 3
+  },
+  {
+    "sku": "SS22-128-BLK",
+    "name": "Samsung Galaxy S22",
+    "storage": 128,
+    "color": "Phantom Black",
+    "price_azn": 799,
+    "stock": 2
+  },
+  {
+    "sku": "SS23-256-CRM",
+    "name": "Samsung Galaxy S23",
+    "storage": 256,
+    "color": "Cream",
+    "price_azn": 1199,
+    "stock": 4
+  },
+  {
+    "sku": "SS24-256-VIO",
+    "name": "Samsung Galaxy S24",
+    "storage": 256,
+    "color": "Cobalt Violet",
+    "price_azn": 1599,
+    "stock": 3
+  },
+  {
+    "sku": "SA15-128-BLU",
+    "name": "Samsung Galaxy A15",
+    "storage": 128,
+    "color": "Blue",
+    "price_azn": 329,
+    "stock": 8
+  },
+  {
+    "sku": "SA25-128-BLK",
+    "name": "Samsung Galaxy A25",
+    "storage": 128,
+    "color": "Black",
+    "price_azn": 449,
+    "stock": 5
+  },
+  {
+    "sku": "SA55-256-ICE",
+    "name": "Samsung Galaxy A55",
+    "storage": 256,
+    "color": "Iceblue",
+    "price_azn": 749,
+    "stock": 4
+  },
+  {
+    "sku": "RN13-128-BLK",
+    "name": "Xiaomi Redmi Note 13",
+    "storage": 128,
+    "color": "Midnight Black",
+    "price_azn": 379,
+    "stock": 7
+  },
+  {
+    "sku": "XM14-256-GRN",
+    "name": "Xiaomi 14",
+    "storage": 256,
+    "color": "Jade Green",
+    "price_azn": 1199,
+    "stock": 2
+  }
+]

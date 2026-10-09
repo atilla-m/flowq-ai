@@ -1,0 +1,167 @@
+[
+  {
+    "sku": "ACC-001",
+    "name": "iPhone 11 — Qoruyucu kabro",
+    "category": "case",
+    "price_azn": 19,
+    "stock": 12,
+    "compatible_models": [
+      "iPhone 11"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-001.svg"
+  },
+  {
+    "sku": "ACC-002",
+    "name": "iPhone 12 — Ekran qoruyucusu",
+    "category": "screen_protector",
+    "price_azn": 15,
+    "stock": 12,
+    "compatible_models": [
+      "iPhone 12"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-002.svg"
+  },
+  {
+    "sku": "ACC-003",
+    "name": "iPhone 13 — Qoruyucu kabro",
+    "category": "case",
+    "price_azn": 25,
+    "stock": 12,
+    "compatible_models": [
+      "iPhone 13"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-003.svg"
+  },
+  {
+    "sku": "ACC-004",
+    "name": "iPhone 13 — Ekran qoruyucusu",
+    "category": "screen_protector",
+    "price_azn": 15,
+    "stock": 12,
+    "compatible_models": [
+      "iPhone 13"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-004.svg"
+  },
+  {
+    "sku": "ACC-005",
+    "name": "iPhone 14 — Qoruyucu kabro",
+    "category": "case",
+    "price_azn": 25,
+    "stock": 12,
+    "compatible_models": [
+      "iPhone 14"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-005.svg"
+  },
+  {
+    "sku": "ACC-006",
+    "name": "iPhone 15 — Qoruyucu kabro",
+    "category": "case",
+    "price_azn": 29,
+    "stock": 12,
+    "compatible_models": [
+      "iPhone 15"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-006.svg"
+  },
+  {
+    "sku": "ACC-007",
+    "name": "iPhone 15 — Sürətli şarj adapteri",
+    "category": "charger",
+    "price_azn": 39,
+    "stock": 12,
+    "compatible_models": [
+      "iPhone 15"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-007.svg"
+  },
+  {
+    "sku": "ACC-008",
+    "name": "iPhone 16 — Qoruyucu kabro",
+    "category": "case",
+    "price_azn": 35,
+    "stock": 12,
+    "compatible_models": [
+      "iPhone 16"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-008.svg"
+  },
+  {
+    "sku": "ACC-009",
+    "name": "iPhone 16 — Ekran qoruyucusu",
+    "category": "screen_protector",
+    "price_azn": 19,
+    "stock": 12,
+    "compatible_models": [
+      "iPhone 16"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-009.svg"
+  },
+  {
+    "sku": "ACC-010",
+    "name": "Samsung Galaxy S21 — Qoruyucu kabro",
+    "category": "case",
+    "price_azn": 19,
+    "stock": 12,
+    "compatible_models": [
+      "Samsung Galaxy S21"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-010.svg"
+  },
+  {
+    "sku": "ACC-011",
+    "name": "Samsung Galaxy S22 — Ekran qoruyucusu",
+    "category": "screen_protector",
+    "price_azn": 15,
+    "stock": 12,
+    "compatible_models": [
+      "Samsung Galaxy S22"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-011.svg"
+  },
+  {
+    "sku": "ACC-012",
+    "name": "Samsung Galaxy S23 — Qoruyucu kabro",
+    "category": "case",
+    "price_azn": 25,
+    "stock": 12,
+    "compatible_models": [
+      "Samsung Galaxy S23"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-012.svg"
+  },
+  {
+    "sku": "ACC-013",
+    "name": "Samsung Galaxy S24 — Sürətli şarj adapteri",
+    "category": "charger",
+    "price_azn": 35,
+    "stock": 12,
+    "compatible_models": [
+      "Samsung Galaxy S24"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-013.svg"
+  },
+  {
+    "sku": "ACC-014",
+    "name": "Samsung Galaxy A55 — Qoruyucu kabro",
+    "category": "case",
+    "price_azn": 19,
+    "stock": 12,
+    "compatible_models": [
+      "Samsung Galaxy A55"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-014.svg"
+  },
+  {
+    "sku": "ACC-015",
+    "name": "Xiaomi Redmi Note 13 — Qoruyucu kabro",
+    "category": "case",
+    "price_azn": 19,
+    "stock": 12,
+    "compatible_models": [
+      "Xiaomi Redmi Note 13"
+    ],
+    "image_url": "http://localhost:8000/api/assets/accessories/ACC-015.svg"
+  }
+]

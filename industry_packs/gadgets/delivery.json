@@ -1,0 +1,137 @@
+{
+  "pickup_fee_azn": 0,
+  "pickup_aliases": [
+    "pickup",
+    "pick up",
+    "mağazadan",
+    "magazadan",
+    "özüm götür",
+    "ozum gotur",
+    "самовывоз"
+  ],
+  "districts": [
+    {
+      "name": "Yasamal",
+      "fee_azn": 3,
+      "aliases": [
+        "yasamal",
+        "ясамал"
+      ]
+    },
+    {
+      "name": "Nəsimi",
+      "fee_azn": 3,
+      "aliases": [
+        "nesimi",
+        "nasimi",
+        "насими"
+      ]
+    },
+    {
+      "name": "Nərimanov",
+      "fee_azn": 3,
+      "aliases": [
+        "nerimanov",
+        "narimanov",
+        "нариманов"
+      ]
+    },
+    {
+      "name": "Xətai",
+      "fee_azn": 4,
+      "aliases": [
+        "xetai",
+        "khatai",
+        "хатаи"
+      ]
+    },
+    {
+      "name": "Binəqədi",
+      "fee_azn": 4,
+      "aliases": [
+        "bineqedi",
+        "binagadi",
+        "бинагади"
+      ]
+    },
+    {
+      "name": "Sabunçu",
+      "fee_azn": 5,
+      "aliases": [
+        "sabuncu",
+        "sabunchu",
+        "сабунчи"
+      ]
+    },
+    {
+      "name": "Suraxanı",
+      "fee_azn": 5,
+      "aliases": [
+        "suraxani",
+        "surakhani",
+        "сураханы"
+      ]
+    },
+    {
+      "name": "Xəzər",
+      "fee_azn": 7,
+      "aliases": [
+        "xezer",
+        "khazar",
+        "хазар"
+      ]
+    },
+    {
+      "name": "Qaradağ",
+      "fee_azn": 8,
+      "aliases": [
+        "qaradag",
+        "garadagh",
+        "гарадаг"
+      ]
+    },
+    {
+      "name": "Sumqayıt",
+      "fee_azn": 10,
+      "aliases": [
+        "sumqayit",
+        "sumgait",
+        "сумгаит"
+      ]
+    },
+    {
+      "name": "Abşeron",
+      "fee_azn": 8,
+      "aliases": [
+        "abseron",
+        "absheron",
+        "абшерон"
+      ]
+    },
+    {
+      "name": "Nizami",
+      "fee_azn": 4,
+      "aliases": [
+        "nizami",
+        "низами"
+      ]
+    },
+    {
+      "name": "Səbail",
+      "fee_azn": 3,
+      "aliases": [
+        "sebail",
+        "sabail",
+        "сабаил"
+      ]
+    },
+    {
+      "name": "Pirallahı",
+      "fee_azn": 10,
+      "aliases": [
+        "pirallahi",
+        "пираллахи"
+      ]
+    }
+  ]
+}

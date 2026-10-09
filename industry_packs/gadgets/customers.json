@@ -1,0 +1,98 @@
+[
+  {
+    "id": "cust_01",
+    "name": "Aysel Məmmədova",
+    "phone": "+994501234567",
+    "history": [
+      {
+        "channel": "voice",
+        "summary": "iPhone 13 128 GB istifadə edir. iPhone 15-ə keçmək və trade-in istəyir. Yasamalda yaşayır.",
+        "ts": "2026-10-01T10:00:00.000000Z"
+      }
+    ]
+  },
+  {
+    "id": "cust_02",
+    "name": "Elvin Əliyev",
+    "phone": "+994551234567",
+    "history": [
+      {
+        "channel": "whatsapp",
+        "summary": "Samsung Galaxy S21 istifadə edir. Galaxy S24 və uyğun kabro ilə maraqlanıb. Nərimanov.",
+        "ts": "2026-10-01T10:00:00.000000Z"
+      }
+    ]
+  },
+  {
+    "id": "cust_03",
+    "name": "Nigar Həsənova",
+    "phone": "+994701234567",
+    "history": [
+      {
+        "channel": "whatsapp",
+        "summary": "iPhone 14 alıb. Çəhrayı iPhone 15 hədiyyə üçün soruşub. Nəsimi.",
+        "ts": "2026-10-01T10:00:00.000000Z"
+      }
+    ]
+  },
+  {
+    "id": "cust_04",
+    "name": "Rəşad Quliyev",
+    "phone": "+994771234567",
+    "history": [
+      {
+        "channel": "voice",
+        "summary": "Büdcəsi 500 AZN. Samsung Galaxy A25 istəyir. Sumqayıtda yaşayır.",
+        "ts": "2026-10-01T10:00:00.000000Z"
+      }
+    ]
+  },
+  {
+    "id": "cust_05",
+    "name": "Leyla İsmayılova",
+    "phone": "+994501112233",
+    "history": [
+      {
+        "channel": "voice",
+        "summary": "Rusca danışmağa üstünlük verir. iPhone 12 128 GB trade-in ilə maraqlanıb. Xətai.",
+        "ts": "2026-10-01T10:00:00.000000Z"
+      }
+    ]
+  },
+  {
+    "id": "cust_06",
+    "name": "Murad Abbasov",
+    "phone": "+994551112233",
+    "history": [
+      {
+        "channel": "whatsapp",
+        "summary": "Xiaomi Redmi Note 13 və çatdırılma qiymətini soruşub. Binəqədi.",
+        "ts": "2026-10-01T10:00:00.000000Z"
+      }
+    ]
+  },
+  {
+    "id": "cust_07",
+    "name": "Günel Rzayeva",
+    "phone": "+994701112233",
+    "history": [
+      {
+        "channel": "whatsapp",
+        "summary": "iPhone 16 axtarır. Telefonun rəngi və kabro seçimi vacibdir. Səbail.",
+        "ts": "2026-10-01T10:00:00.000000Z"
+      }
+    ]
+  },
+  {
+    "id": "cust_08",
+    "name": "Tural Hüseynov",
+    "phone": "+994771112233",
+    "history": [
+      {
+        "channel": "voice",
+        "summary": "Samsung Galaxy S23 üçün trade-in təklifini yoxlamaq istəyir. Abşeron.",
+        "ts": "2026-10-01T10:00:00.000000Z"
+      }
+    ]
+  }
+]
