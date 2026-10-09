@@ -17,7 +17,7 @@ price the shop's rules do not allow.
 
 | | Link | Notes |
 | --- | --- | --- |
-| **Mock demo (always on)** | _being deployed — link will be added here_ | Runs entirely in the browser on scripted data. No backend, no AI, no keys. |
+| **Mock demo (always on)** | https://flowq-ai.vercel.app | Runs entirely in the browser on scripted data. No backend, no AI, no keys. |
 | **Live demo (real AI)** | https://distance-qui-ver-partition.trycloudflare.com | Real voice and chat agent. Works while our laptop is online. |
 
 Things to say (voice call) or type (WhatsApp panel):
