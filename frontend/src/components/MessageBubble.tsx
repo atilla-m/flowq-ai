@@ -36,10 +36,10 @@ function ProductCard({ m }: { m: Message }) {
       <div className="px-1 pt-2">
         <div className="text-sm font-semibold">{pickStr(d, 'name', 'title') ?? m.text ?? 'Product'}</div>
         {variant && <div className="text-xs text-wa-meta">{variant}</div>}
-        {compatible.length > 0 && <div className="text-xs text-wa-meta">Uyğundur: {compatible.join(', ')}</div>}
+        {compatible.length > 0 && <div className="text-xs text-wa-meta">Fits: {compatible.join(', ')}</div>}
         <div className="mt-0.5 flex items-baseline justify-between">
           <span className="text-base font-bold text-emerald-700">{azn(pickNum(d, 'price_azn', 'price'))}</span>
-          {stock !== undefined && <span className="text-xs text-wa-meta">Stokda: {stock}</span>}
+          {stock !== undefined && <span className="text-xs text-wa-meta">In stock: {stock}</span>}
         </div>
       </div>
     </div>
@@ -56,7 +56,7 @@ function MediaRequest({ m, onUploadPhotos }: { m: Message; onUploadPhotos(): voi
     <div className="w-72 rounded-md border border-amber-300 bg-amber-50 p-3">
       <div className="flex items-center gap-2 text-sm font-semibold text-amber-900">
         <CameraIcon className="h-4 w-4" />
-        Şəkil tələbi
+        Photo request
       </div>
       {body && <p className="mt-1.5 text-sm whitespace-pre-wrap text-amber-950">{body}</p>}
       {steps.length > 0 && (
@@ -113,9 +113,9 @@ function PaymentLink({ m }: { m: Message }) {
   return (
     <div className="w-64">
       <div className="rounded-md bg-emerald-50 p-3">
-        <div className="text-xs font-medium tracking-wide text-emerald-800 uppercase">Ödəniş linki</div>
+        <div className="text-xs font-medium tracking-wide text-emerald-800 uppercase">Payment link</div>
         <div className="mt-1 text-2xl font-bold text-emerald-900">{amount === undefined ? '…' : azn(amount)}</div>
-        {orderId && <div className="text-xs text-wa-meta">Sifariş {orderId}</div>}
+        {orderId && <div className="text-xs text-wa-meta">Order {orderId}</div>}
       </div>
       {m.text && <p className="px-1 pt-2 text-sm">{m.text}</p>}
       <button
@@ -134,7 +134,7 @@ function OrderSummary({ m }: { m: Message }) {
   return (
     <div className="w-72">
       {/* A snapshot from when the order was created, so no live status here: the payment card has it. */}
-      <div className="border-b border-black/10 px-1 pb-2 text-sm font-semibold">Sifariş {o.id ?? ''}</div>
+      <div className="border-b border-black/10 px-1 pb-2 text-sm font-semibold">Order {o.id ?? ''}</div>
       <dl className="space-y-1 px-1 py-2 text-sm">
         {o.items.map((it, i) => (
           <div key={i} className="flex justify-between gap-3">
@@ -153,13 +153,13 @@ function OrderSummary({ m }: { m: Message }) {
         )}
         {o.delivery !== undefined && (
           <div className="flex justify-between gap-3">
-            <dt>Çatdırılma{o.address ? ` · ${o.address}` : ''}</dt>
+            <dt>Delivery{o.address ? ` · ${o.address}` : ''}</dt>
             <dd className="shrink-0 tabular-nums">{azn(o.delivery)}</dd>
           </div>
         )}
       </dl>
       <div className="flex justify-between border-t border-black/10 px-1 pt-2 text-sm font-bold">
-        <span>Cəmi</span>
+        <span>Total</span>
         <span className="tabular-nums">{azn(o.total)}</span>
       </div>
     </div>

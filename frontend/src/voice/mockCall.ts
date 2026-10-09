@@ -13,23 +13,23 @@ type Step =
 
 const FIRST_CALL: Step[] = [
   { tool: 'get_customer_history' },
-  { agent: 'Salam, Aysel xanım! FlowQ-dur. Keçən dəfə iPhone 15-ə keçmək istəyirdiniz — davam edək?' },
-  { customer: 'Bəli. iPhone 15, 128 giqabayt, qara rəng var? Köhnə iPhone 13-ü də vermək istəyirəm.' },
-  { agent: 'Bir saniyə, yoxlayıram.' },
+  { agent: 'Hi Aysel, this is FlowQ. Last time you were looking at upgrading to an iPhone 15. Shall we continue?' },
+  { customer: 'Yes. Do you have the iPhone 15 in black, 128 gigabytes? I also want to trade in my iPhone 12.' },
+  { agent: 'One second, let me check.' },
   { tool: 'search_inventory', args: { query: 'iPhone 15 128 Black' } },
-  { tool: 'request_media_whatsapp', args: { what: 'iPhone 13 trade-in' } },
-  { agent: 'Bəli, stokda var — 1399 manat. Trade-in üçün WhatsApp-a təlimat göndərdim, şəkilləri ora yükləyin.' },
-  { customer: 'Yaxşı, amma indi vaxtım yoxdur. Mənə geri zəng edin.' },
+  { tool: 'request_media_whatsapp', args: { what: 'iPhone 12 trade-in' } },
+  { agent: 'Yes, it is in stock for 1399 AZN. I just sent photo instructions to your WhatsApp for the trade-in.' },
+  { customer: 'OK, but I have no balance right now. Please call me back.' },
   { tool: 'schedule_callback', args: { delay_seconds: 8 } },
-  { agent: 'Əlbəttə, bir neçə saniyəyə zəng edirəm. Sağ olun!' },
+  { agent: 'Of course, I will call you back in a few seconds. Goodbye!' },
   { hangup: 'callback' },
 ]
 
 const CALLBACK_CALL: Step[] = [
   { tool: 'get_customer_history' },
-  { agent: 'Salam, yenə FlowQ-dur. iPhone 15 və trade-in haqqında danışırdıq — şəkilləri göndərə bildiniz?' },
-  { customer: 'Hə, indi WhatsApp-a yükləyirəm.' },
-  { agent: 'Əla, şəkillər gələn kimi qiyməti deyəcəm.' },
+  { agent: 'Hi again, this is FlowQ calling you back. We were talking about the iPhone 15 and your trade-in. Were you able to send the photos?' },
+  { customer: 'Yes, I am uploading them to WhatsApp now.' },
+  { agent: 'Great. As soon as they arrive I will give you the price.' },
 ]
 
 let callCount = 0

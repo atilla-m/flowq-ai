@@ -135,7 +135,7 @@ export function PhonePanel({ customer, call }: { customer: Customer; call: CallS
             {status === 'idle' ? (
               <>
                 <p className="text-sm text-slate-300">Call as {customer.name}</p>
-                <p>Speak Azerbaijani or Russian. The live transcript appears here.</p>
+                <p>Just talk. The live transcript appears here.</p>
                 {IS_MOCK && <p className="mt-2 text-amber-400/80">Mock mode: the call is a scripted simulation.</p>}
               </>
             ) : (

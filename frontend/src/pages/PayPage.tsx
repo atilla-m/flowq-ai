@@ -69,7 +69,7 @@ export default function PayPage({ orderId }: { orderId: string }) {
             <>
               <div className="border-b border-slate-200 p-5">
                 <div className="flex items-baseline justify-between">
-                  <h1 className="font-semibold">Sifariş {order.id ?? orderId}</h1>
+                  <h1 className="font-semibold">Order {order.id ?? orderId}</h1>
                   <span className="text-xs text-slate-500">{paid ? 'paid' : (order.status ?? '').replace(/_/g, ' ')}</span>
                 </div>
                 <dl className="mt-3 space-y-1.5 text-sm">
@@ -90,13 +90,13 @@ export default function PayPage({ orderId }: { orderId: string }) {
                   )}
                   {order.delivery !== undefined && (
                     <div className="flex justify-between gap-3">
-                      <dt>Çatdırılma{order.address ? ` · ${order.address}` : ''}</dt>
+                      <dt>Delivery{order.address ? ` · ${order.address}` : ''}</dt>
                       <dd className="shrink-0 tabular-nums">{azn(order.delivery)}</dd>
                     </div>
                   )}
                 </dl>
                 <div className="mt-3 flex justify-between border-t border-slate-200 pt-3 text-lg font-bold">
-                  <span>Cəmi</span>
+                  <span>Total</span>
                   <span className="tabular-nums">{azn(order.total)}</span>
                 </div>
               </div>
@@ -106,7 +106,7 @@ export default function PayPage({ orderId }: { orderId: string }) {
                   <span className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
                     <CheckIcon className="h-7 w-7" />
                   </span>
-                  <h2 className="mt-3 text-lg font-semibold">Ödəniş uğurla tamamlandı</h2>
+                  <h2 className="mt-3 text-lg font-semibold">Payment successful</h2>
                   <p className="mt-1 text-sm text-slate-500">
                     {azn(order.total)} paid (demo). FlowQ has been notified — go back to the chat to see the confirmation.
                   </p>

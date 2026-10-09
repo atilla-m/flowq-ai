@@ -4,7 +4,7 @@
 
 import type { Api, Channel, Customer, InboxEvent, Json, Message, MessageType, TraceEntry } from './types'
 
-const KEY = 'flowq-mock-v2'
+const KEY = 'flowq-mock-v3'
 
 interface PhoneState {
   quoteId?: string
@@ -47,33 +47,34 @@ const CUSTOMERS: (Customer & { history_summary: string })[] = [
     id: 'cust_01',
     name: 'Aysel Məmmədova',
     phone: '+994501234567',
-    history_summary: 'iPhone 13 128 GB istifadə edir. iPhone 15-ə keçmək və trade-in istəyir. Yasamalda yaşayır.',
+    history_summary: 'Uses iPhone 12 128 GB. Interested in upgrading to iPhone 15 with trade-in. Lives in Yasamal.',
   },
   {
     id: 'cust_02',
     name: 'Elvin Əliyev',
     phone: '+994551234567',
-    history_summary: 'Samsung Galaxy S21 istifadə edir. Galaxy S24 və uyğun kabro ilə maraqlanıb. Nərimanov.',
+    history_summary: 'Uses Samsung Galaxy S21. Asked about Galaxy S24 and a compatible case. Nərimanov.',
   },
   {
     id: 'cust_03',
     name: 'Nigar Həsənova',
     phone: '+994701234567',
-    history_summary: 'iPhone 14 alıb. Çəhrayı iPhone 15 hədiyyə üçün soruşub. Nəsimi.',
+    history_summary: 'Bought iPhone 14 previously. Asked about a pink iPhone 15 as a gift. Nəsimi.',
   },
   {
     id: 'cust_05',
     name: 'Leyla İsmayılova',
     phone: '+994501112233',
-    history_summary: 'Rusca danışmağa üstünlük verir. iPhone 12 128 GB trade-in ilə maraqlanıb. Xətai.',
+    history_summary: 'Asked about trading in iPhone 12 128 GB. Xətai.',
   },
 ]
 
 const PHONE = { sku: 'IP15-128-BLK', name: 'iPhone 15', storage: 128, color: 'Black', price_azn: 1399, stock: 5 }
-const CASE = { sku: 'ACC-006', name: 'iPhone 15 — Qoruyucu kabro', category: 'case', price_azn: 29, stock: 12 }
+const CASE = { sku: 'ACC-006', name: 'iPhone 15 — Protective case', category: 'case', price_azn: 29, stock: 12 }
 const MEDIA_INSTRUCTIONS =
-  'Zəhmət olmasa WhatsApp panelinə 4 aydın şəkil göndərin: 1) ekranın tam görünüşü, 2) arxa tərəf, ' +
-  '3) Settings > Battery > Battery Health ekran görüntüsü, 4) Settings > General > About ekran görüntüsü.'
+  'Please upload four clear images in the WhatsApp panel: 1) the full screen, 2) the back of the phone, ' +
+  '3) Settings > Battery > Battery Health screenshot, 4) Settings > General > About screenshot showing model and storage.'
+const DISTRICTS = ['Yasamal', 'Nəsimi', 'Nərimanov', 'Xətai', 'Binəqədi', 'Səbail']
 const MAX_INCREASE_PCT = 5
 const STEP_PCT = 2
 
@@ -145,7 +146,7 @@ type ToolFn = (s: Store, phone: string, args: Json, channel: Channel) => Json
 const TOOLS: Record<string, ToolFn> = {
   get_customer_history: (_s, phone) => {
     const c = CUSTOMERS.find((x) => x.phone === phone)
-    return { name: c?.name ?? null, history_summary: c?.history_summary ?? 'Yeni müştəri.' }
+    return { name: c?.name ?? null, history_summary: c?.history_summary ?? 'New customer.' }
   },
 
   search_inventory: (_s, _phone, args) => ({ items: [{ ...PHONE, kind: 'phone' }], currency: 'AZN', query: String(args.query ?? '') }),
@@ -160,17 +161,22 @@ const TOOLS: Record<string, ToolFn> = {
 
   analyze_device_media: (s, phone, args) => {
     const ids = Array.isArray(args.media_ids) && args.media_ids.length ? args.media_ids : (st(s, phone).lastMedia ?? [])
-    if (!ids.length) return { error: 'no_media', message: 'Heç bir şəkil yüklənməyib.' }
+    if (!ids.length) return { error: 'no_media', message: 'No photos have been uploaded yet.' }
     return {
       analysis_id: `an_${s.seq++}`,
-      model: 'iPhone 13',
+      model: 'iPhone 12',
       storage: 128,
-      battery_health: 84,
+      battery_health: 88,
       screen_cracked: true,
       back_cracked: false,
       confidence: 0.91,
       mismatches: [
-        { field: 'screen', claimed: 'İdeal vəziyyətdədir', observed: 'Ekranın sağ aşağı küncündə çat görünür' },
+        {
+          field: 'screen_cracked',
+          claimed: false,
+          observed: true,
+          message: 'Customer said the screen is perfect; the photo shows a crack in the lower right corner',
+        },
       ],
     }
   },
@@ -178,18 +184,15 @@ const TOOLS: Record<string, ToolFn> = {
   calculate_tradein: (s, phone, args) => {
     const p = st(s, phone)
     p.quoteId = `q_${s.seq++}`
-    p.baseOffer = 360
-    p.offer = 360
+    p.baseOffer = 250
+    p.offer = 250
     return {
       quote_id: p.quoteId,
       analysis_id: (args.device_info as Json | undefined)?.analysis_id ?? null,
-      base_offer: 480,
-      deductions: [
-        { reason: 'Ekranda çat var', amount_azn: 100 },
-        { reason: 'Batareya 85%-dən aşağıdır', amount_azn: 20 },
-      ],
-      final_offer: 360,
-      current_offer: 360,
+      base_offer: 350,
+      deductions: [{ reason: 'Cracked screen', amount_azn: 100 }],
+      final_offer: 250,
+      current_offer: 250,
       is_final: false,
     }
   },
@@ -214,8 +217,8 @@ const TOOLS: Record<string, ToolFn> = {
   calculate_delivery: (s, phone, args) => {
     const p = st(s, phone)
     const address = String(args.address ?? 'Yasamal')
-    const pickup = /mağaza|magaza|pickup|самовывоз/i.test(address)
-    p.district = pickup ? 'pickup' : /yasamal|ясамал/i.test(address) ? 'Yasamal' : address
+    const pickup = /pick ?up|in store|collect/i.test(address)
+    p.district = pickup ? 'pickup' : (DISTRICTS.find((d) => address.toLowerCase().includes(d.toLowerCase())) ?? 'Yasamal')
     p.deliveryFee = pickup ? 0 : 3
     return { address, district: p.district, fee_azn: p.deliveryFee, currency: 'AZN', needs_clarification: false }
   },
@@ -254,7 +257,7 @@ const TOOLS: Record<string, ToolFn> = {
     }
     s.orders[id] = order
     p.orderId = id
-    pushMessage(s, phone, 'agent', 'order_summary', { text: `Sifariş ${id}: cəmi ${total.toFixed(2)} AZN.`, data: order })
+    pushMessage(s, phone, 'agent', 'order_summary', { text: `Order ${id}: total ${total.toFixed(2)} AZN.`, data: order })
     pushEvent(s, phone, 'order_update', { order_id: id, status: 'awaiting_payment' })
     return order
   },
@@ -262,10 +265,10 @@ const TOOLS: Record<string, ToolFn> = {
   create_payment_link: (s, phone, args) => {
     const order = s.orders[String(args.order_id)]
     if (!order || order.phone !== phone) return { error: 'invalid_request', message: 'Order not found for this customer' }
-    if (order.status === 'paid') return { order_id: order.id, status: 'paid', message: 'Bu sifariş artıq ödənilib.' }
+    if (order.status === 'paid') return { order_id: order.id, status: 'paid', message: 'This order is already paid.' }
     const url = `${location.origin}/pay/${order.id}`
     pushMessage(s, phone, 'agent', 'payment_link', {
-      text: 'Ödəniş üçün keçid:',
+      text: 'Payment link:',
       data: { order_id: order.id, url, status: 'pending' },
     })
     return { order_id: order.id, url, status: 'pending' }
@@ -300,9 +303,9 @@ const TOOLS: Record<string, ToolFn> = {
   },
 
   handoff_to_human: (s, phone, args, channel) => {
-    const summary = typeof args.summary === 'string' && args.summary ? args.summary : 'Müştəri menecerlə danışmaq istədi.'
+    const summary = typeof args.summary === 'string' && args.summary ? args.summary : 'The customer asked to speak to a manager.'
     pushEvent(s, phone, 'handoff', { phone, summary, channel })
-    pushMessage(s, phone, 'agent', 'text', { text: 'Sizi əməkdaşımıza yönləndirirəm.' })
+    pushMessage(s, phone, 'agent', 'text', { text: 'I am transferring you to a colleague.' })
     return { handed_off: true }
   },
 }
@@ -331,58 +334,60 @@ async function chatTurn(phone: string, text: string, mediaIds: string[]): Promis
     mutate((s) => pushMessage(s, phone, 'agent', type, { text: msg, ...rest }))
   const state = () => load().state[phone] ?? {}
 
-  const HANDOFF_SUMMARY = 'Müştəri iPhone 15 (128 GB, qara) alır, iPhone 13 trade-in edir. Menecerlə danışmaq istədi.'
+  const HANDOFF_SUMMARY =
+    'Customer is buying an iPhone 15 (128 GB, Black) with an iPhone 12 trade-in and asked to speak to a manager.'
 
   if (mediaIds.length) {
-    const analysis = await tool('analyze_device_media', { media_ids: mediaIds, claimed: { model: 'iPhone 13', screen_cracked: false } })
+    const analysis = await tool('analyze_device_media', { media_ids: mediaIds, claimed: { model: 'iPhone 12', screen_cracked: false } })
     const quote = await tool('calculate_tradein', {
       device_info: { analysis_id: analysis.analysis_id, powers_on: true, water_damage: false, repaired_before: false, face_id_working: true, icloud_signed_out: true },
     })
     say(
-      `Şəkilləri yoxladım. Şəkildə ekranın çatladığı görünür, ona görə qiyməti buna əsasən hesablayıram. ` +
-        `iPhone 13 128 GB üçün trade-in təklifim: ${quote.final_offer} AZN (ekran −100, batareya −20).`,
+      `Thanks, I checked the photos. They show a cracked screen, so I am pricing on what the photos show. ` +
+        `My trade-in offer for your iPhone 12 128 GB is ${quote.final_offer} AZN (350 minus 100 for the screen).`,
     )
-  } else if (has(t, 'menecer', 'operator', 'insan', 'менеджер', 'manager')) {
+  } else if (has(t, 'manager', 'human', 'real person', 'supervisor')) {
     await tool('handoff_to_human', { summary: HANDOFF_SUMMARY })
-  } else if (has(t, 'zəng', 'zeng', 'позвон', 'call me')) {
+  } else if (has(t, 'call me', 'call back', 'callback', 'no balance')) {
     await tool('schedule_callback', { delay_seconds: 8 })
-    say('Əlbəttə, bir neçə saniyəyə sizə zəng edirik.')
-  } else if (has(t, 'ödədim', 'odedim', 'оплатил', 'paid')) {
+    say('Of course, we will call you back in a few seconds.')
+  } else if (has(t, 'paid', 'i sent the money', 'transferred')) {
     const res = state().orderId ? await tool('check_payment_status', { order_id: state().orderId }) : { error: 'no_order' }
     say(
       res.error
-        ? 'Hələ aktiv sifarişiniz yoxdur.'
+        ? 'You do not have an open order yet.'
         : res.status === 'paid'
-          ? 'Ödənişiniz təsdiqləndi, təşəkkür edirik! Sifariş hazırlanır.'
-          : 'Sistemdə ödəniş hələ görünmür. Zəhmət olmasa linkdəki "Pay" düyməsi ilə tamamlayın.',
+          ? 'Your payment is confirmed, thank you! We are preparing your order.'
+          : 'I do not see a payment in the system yet. Please complete it with the "Pay" button on the link.',
     )
-  } else if (has(t, 'haradadır', 'haradadir', 'status', 'где заказ', 'izlə')) {
+  } else if (has(t, 'where is my order', 'order status', 'track', 'status')) {
     const res = await tool('get_order_status', state().orderId ? { order_id: state().orderId } : {})
     say(
       res.id
-        ? `Sifariş ${res.id}: ${res.status === 'paid' ? 'ödənilib, hazırlanır' : 'ödəniş gözlənilir'}.`
-        : 'Hələ aktiv sifarişiniz yoxdur.',
+        ? `Order ${res.id}: ${res.status === 'paid' ? 'paid and being prepared' : 'awaiting payment'}.`
+        : 'You do not have an open order yet.',
     )
-  } else if (has(t, 'trade', 'köhnə', 'kohne', 'dəyiş', 'deyis', 'обмен')) {
-    await tool('request_media_whatsapp', { what: 'iPhone 13 trade-in' })
-    say('Yoxlamaq üçün bir neçə şəkil lazımdır — yuxarıdakı təlimata baxın.')
-  } else if (has(t, 'artır', 'artir', 'azdır', 'azdir', 'endirim', 'мало', 'больше')) {
-    const res = await tool('negotiate_offer', { quote_id: state().quoteId, customer_ask: 450 })
+  } else if (has(t, 'trade', 'old phone', 'exchange')) {
+    await tool('request_media_whatsapp', { what: 'iPhone 12 trade-in' })
+    say('I need a few photos to check it. Please follow the instructions above.')
+  } else if (has(t, 'more', 'higher', 'too low', 'better price', 'can you do')) {
+    const extra = Number(t.match(/(\d+)\s*(azn|manat)?\s*more/)?.[1] ?? 50)
+    const res = await tool('negotiate_offer', { quote_id: state().quoteId, customer_ask: (state().offer ?? 0) + extra })
     say(
       res.error
-        ? 'Əvvəlcə telefonun şəkillərini göndərin, sonra qiyməti müzakirə edək.'
+        ? 'Please send photos of the phone first, then we can talk about the price.'
         : res.is_final
-          ? `Son təklifim ${res.new_offer} AZN-dir — bundan artıq mümkün deyil.`
-          : `Sizin üçün ${res.new_offer} AZN edə bilərəm.`,
+          ? `${res.new_offer} AZN is my final offer. I cannot go any higher.`
+          : `I can do ${res.new_offer} AZN for you.`,
     )
-  } else if (has(t, 'kabro', 'aksesuar', 'case', 'чехол')) {
+  } else if (has(t, 'case', 'accessor', 'cover')) {
     await tool('get_accessories', { phone_model: 'iPhone 15' })
     mutate((s) => void (st(s, phone).accessory = true))
-    say('iPhone 15 üçün uyğun kabro: 29 AZN. Sifarişə əlavə etdim.')
-  } else if (has(t, 'çatdır', 'catdir', 'yasamal', 'доставк', 'mağaza', 'ünvan')) {
+    say('A matching protective case for the iPhone 15 is 29 AZN. I added it to your order.')
+  } else if (has(t, 'deliver', 'address', 'pick up', 'pickup', ...DISTRICTS.map((d) => d.toLowerCase()))) {
     const res = await tool('calculate_delivery', { address: text })
-    say(`${res.district}: çatdırılma ${res.fee_azn} AZN.`)
-  } else if (has(t, 'sifariş', 'sifaris', 'razıyam', 'raziyam', 'alıram', 'aliram', 'беру', 'оформ')) {
+    say(res.district === 'pickup' ? 'Store pickup is free.' : `Delivery to ${res.district} is ${res.fee_azn} AZN.`)
+  } else if (has(t, 'order', 'deal', 'i agree', 'buy', "i'll take", 'go ahead', 'confirm')) {
     if (state().deliveryFee === undefined) await tool('calculate_delivery', { address: 'Yasamal' })
     const cur = state()
     const order = await tool('create_order', {
@@ -398,7 +403,7 @@ async function chatTurn(phone: string, text: string, mediaIds: string[]): Promis
       image_url: PHONE_IMG,
       data: { ...PHONE, kind: 'phone', currency: 'AZN' },
     })
-    say('iPhone 15 128 GB qara stokda var — 1399 AZN. Köhnə telefonunuzu trade-in etmək istəyirsiniz?')
+    say('Yes, the iPhone 15 128 GB in Black is in stock for 1399 AZN. Would you like to trade in your old phone?')
   }
 
   return (load().messages[phone] ?? []).slice(before).filter((m) => m.from === 'agent')
@@ -487,7 +492,7 @@ export const mockApi: Api = {
         order.status = 'paid'
         order.paid_at = iso()
         pushMessage(s, order.phone, 'agent', 'text', {
-          text: `Ödənişiniz alındı ✅ Sifariş ${order.id} hazırlanır, kuryer 2 saat ərzində çatdıracaq.`,
+          text: `Payment confirmed. Order: ${order.id}.`,
         })
         pushEvent(s, order.phone, 'order_update', { order_id: order.id, status: 'paid' })
       }

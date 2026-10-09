@@ -108,7 +108,7 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
       <div className="wa-wallpaper scroll-thin min-h-0 flex-1 space-y-1.5 overflow-y-auto px-4 py-3">
         {visible.length === 0 && (
           <div className="mx-auto mt-6 max-w-xs rounded-lg bg-[#fff5c4] px-3 py-2 text-center text-xs text-wa-ink shadow-sm">
-            Write to FlowQ in Azerbaijani or Russian — e.g. “iPhone 15 neçəyədir?”
+            Message FlowQ, for example “Hi, do you have the iPhone 15?”
           </div>
         )}
         {visible.map((m) => (
@@ -188,7 +188,7 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder={drafts.length ? 'Add a caption (optional)' : 'Mesaj yazın'}
+          placeholder={drafts.length ? 'Add a caption (optional)' : 'Type a message'}
           className="min-w-0 flex-1 rounded-full bg-white px-4 py-2 text-sm text-wa-ink outline-none placeholder:text-wa-meta"
         />
         <button
