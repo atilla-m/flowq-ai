@@ -1,6 +1,8 @@
 import { useEffect, useState, type ComponentType, type SVGProps } from 'react'
 import { api } from '../api/client'
-import type { TraceEntry } from '../api/types'
+import type { Message, TraceEntry } from '../api/types'
+import type { LastOrder } from '../hooks/useInbox'
+import { CurrentOrder } from './CurrentOrder'
 import { newer, type DemoReset } from '../lib/demoReset'
 import { clock } from '../lib/pick'
 import { KIND_LABEL, viewOf, type Kind } from '../lib/traceView'
@@ -77,12 +79,14 @@ function Kpi({ label, value, note }: { label: string; value: string | number; no
 
 interface Props {
   phone: string
+  messages: Message[]
+  lastOrder: LastOrder | null
   /** Set by "Reset demo": entries up to `traceUpTo` are hidden and not counted. */
   reset: DemoReset | null
   onShowHistory(): void
 }
 
-export function TraceDrawer({ phone, reset, onShowHistory }: Props) {
+export function TraceDrawer({ phone, messages, lastOrder, reset, onShowHistory }: Props) {
   const [entries, setEntries] = useState<TraceEntry[]>([])
   // A dedicated console can show the full timeline at every desktop height.
   const [size, setSize] = useState<Size>('open')
@@ -155,6 +159,7 @@ export function TraceDrawer({ phone, reset, onShowHistory }: Props) {
         <Kpi label="Policy blocks" value={count('policy')} />
         <Kpi label="Mismatches" value={mismatches} />
       </div>
+      <CurrentOrder entries={session.map(({ e }) => e)} messages={messages} lastOrder={lastOrder} />
       <div className="trace-header">
         <button
           onClick={() => setSize((s) => (s === 'compact' ? 'open' : 'compact'))}

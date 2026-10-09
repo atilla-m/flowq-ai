@@ -32,6 +32,10 @@ export const SpeakerIcon = (p: P) => (
   <svg {...base(p)}><path d="m11 5-6 4H2v6h3l6 4V5ZM15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14" /></svg>
 )
 
+export const LockIcon = (p: P) => (
+  <svg {...base(p)}><rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10V6a4 4 0 0 1 8 0v4M12 14v3" /></svg>
+)
+
 export const VerifiedIcon = (p: P) => (
   <svg {...base(p)}><path d="m12 2 3 2 3.5.5.5 3.5 2 4-2 3-.5 3.5-3.5.5-3 2-3-2-3.5-.5-.5-3.5-2-3 2-4 .5-3.5L9 4zM8 12l2.5 2.5L16 9" /></svg>
 )

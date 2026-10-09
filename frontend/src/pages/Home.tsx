@@ -111,7 +111,7 @@ function Workspace({ customer, showScript, onHideScript, reset, onShowHistory }:
             </span>
           </header>
           <CustomerCard customer={customer} memory={memory} lastOrder={inbox.lastOrder} orderNews={toast} />
-          <TraceDrawer phone={phone} reset={reset} onShowHistory={onShowHistory} />
+          <TraceDrawer phone={phone} messages={inbox.messages} lastOrder={inbox.lastOrder} reset={reset} onShowHistory={onShowHistory} />
         </aside>
       </main>
 

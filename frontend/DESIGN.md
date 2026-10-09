@@ -44,3 +44,9 @@ All captures are in `/tmp/flowq-polish/output/playwright/`:
 | Full trace | full-trace-1920x1080.png | full-trace-1366x768.png |
 
 Additional captures: light-1366x768.png, mobile-390x844.png, expanded-json-1920x1080.png and expanded-json-1366x768.png.
+
+## Current order addition
+
+A compact Current order section sits between metrics and Live actions. It projects already received trace results, structured inbox messages and the existing inbox order status; it adds no requests. Five mint steps track successful product/trade-in/offer/delivery/payment results. Itemized mono amounts use the authoritative order snapshot after creation, with a negative trade-in credit, final-offer lock, accessories, delivery and total. Only matching backend paid status or the existing paid order event marks Paid; customer text and unrelated orders cannot. Failed/clarification results are ignored. New lines animate for 150 ms and changed amounts briefly highlight; reduced motion applies. Live actions retains the remaining scroll height.
+
+Validation: build/lint, pure projection checks (progress, totals, quantities, zero delivery, final offers, false payment claims, stale orders and failures), and an active mock call through the full flow at both desktop sizes, including actual mock payment through the existing payment page. Captures: `/tmp/flowq-current-order/output/playwright/awaiting-1920x1080.png`, `awaiting-1366x768.png`, `paid-1920x1080.png`, `paid-1366x768.png`. API calls, polling and voice/hook files remain unchanged.
