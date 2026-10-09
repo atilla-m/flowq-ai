@@ -51,7 +51,7 @@ def test_vision_all_photos_and_polite_mismatch_notice(tmp_path, pack):
         ids = [upload(client) for _ in range(4)]
         result = call(client, "analyze_device_media", {"media_ids": ids, "claimed": {"battery_health": 100, "damage": "none"}})
         assert len(ai.media) == 4 and result["analysis_id"]
-        assert "Şəkillər" in result["customer_notice"]
+        assert "photos" in result["customer_notice"]
         quote = call(client, "calculate_tradein", {"device_info": {"analysis_id": result["analysis_id"],
             "battery_health": 100, "screen_cracked": False, "powers_on": True, "water_damage": False,
             "repaired_before": False, "face_id_working": True, "icloud_signed_out": False}})

@@ -13,7 +13,7 @@ def calculate_delivery(address: str, config: dict) -> dict:
             matches.append(district)
     if len(matches) != 1:
         return {"address": address, "fee_azn": None, "needs_clarification": True,
-                "question": "Çatdırılma üçün hansı rayon və ya şəhərdir?",
+                "question": "Which district or city should we deliver to?",
                 "districts": [district["name"] for district in config["districts"]]}
     district = matches[0]
     return {"address": address, "district": district["name"], "fee_azn": district["fee_azn"],

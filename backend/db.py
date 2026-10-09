@@ -252,6 +252,6 @@ class Database:
                                "DO UPDATE SET status='paid', paid_at=excluded.paid_at", (order_id, ts, ts))
             connection.execute("UPDATE orders SET status='paid' WHERE id=?", (order_id,))
             self.add_event(order["phone"], "order_update", {"order_id": order_id, "status": "paid"}, connection=connection)
-            self.add_message(order["phone"], "agent", "text", text=f"Ödəniş təsdiqləndi. Sifariş: {order_id}.",
+            self.add_message(order["phone"], "agent", "text", text=f"Payment confirmed. Order: {order_id}.",
                              data={"order_id": order_id, "status": "paid"}, connection=connection)
         return {"status": "paid"}

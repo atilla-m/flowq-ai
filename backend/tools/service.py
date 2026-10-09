@@ -62,7 +62,7 @@ class ToolService:
                 result = {"error": "provider_error", "message": str(error)}
             except Exception:
                 logger.exception("Tool failed: %s", name)
-                result = {"error": "tool_unavailable", "message": "Bu əməliyyat hazırda mümkün deyil. Yenidən yoxlayın və ya əməkdaşa müraciət edin."}
+                result = {"error": "tool_unavailable", "message": "This action is temporarily unavailable. Please try again or speak with a shop assistant."}
             elapsed = round((time.perf_counter() - started) * 1000, 3)
             self.db.log_tool(phone, channel, name, loggable(args), result, elapsed)
             return result
@@ -124,7 +124,7 @@ class ToolService:
                                (analysis_id, phone, now_iso(), dumps(result["media_ids"]), dumps(result)))
         if result.get("mismatches"):
             details = "; ".join(item["message"] for item in result["mismatches"])
-            notice = f"Şəkillər dediyiniz bəzi məlumatlarla uyğun gəlmir: {details}. Qiyməti şəkillərdə görünən vəziyyətə əsasən hesablayacağıq."
+            notice = f"The photos differ from some of the details you provided: {details}. We will base the offer on the condition shown in the photos."
             result["customer_notice"] = notice
             self.db.add_message(phone, "agent", "text", text=notice,
                                 data={"analysis_id": analysis_id, "mismatches": result["mismatches"]})
@@ -137,10 +137,10 @@ class ToolService:
                 ("AND id=?" if analysis_id else "ORDER BY ts DESC LIMIT 1"),
                 (phone, analysis_id) if analysis_id else (phone,)).fetchone()
             if not row:
-                return {"need_retake": True, "reason": "Əvvəlcə şəkilləri analyze_device_media ilə yoxlamaq lazımdır."}
+                return {"need_retake": True, "reason": "Please verify the photos before calculating a trade-in offer."}
             observation = json.loads(row["result"])
             if observation.get("need_retake") or observation.get("confidence", 0) < self.pack.tradein_rules["minimum_vision_confidence"]:
-                return {"need_retake": True, "reason": observation.get("reason", "Daha aydın şəkillər göndərin.")}
+                return {"need_retake": True, "reason": observation.get("reason", "Please send clearer photos.")}
             required = self.pack.tradein_rules["required_visual_fields"]
             if any(observation.get(field) is None for field in required):
                 return {"need_retake": True, "reason": self.pack.tradein_rules["media_instructions"]}
@@ -152,7 +152,7 @@ class ToolService:
                 missing.remove("powers_on")
             if missing:
                 return {"needs_clarification": True, "missing_fields": missing,
-                        "message": "Qiymətləndirmədən əvvəl qısa yoxlama suallarını tamamlayın."}
+                        "message": "Please complete the short condition checklist before we calculate the offer."}
             verified = {field: observation[field] for field in required}
             # Verified photo facts win even when an LLM submits contradictory device_info.
             verified.update({field: device_info[field] for field in self.pack.tradein_rules["checklist_fields"] if field in device_info})
@@ -258,7 +258,7 @@ class ToolService:
                                 dumps(delivery), total, "awaiting_payment", analysis_id, idempotency_key))
             connection.execute("INSERT INTO payments VALUES (?, 'pending', ?, NULL)", (order_id, ts))
             order = self.db.order_dict(connection.execute("SELECT * FROM orders WHERE id=?", (order_id,)).fetchone())
-            self.db.add_message(phone, "agent", "order_summary", text=f"Sifariş {order_id}: cəmi {total / 100:.2f} AZN.",
+            self.db.add_message(phone, "agent", "order_summary", text=f"Order {order_id}: total {total / 100:.2f} AZN.",
                                 data=order, connection=connection)
             self.db.add_event(phone, "order_update", {"order_id": order_id, "status": "awaiting_payment"}, connection=connection)
         return order
@@ -267,9 +267,9 @@ class ToolService:
         self.db.order(order_id, phone)
         status = self.check_payment_status(phone=phone, channel=channel, order_id=order_id)
         if status["status"] == "paid":
-            return {"order_id": order_id, "status": "paid", "message": "Bu sifariş artıq ödənilib."}
+            return {"order_id": order_id, "status": "paid", "message": "This order has already been paid."}
         url = f"{self.settings.frontend_url}/pay/{order_id}"
-        self.db.add_message(phone, "agent", "payment_link", text="Ödəniş üçün keçid:",
+        self.db.add_message(phone, "agent", "payment_link", text="Your payment link:",
                             data={"order_id": order_id, "url": url, "status": "pending"})
         return {"order_id": order_id, "url": url, "status": "pending"}
 
@@ -295,5 +295,5 @@ class ToolService:
 
     def handoff_to_human(self, *, phone, channel, summary):
         event = self.db.add_event(phone, "handoff", {"phone": phone, "summary": summary, "channel": channel})
-        self.db.add_message(phone, "agent", "text", text="Sizi əməkdaşımıza yönləndirirəm.", data={"event_id": event["id"]})
+        self.db.add_message(phone, "agent", "text", text="I am connecting you with a shop assistant.", data={"event_id": event["id"]})
         return {"handed_off": True, "event_id": event["id"]}

@@ -77,11 +77,11 @@ class ChatAgent:
                         facts.append({"tool": item.name, "result": result})
                     inputs.append({"type": "function_call_output", "call_id": item.call_id, "output": dumps(result)})
             if not final_text:
-                final_text = "Davam etmək üçün növbəti məlumatı göndərin. İstəsəniz sizi əməkdaşımıza yönləndirə bilərəm."
+                final_text = "Please send the next detail to continue. I can connect you with a shop assistant if you prefer."
             self.db.add_message(phone, "agent", "text", text=final_text)
-            summary = "Müştəri dedi (təsdiqlənməmiş): " + text[:1200] + "\nFlowQ: " + final_text[:1200]
+            summary = "Customer said (unverified): " + text[:1200] + "\nFlowQ: " + final_text[:1200]
             if facts:
-                summary += "\nBackend alət nəticələri: " + dumps(facts)[:6000]
+                summary += "\nBackend tool results: " + dumps(facts)[:6000]
             self.db.add_conversation(phone, "whatsapp", summary)
             return {"messages": self.db.inbox(phone, cursor)["messages"]}
 
@@ -94,6 +94,6 @@ class ChatAgent:
         except (AIUnavailable, AIProviderError):
             # Keep memory even during a provider outage, explicitly as unverified transcript.
             logger.warning("Call summary unavailable; preserving transcript excerpt")
-            summary = "Zəng transkripti (təsdiqlənməmiş müştəri ifadələri): " + transcript[:6000]
+            summary = "Call transcript (unverified customer statements): " + transcript[:6000]
         self.db.add_conversation(phone, "voice", summary)
         return {"ok": True}

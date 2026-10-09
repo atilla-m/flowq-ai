@@ -69,9 +69,9 @@ def normalize_observation(observation: dict, claimed: dict, rules: dict) -> dict
 
             def readable(value):
                 if isinstance(value, bool):
-                    return "var" if value else "yoxdur"
+                    return "yes" if value else "no"
                 return str(value)
 
             mismatches.append({"field": field, "claimed": claim, "observed": observed,
-                "message": f"{label}: dediyiniz {readable(claim)}, şəkillərdə {readable(observed)} görünür"})
+                "message": f"{label}: you reported {readable(claim)}; the photos show {readable(observed)}"})
     return {**observation, "mismatches": mismatches, "need_retake": need_retake}
