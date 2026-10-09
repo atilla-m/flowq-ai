@@ -52,7 +52,8 @@ def test_filters_only_and_strict_alternative_filters(pack):
 
 
 def test_unknown_models_and_available_variants_do_not_trigger_alternatives(pack):
-    assert not search_inventory("iPhone 99", pack.catalog)["alternatives"]
+    unknown = search_inventory("iPhone 99", pack.catalog)
+    assert unknown["items"] and unknown["fallback"] and not unknown["alternatives"]
     available = search_inventory("iPhone 17", pack.catalog)
     assert available["items"] and not available["out_of_stock"]
     assert all(item["category"] == "phones" for item in available["items"])

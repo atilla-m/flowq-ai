@@ -116,6 +116,8 @@ Both Realtime and chat advertise **17 tools** through the shared registry. Exist
 
 The existing `get_accessories({phone_model})` also accepts laptop/tablet/watch/console/headphone model names. Its argument name stays unchanged; compatibility and images still match the exact model, including Plus variants.
 
+Inventory queries ignore conversational filler such as “do you have”, “in stock” and “price”. Brand, product-family and category words scope the matches. If no model/variant matches, recognized brand/category scopes can return broader items with a non-null `fallback:{brands,categories,reason}`. A null `fallback` means no broad fallback was used. Never label fallback items as the unavailable requested model; explicit filters still apply. Stock-only searches must use `in_stock:true`.
+
 For `check_installment`, `{"sku":"MBA13-M4-256-SKY","months":6}` estimates a 2499 AZN purchase at 416.50 AZN per month (the final payment is also 416.50). It reads current DB stock; quotes exclude delivery and trade-in and require card/provider approval. It never creates a payment or financing agreement. The first installments round down to cents; the final one settles the remainder. Returns are 14 days under the tool-provided conditions; warranty duration comes from each SKU.
 
 Additional asset routes remain `GET /api/media/{media_id}` and `GET /api/assets/accessories/{sku}.svg`.

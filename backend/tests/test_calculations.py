@@ -90,4 +90,5 @@ def test_inventory_fuzzy_and_numeric_variants(pack):
     items = search_inventory("iphon 15 128", pack.catalog)["items"]
     assert items and all(item["name"] == "iPhone 15" and item["storage"] == 128 for item in items)
     assert search_inventory("S24", pack.catalog)["items"][0]["name"] == "Samsung Galaxy S24"
-    assert not search_inventory("iPhone 99", pack.catalog)["items"]
+    unavailable = search_inventory("iPhone 99", pack.catalog)
+    assert unavailable["fallback"] and all(item["name"] != "iPhone 99" for item in unavailable["items"])
