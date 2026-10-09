@@ -12,11 +12,12 @@ from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel, Field, field_validator
 
 from backend.ai import AIClient, AIProviderError, AIUnavailable
-from backend.agent import ChatAgent
+from backend.agent import ChatAgent, memory_instructions
 from backend.config import Settings
 from backend.db import Database, normalize_phone, now_iso
 from backend.pack import IndustryPack
 from backend.tools.service import ToolService
+from backend.tools.schemas import realtime_tools
 
 
 class PhoneBody(BaseModel):
@@ -93,6 +94,16 @@ def create_app(settings: Settings | None = None, ai=None) -> FastAPI:
             return await agent.turn(body.phone, body.text, body.media_ids)
         except ValueError as error:
             raise HTTPException(422, str(error)) from error
+        except AIUnavailable as error:
+            raise HTTPException(503, str(error)) from error
+        except AIProviderError as error:
+            raise HTTPException(502, str(error)) from error
+
+    @app.post("/api/realtime/session")
+    async def realtime_session(body: PhoneBody):
+        instructions = memory_instructions(pack.voice_prompt, db.history(body.phone))
+        try:
+            return await ai.realtime_session(instructions, realtime_tools())
         except AIUnavailable as error:
             raise HTTPException(503, str(error)) from error
         except AIProviderError as error:

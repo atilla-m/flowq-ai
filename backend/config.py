@@ -21,6 +21,7 @@ class Settings:
     vision_model: str = "gpt-6.1-sol"
     realtime_model: str = "gpt-realtime-2.1"
     realtime_voice: str = "marin"
+    transcription_model: str = "gpt-live-transcribe"
     industry_pack: str = "gadgets"
     database_path: Path = ROOT / "backend/data/flowq.sqlite3"
     upload_dir: Path = ROOT / "backend/data/media"
@@ -36,6 +37,7 @@ class Settings:
             vision_model=os.getenv("VISION_MODEL", cls.vision_model),
             realtime_model=os.getenv("REALTIME_MODEL", cls.realtime_model),
             realtime_voice=os.getenv("REALTIME_VOICE", cls.realtime_voice),
+            transcription_model=os.getenv("TRANSCRIPTION_MODEL", cls.transcription_model),
             industry_pack=os.getenv("INDUSTRY_PACK", cls.industry_pack),
             database_path=rooted_path(os.getenv("DATABASE_PATH", "backend/data/flowq.sqlite3")),
             upload_dir=rooted_path(os.getenv("UPLOAD_DIR", "backend/data/media")),

@@ -88,3 +88,23 @@ class AIClient:
             return {"model": None, "storage": None, "battery_health": None, "screen_cracked": None,
                     "back_cracked": None, "other_damage": [], "confidence": 0, "mismatches": [],
                     "need_retake": True, "reason": "Şəkillərdə məlumatları dəqiq oxumaq mümkün olmadı. " + pack.tradein_rules["media_instructions"]}
+
+    async def realtime_session(self, instructions: str, tools: list[dict]) -> dict:
+        client = self.require_client()
+        session = {
+            "type": "realtime", "model": self.settings.realtime_model,
+            "instructions": instructions, "tools": tools, "tool_choice": "auto",
+            "output_modalities": ["audio"],
+            "audio": {"input": {"transcription": {"model": self.settings.transcription_model},
+                                "turn_detection": {"type": "server_vad", "create_response": True, "interrupt_response": True}},
+                      "output": {"voice": self.settings.realtime_voice}},
+        }
+        try:
+            secret = await client.realtime.client_secrets.create(
+                expires_after={"anchor": "created_at", "seconds": 600}, session=session)
+        except OpenAIError as error:
+            raise AIProviderError("OpenAI Realtime session creation failed; check key and model access") from error
+        if not secret.value or secret.value == self.settings.api_key:
+            raise AIProviderError("OpenAI did not return a usable ephemeral client secret")
+        return {"client_secret": secret.value, "model": self.settings.realtime_model,
+                "instructions": instructions, "tools": tools}
