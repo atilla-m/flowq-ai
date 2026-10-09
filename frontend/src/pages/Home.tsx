@@ -85,6 +85,7 @@ function Workspace({ customer, showScript, onHideScript }: { customer: Customer;
             messages={inbox.messages}
             online={inbox.online}
             callActive={call.status === 'connected'}
+            onUploadDuringCall={call.notifyUpload}
             addLocal={inbox.addLocal}
             mergeServer={inbox.mergeServer}
           />

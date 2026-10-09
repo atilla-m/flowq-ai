@@ -10,6 +10,7 @@ interface Props {
   online: boolean
   /** A voice call is live: photo uploads go to the voice agent instead of starting a chat turn. */
   callActive: boolean
+  onUploadDuringCall(mediaIds: string[]): void
   addLocal(m: Omit<Message, 'id' | 'ts'>): void
   mergeServer(m: Message[]): void
 }
@@ -19,7 +20,7 @@ interface Draft {
   preview: string
 }
 
-export function ChatPanel({ customer, messages, online, callActive, addLocal, mergeServer }: Props) {
+export function ChatPanel({ customer, messages, online, callActive, onUploadDuringCall, addLocal, mergeServer }: Props) {
   const [text, setText] = useState('')
   const [drafts, setDrafts] = useState<Draft[]>([])
   const [busy, setBusy] = useState(false)
@@ -49,7 +50,10 @@ export function ChatPanel({ customer, messages, online, callActive, addLocal, me
       if (trimmed) addLocal({ from: 'customer', type: 'text', text: trimmed })
       // During a call the voice agent picks the photos up via analyze_device_media; a parallel
       // WhatsApp turn would make two agents answer at once.
-      if (callActive && !trimmed) return
+      if (callActive && !trimmed) {
+        onUploadDuringCall(mediaIds)
+        return
+      }
       const res = await api.chat(phone, trimmed, mediaIds)
       mergeServer(res.messages ?? [])
     } catch (e) {

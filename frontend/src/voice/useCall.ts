@@ -16,6 +16,8 @@ export interface CallState {
   latencies: number[]
   start(): void
   end(): void
+  /** Photos landed in WhatsApp during the call: nudge the voice agent so it reacts right away. */
+  notifyUpload(mediaIds: string[]): void
   dismissError(): void
 }
 
@@ -122,6 +124,11 @@ export function useCall(phone: string): CallState {
     latencies,
     start,
     end,
+    notifyUpload: useCallback((mediaIds: string[]) => {
+      driver.current?.notify?.(
+        `(WhatsApp) The customer just uploaded ${mediaIds.length} photo(s) for the trade-in. media_ids: ${mediaIds.join(', ')}`,
+      )
+    }, []),
     dismissError: useCallback(() => setError(null), []),
   }
 }

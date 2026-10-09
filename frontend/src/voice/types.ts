@@ -32,4 +32,6 @@ export interface CallSink {
 
 export interface CallDriver {
   stop(): void
+  /** Tell the agent, mid-call, about something that happened outside the audio (e.g. photos uploaded). */
+  notify?(text: string): void
 }

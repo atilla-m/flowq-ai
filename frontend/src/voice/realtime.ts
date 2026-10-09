@@ -342,5 +342,13 @@ export function startRealtimeCall(phone: string, sink: CallSink): CallDriver {
     else fail('realtime', `Voice call failed: ${e instanceof Error ? e.message : String(e)}`)
   })
 
-  return { stop }
+  const notify = (text: string) => {
+    send({
+      type: 'conversation.item.create',
+      item: { type: 'message', role: 'user', content: [{ type: 'input_text', text }] },
+    })
+    send({ type: 'response.create' })
+  }
+
+  return { stop, notify }
 }
