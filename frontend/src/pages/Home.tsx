@@ -3,17 +3,22 @@ import { api, API_BASE, IS_MOCK } from '../api/client'
 import { resetMock } from '../api/mock'
 import type { Customer, InboxEvent } from '../api/types'
 import { ChatPanel } from '../components/ChatPanel'
+import { CustomerCard } from '../components/CustomerCard'
 import { DemoScript } from '../components/DemoScript'
-import { ListIcon, Logo } from '../components/icons'
+import { ListIcon, Logo, MoonIcon, SunIcon } from '../components/icons'
 import { HandoffBanner, IncomingCall } from '../components/Overlays'
 import { PhonePanel } from '../components/PhonePanel'
 import { TraceDrawer } from '../components/TraceDrawer'
 import { useInbox } from '../hooks/useInbox'
 import { latestTs, loadReset, saveReset, type DemoReset } from '../lib/demoReset'
 import { pickNum, pickStr } from '../lib/pick'
+import { useTheme } from '../lib/theme'
 import { useCall } from '../voice/useCall'
 
 const PHONE_KEY = 'flowq-selected-phone'
+
+const ghostBtn =
+  'cursor-pointer rounded-lg border border-line bg-surface px-3 py-1.5 text-sm font-medium text-ink-2 transition hover:border-ink-3/50 hover:text-ink disabled:cursor-default disabled:opacity-50'
 
 interface WorkspaceProps {
   customer: Customer
@@ -28,26 +33,30 @@ function Workspace({ customer, showScript, onHideScript, reset, onShowHistory }:
   const call = useCall(phone)
   const [incoming, setIncoming] = useState(false)
   const [handoff, setHandoff] = useState<string | null>(null)
+  // Latest order_update, shown for a few seconds as a highlight on the customer card.
   const [toast, setToast] = useState<string | null>(null)
   const [memory, setMemory] = useState<string | undefined>(customer.history_summary)
 
   const resetTraceUpTo = reset?.traceUpTo
-  const onEvent = useCallback((e: InboxEvent) => {
-    if (e.type === 'incoming_callback') {
-      // A callback's timestamp is when it is due, not when it was asked for. One that was
-      // scheduled before "Reset demo" belongs to the previous take, so don't ring for it.
-      const due = Date.parse(pickStr(e.data, 'scheduled_at') ?? e.ts)
-      const askedAt = due - (pickNum(e.data, 'delay_seconds') ?? 0) * 1000
-      if (resetTraceUpTo && askedAt <= Date.parse(resetTraceUpTo) + 1000) return
-      setIncoming(true)
-    } else if (e.type === 'handoff')
-      setHandoff(pickStr(e.data, 'summary', 'reason', 'text') ?? 'A human agent is taking over this conversation.')
-    else if (e.type === 'order_update') {
-      const id = pickStr(e.data, 'order_id', 'id')
-      const status = pickStr(e.data, 'status')?.replace(/_/g, ' ')
-      setToast(`Order ${id ?? ''} ${status ? `· ${status}` : 'updated'}`)
-    }
-  }, [resetTraceUpTo])
+  const onEvent = useCallback(
+    (e: InboxEvent) => {
+      if (e.type === 'incoming_callback') {
+        // A callback's timestamp is when it is due, not when it was asked for. One that was
+        // scheduled before "Reset demo" belongs to the previous take, so don't ring for it.
+        const due = Date.parse(pickStr(e.data, 'scheduled_at') ?? e.ts)
+        const askedAt = due - (pickNum(e.data, 'delay_seconds') ?? 0) * 1000
+        if (resetTraceUpTo && askedAt <= Date.parse(resetTraceUpTo) + 1000) return
+        setIncoming(true)
+      } else if (e.type === 'handoff')
+        setHandoff(pickStr(e.data, 'summary', 'reason', 'text') ?? 'A human agent is taking over this conversation.')
+      else if (e.type === 'order_update') {
+        const id = pickStr(e.data, 'order_id', 'id')
+        const status = pickStr(e.data, 'status')?.replace(/_/g, ' ')
+        setToast(`Order ${id ?? ''} ${status ? `· ${status}` : 'updated'}`)
+      }
+    },
+    [resetTraceUpTo],
+  )
   const inbox = useInbox(phone, onEvent, reset?.messagesUpTo)
 
   useEffect(() => {
@@ -74,19 +83,10 @@ function Workspace({ customer, showScript, onHideScript, reset, onShowHistory }:
     <>
       {handoff && <HandoffBanner summary={handoff} onClose={() => setHandoff(null)} />}
 
-      {memory && (
-        <p className="mx-4 mt-3 truncate text-xs text-slate-400" title={memory}>
-          <span className="mr-2 rounded bg-slate-800 px-1.5 py-0.5 font-medium text-slate-300">Agent memory</span>
-          {memory}
-        </p>
-      )}
+      <CustomerCard customer={customer} memory={memory} lastOrder={inbox.lastOrder} orderNews={toast} />
 
-      <main
-        className={`grid min-h-0 flex-1 gap-4 overflow-y-auto p-4 lg:overflow-hidden ${
-          showScript ? 'lg:grid-cols-[22rem_minmax(0,1fr)_19rem]' : 'lg:grid-cols-[22rem_minmax(0,1fr)]'
-        }`}
-      >
-        <div className="h-[38rem] min-h-0 lg:h-full">
+      <main className="grid min-h-0 flex-1 gap-4 overflow-y-auto p-4 lg:grid-cols-2 lg:overflow-hidden">
+        <div className="h-[40rem] min-h-0 lg:h-full">
           <PhonePanel customer={customer} call={call} />
         </div>
         <div className="h-[38rem] min-h-0 lg:h-full">
@@ -100,20 +100,11 @@ function Workspace({ customer, showScript, onHideScript, reset, onShowHistory }:
             mergeServer={inbox.mergeServer}
           />
         </div>
-        {showScript && (
-          <div className="h-[30rem] min-h-0 lg:h-full">
-            <DemoScript onClose={onHideScript} />
-          </div>
-        )}
       </main>
 
       <TraceDrawer phone={phone} reset={reset} onShowHistory={onShowHistory} />
 
-      {toast && (
-        <div className="fixed top-[4.25rem] left-1/2 z-40 -translate-x-1/2 animate-rise rounded-lg border border-emerald-400/40 bg-slate-900 px-4 py-2 text-sm text-emerald-200 shadow-xl" role="status">
-          {toast}
-        </div>
-      )}
+      <DemoScript open={showScript} onClose={onHideScript} />
 
       {incoming && (
         <IncomingCall
@@ -133,8 +124,9 @@ export default function Home() {
   const [customers, setCustomers] = useState<Customer[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [phone, setPhone] = useState<string | null>(() => localStorage.getItem(PHONE_KEY))
-  const [showScript, setShowScript] = useState(() => window.innerWidth >= 1280)
+  const [showScript, setShowScript] = useState(false)
   const [attempt, setAttempt] = useState(0)
+  const [theme, toggleTheme] = useTheme()
 
   useEffect(() => {
     let alive = true
@@ -182,21 +174,21 @@ export default function Home() {
     setResetCount((n) => n + 1)
   }
 
+  const hideScript = useCallback(() => setShowScript(false), [])
+
   return (
-    <div className="flex h-full flex-col">
-      <header className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b border-slate-800 bg-slate-900/70 px-4 py-2.5">
-        <div className="flex items-center gap-2.5">
-          <Logo className="h-8 w-8" />
+    <div className="flex h-full flex-col bg-bg text-ink">
+      <header className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b border-line bg-surface px-5 py-2.5">
+        <div className="flex items-center gap-3">
+          <Logo className="h-9 w-9" />
           <div className="leading-tight">
-            <h1 className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-lg font-bold text-transparent">
-              FlowQ AI
-            </h1>
-            <p className="hidden text-[11px] text-slate-400 sm:block">Voice + WhatsApp sales agent</p>
+            <h1 className="text-base font-semibold tracking-tight text-ink">FlowQ AI</h1>
+            <p className="hidden text-xs text-ink-3 sm:block">AI sales agent — voice + WhatsApp</p>
           </div>
         </div>
 
-        <span className="rounded-full border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs text-slate-200">
-          Industry: <span className="font-semibold text-emerald-300">Gadgets</span>
+        <span className="rounded-full border border-line bg-surface-2 px-2.5 py-1 text-xs text-ink-2">
+          Industry: <span className="font-semibold text-ink">Gadgets</span>
         </span>
         {IS_MOCK && (
           <button
@@ -205,15 +197,15 @@ export default function Home() {
               location.reload()
             }}
             title="Mock mode: data is faked in the browser. Click to reset it."
-            className="cursor-pointer rounded-full border border-amber-400/40 bg-amber-400/10 px-2.5 py-1 text-xs text-amber-200"
+            className="cursor-pointer rounded-full bg-warn-soft px-2.5 py-1 text-xs font-medium text-warn"
           >
             Mock data · reset
           </button>
         )}
 
-        <div className="ml-auto flex items-center gap-3">
-          <label className="flex items-center gap-2 text-xs text-slate-400">
-            <span className="hidden sm:inline">Demo customer</span>
+        <div className="ml-auto flex items-center gap-2">
+          <label className="flex items-center gap-2 text-xs text-ink-3">
+            <span className="hidden md:inline">Customer</span>
             <select
               value={customer?.phone ?? ''}
               disabled={!customers?.length}
@@ -221,7 +213,7 @@ export default function Home() {
                 setPhone(e.target.value)
                 localStorage.setItem(PHONE_KEY, e.target.value)
               }}
-              className="max-w-56 cursor-pointer rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-sm text-slate-100 outline-none focus:border-emerald-400"
+              className="max-w-60 cursor-pointer rounded-lg border border-line bg-surface px-3 py-1.5 text-sm font-medium text-ink outline-none focus:border-accent"
             >
               {customers?.map((c) => (
                 <option key={c.id} value={c.phone}>
@@ -234,19 +226,27 @@ export default function Home() {
             onClick={resetDemo}
             disabled={!customer || resetting}
             title="Clears this browser's view for the selected customer: chat, call transcript, trace and stats. Backend data and the agent's memory are not changed."
-            className="cursor-pointer rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-sm text-slate-200 transition hover:border-slate-500 disabled:opacity-50"
+            className={ghostBtn}
           >
             {resetting ? 'Resetting…' : 'Reset demo'}
           </button>
           <button
             onClick={() => setShowScript((s) => !s)}
             aria-pressed={showScript}
-            className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-sm transition ${
-              showScript ? 'border-emerald-400/50 bg-emerald-400/10 text-emerald-200' : 'border-slate-700 bg-slate-800 text-slate-200'
+            className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              showScript ? 'bg-accent-soft text-accent-ink' : 'bg-accent text-on-accent hover:bg-accent-hover'
             }`}
           >
             <ListIcon className="h-4 w-4" />
             Demo script
+          </button>
+          <button
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            title={theme === 'dark' ? 'Light theme' : 'Dark theme'}
+            className="flex h-[2.125rem] w-[2.125rem] cursor-pointer items-center justify-center rounded-lg border border-line bg-surface text-ink-2 transition hover:text-ink"
+          >
+            {theme === 'dark' ? <SunIcon className="h-4 w-4" /> : <MoonIcon className="h-4 w-4" />}
           </button>
         </div>
       </header>
@@ -258,45 +258,45 @@ export default function Home() {
           onShowHistory={showHistory}
           customer={customer}
           showScript={showScript}
-          onHideScript={() => setShowScript(false)}
+          onHideScript={hideScript}
         />
       ) : (
-        <div className="flex flex-1 items-center justify-center p-6 text-center">
+        <div className="flex flex-1 items-center justify-center p-6">
           {error ? (
-            <div className="max-w-md space-y-3">
-              <h2 className="text-lg font-semibold">Can’t reach the FlowQ backend</h2>
-              <p className="text-sm text-slate-400">{error}</p>
-              <ul className="space-y-1.5 text-left text-sm text-slate-400">
+            <div className="max-w-md space-y-3 rounded-2xl border border-line bg-surface p-6 shadow-card">
+              <h2 className="text-lg font-semibold text-ink">Can’t reach the FlowQ backend</h2>
+              <p className="text-sm text-ink-2">{error}</p>
+              <ul className="list-disc space-y-1.5 pl-5 text-sm text-ink-2">
                 <li>
-                  Is the API running at <code className="text-slate-200">{API_BASE}</code>?
+                  Is the API running at <code className="text-ink">{API_BASE}</code>?
                 </li>
                 <li>
                   The backend only answers browsers on its allowlist: its{' '}
-                  <code className="text-slate-200">ALLOWED_ORIGINS</code> must include{' '}
-                  <code className="text-slate-200">{window.location.origin}</code>.
+                  <code className="text-ink">ALLOWED_ORIGINS</code> must include{' '}
+                  <code className="text-ink">{window.location.origin}</code>.
                 </li>
                 {window.location.protocol === 'https:' && API_BASE.startsWith('http://') && (
-                  <li className="text-amber-300">
+                  <li className="text-warn">
                     This page is on HTTPS but <code>VITE_API_BASE</code> is plain HTTP, which browsers block. Point it
                     at the backend’s https:// URL and rebuild.
                   </li>
                 )}
                 <li>
-                  No backend? Run the frontend with <code className="text-slate-200">VITE_MOCK=1</code> for built-in
-                  demo data.
+                  No backend? Run the frontend with <code className="text-ink">VITE_MOCK=1</code> for built-in demo
+                  data.
                 </li>
               </ul>
               <button
                 onClick={() => setAttempt((a) => a + 1)}
-                className="cursor-pointer rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-400"
+                className="cursor-pointer rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-on-accent hover:bg-accent-hover"
               >
                 Retry
               </button>
             </div>
           ) : customers ? (
-            <p className="text-sm text-slate-400">The backend returned no demo customers.</p>
+            <p className="text-sm text-ink-3">The backend returned no demo customers.</p>
           ) : (
-            <p className="animate-pulse text-sm text-slate-400">Loading customers…</p>
+            <p className="animate-pulse text-sm text-ink-3">Loading customers…</p>
           )}
         </div>
       )}

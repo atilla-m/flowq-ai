@@ -2,10 +2,11 @@
 
 Single-page demo UI for FlowQ AI, the voice + WhatsApp sales agent for gadget shops in Azerbaijan.
 The UI and demo are in English; prices are in AZN and Baku district names are kept as they are.
-Vite + React + TypeScript + Tailwind. No UI library, no router.
+Vite + React + TypeScript + Tailwind. No UI library, no router. Inter is bundled with the app
+(no font CDN), so the page looks the same offline.
 
-- `/` — phone call panel (OpenAI Realtime over WebRTC), WhatsApp-style chat, agent trace with
-  session stats, demo script
+- `/` — phone call (OpenAI Realtime over WebRTC), WhatsApp-style chat, customer card, agent trace
+  timeline with KPI cards, demo script drawer
 - `/pay/:orderId` — mock payment page ("Demo payment")
 
 ## Run
@@ -57,30 +58,48 @@ visitor. The OpenAI key lives only in `backend/.env`; the browser receives a sho
 client secret per call and nothing else. `.env`, `.env.local` and every other `.env.*` file are
 git-ignored here; only `.env.example` is tracked.
 
+## The screen
+
+- **Header**: customer picker, Reset demo, Demo script and a light/dark toggle (light by default;
+  the choice is remembered in this browser).
+- **Customer card**: name, phone, last device, last order and the agent's memory text. The API
+  returns memory as free text, so "last device" is read from it only when the text says the
+  customer has that phone (e.g. "Uses iPhone 13"); otherwise it says "Not known yet". "Last order"
+  comes from the order messages and order updates in the inbox, and lights up when one arrives.
+- **Voice call** (left): a phone mockup with the call button, live transcript and a waveform that
+  animates while the agent speaks and follows the microphone while the customer speaks. The
+  latency chip sits in the card header.
+- **WhatsApp** (right): the chat, in WhatsApp's own colours.
+- **Agent trace** (bottom): four KPI cards and a timeline of what the agent did.
+
 ## Recording the demo
 
-- **Demo script** (top right): the scenario step by step, with an English line to say for each
-  step and what should happen. Tick steps off as you go.
-- **Reset demo** (top right): clears this browser's view for the selected customer: chat, call
-  transcript, latency, trace, stats, banners and script ticks. It ends a live call. It is
-  frontend-only: nothing is deleted on the backend, so the agent still remembers earlier calls and
-  existing orders. "show history" in the trace strip brings the hidden items back.
-- **Agent trace** (bottom): every tool call the agent makes, newest first. Click a row for the full
-  arguments and result.
-  - normal rows: plain tool calls
-  - amber: a backend rule held the line (final offer at the +5% cap, an "I paid" claim that the
-    database does not confirm, photos that need a retake)
-  - fuchsia: the photos contradict what the customer said
-  - red: a tool returned an error
-  - the **AA** button switches to larger trace text for video
-- **Stats strip** (above the trace): tool calls, last/median tool latency, policy blocks,
-  mismatches detected and errors, counted since the last Reset demo (or over all history if you
-  never reset).
-- **Latency meter** (phone panel): time from the customer finishing a sentence to the first agent
+- **Demo script**: a slide-over drawer with the scenario step by step, an English line to say for
+  each step and what should happen. Tick steps off as you go; ticks survive closing the drawer.
+  Esc closes it.
+- **Reset demo**: clears this browser's view for the selected customer: chat, call transcript,
+  latency, trace, KPIs, banners and script ticks. It ends a live call. It is frontend-only:
+  nothing is deleted on the backend, so the agent still remembers earlier calls and existing
+  orders. "show history" in the trace header brings the hidden items back.
+- **Agent trace**: every tool call, newest first, as one plain-English line each, for example
+  "Checked stock: iPhone 15 128 GB — 5 in stock, 1399 AZN". Click a row for the raw arguments and
+  result. Each row has a status pill:
+  - **OK**: a normal tool call
+  - **Policy block** (amber): a backend rule held the line — the final offer at the +5% cap, an
+    "I paid" claim the database does not confirm, photos that need a retake
+  - **Mismatch** (fuchsia): the photos contradict what the customer said
+  - **Error** (red): the tool returned an error
+- **Trace size**: the chevron switches between the latest step only and the full timeline; the
+  expand button makes it tall; **AA** enlarges the text. On short screens (under about 880 px
+  high) it starts on "latest step only" so the call and chat keep their room.
+- **KPI cards**: tool calls (with an error count when there are any), last/median tool latency,
+  policy blocks and mismatches detected, counted since the last Reset demo (or over all history if
+  you never reset).
+- **Latency chip** (voice card): time from the customer finishing a sentence to the first agent
   audio, including the server's voice-activity silence window when the session reports one. Turns
   that need a tool call include the tool round-trip.
-- Checked layouts: 1920×1080 and 1366×768, full browser window. At 1920 wide the whole UI scales
-  up slightly so text stays readable on video.
+- Checked layouts: 1920×1080 and 1366×768, full browser window, light and dark. At 1920 wide the
+  whole UI scales up slightly so text stays readable on video.
 
 ## How voice works
 
@@ -116,9 +135,13 @@ src/api/mock.ts       in-browser fake backend for VITE_MOCK=1
 src/voice/realtime.ts WebRTC + Realtime events + tool forwarding
 src/voice/mockCall.ts scripted call for mock mode
 src/voice/useCall.ts  call state shared by both drivers
-src/hooks/useInbox.ts 2s inbox polling, de-duplication by id, events
+src/hooks/useInbox.ts 2s inbox polling, de-duplication by id, events, last order
+src/lib/traceView.ts  tool call -> plain-English title and status
 src/lib/demoReset.ts  per-customer "Reset demo" cut-off (browser only)
-src/components/       PhonePanel, ChatPanel, MessageBubble, TraceDrawer, DemoScript, Overlays
+src/lib/theme.ts      light/dark toggle
+src/index.css         design tokens (colours, shadows, motion) for both themes
+src/components/       PhonePanel, ChatPanel, MessageBubble, CustomerCard, TraceDrawer,
+                      DemoScript, Overlays
 src/pages/            Home ("/"), PayPage ("/pay/:orderId")
 ```
 

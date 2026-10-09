@@ -2,8 +2,16 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { absUrl, api } from '../api/client'
 import type { InboxEvent, Message } from '../api/types'
 import { newer } from '../lib/demoReset'
+import { pickStr, toOrderView } from '../lib/pick'
 
 const POLL_MS = 2000
+
+/** The customer's most recent order as the inbox has reported it (for the customer card). */
+export interface LastOrder {
+  id: string
+  total?: number
+  status?: string
+}
 
 const mediaId = (m: Message) => (typeof m.data?.media_id === 'string' ? m.data.media_id : undefined)
 
@@ -41,6 +49,7 @@ function merge(prev: Message[], all: Message[], hideUpTo?: string): Message[] {
 export function useInbox(phone: string, onEvent: (e: InboxEvent) => void, hideUpTo?: string) {
   const [messages, setMessages] = useState<Message[]>([])
   const [online, setOnline] = useState(true)
+  const [lastOrder, setLastOrder] = useState<LastOrder | null>(null)
   const onEventRef = useRef(onEvent)
   useEffect(() => {
     onEventRef.current = onEvent
@@ -51,6 +60,7 @@ export function useInbox(phone: string, onEvent: (e: InboxEvent) => void, hideUp
     let since: string | undefined
     let first = true
     const seenEvents = new Set<string>()
+    let latestOrder: LastOrder | null = null
     let timer: ReturnType<typeof setTimeout>
 
     const tick = async () => {
@@ -64,6 +74,22 @@ export function useInbox(phone: string, onEvent: (e: InboxEvent) => void, hideUp
           if (!since || newer(item.ts, since)) since = item.ts
         }
         setMessages((prev) => merge(prev, msgs, hideUpTo))
+
+        // Customer-card data: read from everything the backend sends, even what "Reset demo" hides.
+        let order = latestOrder
+        for (const m of msgs) {
+          if (m.type !== 'order_summary') continue
+          const o = toOrderView(m.data)
+          if (o.id) order = { id: o.id, total: o.total, status: o.status }
+        }
+        for (const e of events) {
+          if (e.type === 'order_update' && order && pickStr(e.data, 'order_id') === order.id)
+            order = { ...order, status: pickStr(e.data, 'status') ?? order.status }
+        }
+        if (order !== latestOrder) {
+          latestOrder = order
+          setLastOrder(order)
+        }
         for (const e of events) {
           if (seenEvents.has(e.id)) continue
           seenEvents.add(e.id)
@@ -95,5 +121,5 @@ export function useInbox(phone: string, onEvent: (e: InboxEvent) => void, hideUp
     [hideUpTo],
   )
 
-  return { messages, online, addLocal, mergeServer }
+  return { messages, online, lastOrder, addLocal, mergeServer }
 }

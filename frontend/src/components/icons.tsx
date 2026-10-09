@@ -90,23 +90,108 @@ export const UserIcon = (p: P) => (
   </svg>
 )
 
+export const SearchIcon = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m21 21-4.3-4.3" />
+  </svg>
+)
+
+export const SunIcon = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+  </svg>
+)
+
+export const MoonIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+  </svg>
+)
+
+export const TruckIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M1 5h13v11H1zM14 9h4l4 4v3h-8z" />
+    <circle cx="6" cy="18.5" r="2" />
+    <circle cx="18" cy="18.5" r="2" />
+  </svg>
+)
+
+export const ReceiptIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2zM9 8h6M9 12h6" />
+  </svg>
+)
+
+export const CardIcon = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="2" y="5" width="20" height="14" rx="2" />
+    <path d="M2 10h20" />
+  </svg>
+)
+
+export const PackageIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8" />
+  </svg>
+)
+
+export const TagIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M3 3h8l10 10-8 8L3 11zM7.5 7.500h.01" />
+  </svg>
+)
+
+export const TrendIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="m3 17 6-6 4 4 8-8M15 7h6v6" />
+  </svg>
+)
+
+export const BagIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M6 7h12l1 14H5zM9 7V5a3 3 0 0 1 6 0v2" />
+  </svg>
+)
+
+export const ScanIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+)
+
+export const ClockIcon = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 2" />
+  </svg>
+)
+
+export const ExpandIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5" />
+  </svg>
+)
+
+export const BoltIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M13 2 4 14h7l-1 8 9-12h-7z" />
+  </svg>
+)
+
 export function Logo({ className = '' }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden>
       <defs>
         <linearGradient id="flowq-g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#34d399" />
-          <stop offset="1" stopColor="#22d3ee" />
+          <stop offset="0" stopColor="#6366f1" />
+          <stop offset="1" stopColor="#4338ca" />
         </linearGradient>
       </defs>
-      <rect width="32" height="32" rx="8" fill="#0f172a" />
-      <path
-        d="M7 16h3M12 10v12M16 6v20M20 11v10M24 14v4"
-        stroke="url(#flowq-g)"
-        strokeWidth="2.6"
-        strokeLinecap="round"
-        fill="none"
-      />
+      <rect width="32" height="32" rx="9" fill="url(#flowq-g)" />
+      <path d="M8 16h2.500M13 11v10M16.500 7.500v17M20 12v8M24 14.500v3" stroke="#fff" strokeWidth="2.400" strokeLinecap="round" fill="none" />
     </svg>
   )
 }
