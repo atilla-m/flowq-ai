@@ -5,7 +5,7 @@ import { mmss } from '../lib/pick'
 import type { CallState } from '../voice/useCall'
 import { toolLabel } from '../lib/toolLabels'
 import { PhoneFrame } from './PhoneFrame'
-import { BoltIcon, HangupIcon, MicIcon, PhoneIcon, UserIcon, WrenchIcon } from './icons'
+import { BoltIcon, HangupIcon, Logo, MicIcon, PhoneIcon, SpeakerIcon, WrenchIcon } from './icons'
 
 function median(xs: number[]): number | undefined {
   if (!xs.length) return undefined
@@ -35,7 +35,7 @@ function Waveform({ level, agentSpeaking, live }: { level: number; agentSpeaking
   const bars = 28
   return (
     <div className="call-waveform" role="img" aria-label="Microphone level">
-      <MicIcon className={`h-4 w-4 shrink-0 text-accent`} />
+      <MicIcon className="h-4 w-4 shrink-0 text-ink-2" />
       <div className="flex h-8 flex-1 items-center justify-between">
         {Array.from({ length: bars }, (_, i) => {
           // A soft bell curve so the wave is tallest in the middle.
@@ -44,7 +44,7 @@ function Waveform({ level, agentSpeaking, live }: { level: number; agentSpeaking
             return (
               <span
                 key={i}
-                className="w-[3px] origin-center animate-wave rounded-full bg-accent"
+                className="w-[3px] origin-center animate-wave rounded-full bg-ink-2"
                 style={{ height: `${shape * 100}%`, animationDelay: `${(i % 7) * -0.13}s` }}
               />
             )
@@ -52,7 +52,7 @@ function Waveform({ level, agentSpeaking, live }: { level: number; agentSpeaking
           return (
             <span
               key={i}
-              className={`h-full w-[3px] origin-center rounded-full transition-transform duration-100 ${live && level > 0.06 ? 'bg-accent' : 'bg-accent/30'}`}
+              className={`h-full w-[3px] origin-center rounded-full transition-transform duration-100 ${live && level > 0.06 ? 'bg-ink-2' : 'bg-ink-2/30'}`}
               style={{ transform: `scaleY(${h})` }}
             />
           )
@@ -99,9 +99,9 @@ export function PhonePanel({ customer, call }: { customer: Customer; call: CallS
   return (
     <PhoneFrame label="Voice call" className={`call-phone ${active ? 'is-active' : ''}`}>
       <header className="call-header">
-        <span className={`call-avatar ${status === 'ringing' ? 'is-ringing' : ''}`} aria-hidden><UserIcon /></span>
-        <h3>{customer.name}</h3>
-        <p className="call-number">{customer.phone}</p>
+        <span className={`call-avatar ${status === 'ringing' ? 'is-ringing' : ''}`} aria-hidden><Logo /></span>
+        <h3 translate="no">FlowQ Store</h3>
+        <p className="call-number">AI assistant</p>
         <div className="call-status-time">
           <span className={`call-status ${live ? 'is-live' : ''}`} role="status">{statusText}</span>
           {(live || status === 'ended') && <span className="call-clock" aria-label={`Call duration ${mmss(call.seconds)}`}>{mmss(call.seconds)}</span>}
@@ -139,15 +139,28 @@ export function PhonePanel({ customer, call }: { customer: Customer; call: CallS
           {live && (call.agentSpeaking || call.userSpeaking) && <Waveform level={call.micLevel} agentSpeaking={call.agentSpeaking} live={live} />}
         </div>
         {active ? (
-          <button onClick={call.end} className="call-button call-button-end" aria-label="End call" title="End call">
-            <HangupIcon />
-          </button>
+          <div className="ios-button-row">
+            <div className="ios-control">
+              <button disabled className="ios-secondary" aria-label="Mute unavailable" title="Mute control unavailable"><MicIcon /></button>
+              <span>Mute</span>
+            </div>
+            <div className="ios-control">
+              <button disabled className="ios-secondary" aria-label="Speaker control unavailable" title="Speaker routing is managed by your device"><SpeakerIcon /></button>
+              <span>Speaker</span>
+            </div>
+            <div className="ios-control">
+              <button onClick={call.end} className="call-button call-button-end" aria-label="End call" title="End call">
+                <HangupIcon />
+              </button>
+              <span>End</span>
+            </div>
+          </div>
         ) : (
           <button onClick={call.start} className="call-button" aria-label={status === 'ended' ? 'Call again' : 'Call FlowQ'} title={status === 'ended' ? 'Call again' : 'Start call'}>
             <PhoneIcon />
           </button>
         )}
-        <span className="call-button-label">{active ? 'End call' : status === 'ended' ? 'Call again' : 'Call'}</span>
+        {!active && <span className="call-button-label">{status === 'ended' ? 'Call again' : 'Call'}</span>}
         {(live || status === 'ended') && <LatencyChip samples={call.latencies} />}
       </div>
     </PhoneFrame>

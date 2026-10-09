@@ -4,18 +4,18 @@ export type Theme = 'light' | 'dark'
 
 const KEY = 'flowq-theme'
 
-/** Light unless the person explicitly chose dark in this browser. */
+/** Dark unless the person explicitly chose light in this browser. */
 export function savedTheme(): Theme {
   try {
-    return localStorage.getItem(KEY) === 'dark' ? 'dark' : 'light'
+    return localStorage.getItem(KEY) === 'light' ? 'light' : 'dark'
   } catch {
-    return 'light'
+    return 'dark'
   }
 }
 
 export function applyTheme(theme: Theme) {
   document.documentElement.dataset.theme = theme
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#111315' : '#f8f9fa')
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#0a0a0b' : '#f8f9fa')
 }
 
 export function useTheme(): [Theme, () => void] {

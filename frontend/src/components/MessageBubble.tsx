@@ -12,7 +12,7 @@ interface Props {
 
 function Meta({ ts, mine }: { ts: string; mine: boolean }) {
   return (
-    <span className="float-right mt-1 ml-3 flex items-center gap-0.5 text-xs leading-none text-wa-meta select-none">
+    <span className="float-right mt-1 ml-3 flex items-center gap-0.5 text-xs leading-none text-wa-meta font-mono select-none">
       {clock(ts)}
       {mine && (
         <span className="flex text-sky-500">
@@ -39,7 +39,7 @@ function ProductCard({ m }: { m: Message }) {
         {variant && <div className="text-xs text-wa-meta">{variant}</div>}
         {compatible.length > 0 && <div className="text-xs text-wa-meta">Fits: {compatible.join(', ')}</div>}
         <div className="mt-0.5 flex items-baseline justify-between">
-          <span className="text-sm font-semibold text-wa-ink">{azn(pickNum(d, 'price_azn', 'price'))}</span>
+          <span className="text-sm font-semibold text-wa-ink tabular-nums">{azn(pickNum(d, 'price_azn', 'price'))}</span>
           {stock !== undefined && <span className="text-xs text-wa-meta">In stock: {stock}</span>}
         </div>
       </div>
@@ -135,7 +135,7 @@ function OrderSummary({ m }: { m: Message }) {
   return (
     <div className="message-card order-card">
       {/* A snapshot from when the order was created, so no live status here: the payment card has it. */}
-      <div className="border-b border-black/10 px-1 pb-2 text-sm font-semibold">Order {o.id ?? ''}</div>
+      <div className="border-b border-white/10 px-1 pb-2 text-sm font-semibold">Order {o.id ?? ''}</div>
       <dl className="space-y-1 px-1 py-2 text-sm">
         {o.items.map((it, i) => (
           <div key={i} className="flex justify-between gap-3">
@@ -159,7 +159,7 @@ function OrderSummary({ m }: { m: Message }) {
           </div>
         )}
       </dl>
-      <div className="flex justify-between border-t border-black/10 px-1 pt-2 text-sm font-bold">
+      <div className="flex justify-between border-t border-white/10 px-1 pt-2 text-sm font-bold">
         <span>Total</span>
         <span className="tabular-nums">{azn(o.total)}</span>
       </div>

@@ -84,14 +84,12 @@ function Workspace({ customer, showScript, onHideScript, reset, onShowHistory }:
 
       <main id="workspace" tabIndex={-1} className="workspace">
         <div className="customer-view">
-          <h2 className="workspace-label">Customer view</h2>
           <div className="customer-phones">
             <div className="phone-column">
-              <h3 className="phone-label">Voice call</h3>
               <PhonePanel customer={customer} call={call} />
+              <h3 className="phone-label">Call</h3>
             </div>
             <div className="phone-column">
-              <h3 className="phone-label">WhatsApp</h3>
               <ChatPanel
                 customer={customer}
                 messages={inbox.messages}
@@ -101,6 +99,7 @@ function Workspace({ customer, showScript, onHideScript, reset, onShowHistory }:
                 addLocal={inbox.addLocal}
                 mergeServer={inbox.mergeServer}
               />
+              <h3 className="phone-label">WhatsApp</h3>
             </div>
           </div>
         </div>
@@ -195,7 +194,7 @@ export default function Home() {
         <div className="brand">
           <Logo className="brand-mark" />
           <div className="leading-tight">
-            <h1 className="brand-name">FlowQ AI</h1>
+            <h1 className="brand-name" translate="no">FlowQ</h1>
           </div>
         </div>
 
@@ -297,7 +296,7 @@ export default function Home() {
               </ul>
               <button
                 onClick={() => setAttempt((a) => a + 1)}
-                className="cursor-pointer rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-on-accent hover:bg-accent-hover"
+                className="cursor-pointer rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-bg hover:bg-ink-2"
               >
                 Retry
               </button>

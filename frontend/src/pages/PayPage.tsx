@@ -116,7 +116,7 @@ export default function PayPage({ orderId }: { orderId: string }) {
                       // window.close() is ignored for tabs the user opened themselves.
                       window.location.href = '/'
                     }}
-                    className="mt-5 cursor-pointer rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-on-accent hover:bg-accent-hover"
+                    className="mt-5 cursor-pointer rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-bg hover:bg-ink-2"
                   >
                     Back to FlowQ
                   </button>
@@ -151,7 +151,7 @@ export default function PayPage({ orderId }: { orderId: string }) {
                   <button
                     type="submit"
                     disabled={paying}
-                    className="w-full cursor-pointer rounded-lg bg-accent py-3 text-sm font-semibold text-on-accent transition hover:bg-accent-hover disabled:opacity-60"
+                    className="w-full cursor-pointer rounded-lg bg-ink py-3 text-sm font-semibold text-bg transition hover:bg-ink-2 disabled:opacity-60"
                   >
                     {paying ? 'Processing…' : `Pay ${azn(order.total)}`}
                   </button>

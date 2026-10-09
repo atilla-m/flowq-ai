@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../api/client'
 import type { Customer, Message } from '../api/types'
-import { ChevronIcon, ClipIcon, CloseIcon, SendIcon, UserIcon } from './icons'
+import { ChevronIcon, ClipIcon, CloseIcon, Logo, MoreIcon, SendIcon, VerifiedIcon } from './icons'
 import { MessageBubble } from './MessageBubble'
 import { PhoneFrame } from './PhoneFrame'
 
@@ -97,12 +97,12 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
     <PhoneFrame label="WhatsApp chat" className="whatsapp-phone">
       <header className="chat-header">
         <ChevronIcon className="h-5 w-5 rotate-90 shrink-0" />
-        <span className="chat-avatar" aria-hidden><UserIcon className="h-5 w-5" /></span>
+        <span className="chat-avatar" aria-hidden><Logo className="h-8 w-8" /></span>
         <div className="min-w-0 flex-1">
-          <h3>Shop assistant</h3>
+          <h3><span translate="no">FlowQ Store</span><VerifiedIcon className="verified-badge" /></h3>
           <p>{!online ? 'reconnecting…' : callActive ? 'on a call' : 'online'}</p>
         </div>
-        <span className="chat-menu" aria-hidden>⋮</span>
+        <MoreIcon className="chat-menu h-5 w-5" />
       </header>
       <div className="wa-wallpaper chat-messages scroll-thin min-h-0 flex-1 overflow-y-auto" role="log" aria-label="WhatsApp messages" aria-live="polite" aria-relevant="additions">
         {visible.length === 0 && (
@@ -115,12 +115,12 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
         ))}
         {busy && (
           <div className="flex justify-start">
-            <div className="rounded-lg rounded-tl-none bg-white px-3 py-2.5 shadow-sm">
+            <div className="chat-typing rounded-lg rounded-tl-none px-3 py-2.5">
               <span className="flex gap-1">
                 {[0, 150, 300].map((d) => (
                   <span
                     key={d}
-                    className="h-1.5 w-1.5 animate-bounce rounded-full bg-wa-meta"
+                    className="h-1.5 w-1.5 animate-pulse rounded-full bg-wa-meta"
                     style={{ animationDelay: `${d}ms` }}
                   />
                 ))}
@@ -141,7 +141,7 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
       )}
 
       {drafts.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto bg-[#f0f2f5] px-4 pt-2">
+        <div className="chat-drafts flex gap-2 overflow-x-auto px-4 pt-2">
           {drafts.map((d, i) => (
             <div key={d.preview} className="relative shrink-0">
               <img src={d.preview} alt={`Photo ${i + 1} to send`} width={64} height={64} className="h-16 w-16 rounded-md object-cover" />
@@ -180,7 +180,7 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
         <button
           type="button"
           onClick={() => fileInput.current?.click()}
-          className="cursor-pointer rounded-full p-2 text-slate-500 transition hover:bg-black/5 hover:text-slate-700"
+          className="chat-attach cursor-pointer rounded-full p-2"
           aria-label="Attach photos"
           title="Attach photos"
         >
@@ -193,7 +193,7 @@ export function ChatPanel({ customer, messages, online, callActive, onUploadDuri
           name="message"
           autoComplete="off"
           placeholder={drafts.length ? 'Add a caption…' : 'Message…'}
-          className="min-w-0 flex-1 rounded-full bg-white px-4 py-2 text-sm text-wa-ink placeholder:text-wa-meta"
+          className="min-w-0 flex-1 rounded-full px-4 py-2 text-sm text-wa-ink placeholder:text-wa-meta"
         />
         <button
           type="submit"

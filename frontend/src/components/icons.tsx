@@ -28,6 +28,18 @@ export const MicIcon = (p: P) => (
   </svg>
 )
 
+export const SpeakerIcon = (p: P) => (
+  <svg {...base(p)}><path d="m11 5-6 4H2v6h3l6 4V5ZM15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14" /></svg>
+)
+
+export const VerifiedIcon = (p: P) => (
+  <svg {...base(p)}><path d="m12 2 3 2 3.5.5.5 3.5 2 4-2 3-.5 3.5-3.5.5-3 2-3-2-3.5-.5-.5-3.5-2-3 2-4 .5-3.5L9 4zM8 12l2.5 2.5L16 9" /></svg>
+)
+
+export const MoreIcon = (p: P) => (
+  <svg {...base(p)}><circle cx="12" cy="5" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="12" cy="19" r="1" /></svg>
+)
+
 export const SendIcon = (p: P) => (
   <svg {...base(p)}>
     <path d="m22 2-7 20-4-9-9-4zM22 2 11 13" />

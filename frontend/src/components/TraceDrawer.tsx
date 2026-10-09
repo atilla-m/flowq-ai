@@ -45,11 +45,11 @@ const TOOL_ICON: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
   handoff_to_human: UserIcon,
 }
 
-const PILL: Record<Kind, string> = {
-  ok: 'bg-ok-soft text-ok',
-  policy: 'bg-warn-soft text-warn',
-  mismatch: 'bg-mis-soft text-mis',
-  error: 'bg-err-soft text-err',
+const STATUS: Record<Kind, string> = {
+  ok: 'status-ok',
+  policy: 'status-policy',
+  mismatch: 'status-mismatch',
+  error: 'status-error',
 }
 function time(ts: string) {
   const d = new Date(ts)
@@ -200,8 +200,8 @@ export function TraceDrawer({ phone, reset, onShowHistory }: Props) {
       {/* Timeline: newest first. Compact shows only the latest step. */}
       <ol className={`trace-list scroll-thin ${listHeight} ${text}`} aria-label="Agent action timeline">
         {rows.length === 0 && (
-          <li className="px-4 py-3 text-sm text-ink-3">
-            No actions
+          <li className="trace-empty">
+            <span className="waiting-dot" aria-hidden />Waiting for a call or message
           </li>
         )}
         {rows.map(({ e, key, v }, i) => {
@@ -215,11 +215,11 @@ export function TraceDrawer({ phone, reset, onShowHistory }: Props) {
                 title={`${e.tool} · ${e.channel === 'voice' ? 'Voice' : 'WhatsApp'} · ${KIND_LABEL[v.kind]} · ${ms(e.latency_ms ?? 0)} · ${time(e.ts)}${v.detail ? ` · ${v.detail}` : ''}`}
                 className="trace-action"
               >
-                <span className="trace-node"><Icon className="h-4 w-4" /></span>
+                <span className="trace-node" aria-hidden />
                 <span className="trace-action-body">
-                  <span className="trace-title">{v.title}</span>
+                  <span className="trace-title"><Icon className="h-3.5 w-3.5" />{v.title}</span>
                   <span className="trace-action-meta">
-                    <span className={`status-pill ${PILL[v.kind]}`}>{KIND_LABEL[v.kind]}</span>
+                    <span className={`status-indicator ${STATUS[v.kind]}`}><i aria-hidden />{KIND_LABEL[v.kind]}</span>
                     <span className="trace-latency">{ms(e.latency_ms ?? 0)}</span>
                   </span>
                 </span>
@@ -228,9 +228,9 @@ export function TraceDrawer({ phone, reset, onShowHistory }: Props) {
               {isOpen && (
                 <div className="trace-details">
                   <dl className="trace-metadata">
-                    <div><dt>Tool</dt><dd>{e.tool}</dd></div>
+                    <div><dt>Tool</dt><dd className="tool-name" translate="no">{e.tool}</dd></div>
                     <div><dt>Channel</dt><dd>{e.channel === 'voice' ? 'Voice' : 'WhatsApp'}</dd></div>
-                    <div><dt>Result</dt><dd><span className={`status-pill ${PILL[v.kind]}`}>{KIND_LABEL[v.kind]}</span></dd></div>
+                    <div><dt>Result</dt><dd><span className={`status-indicator ${STATUS[v.kind]}`}><i aria-hidden />{KIND_LABEL[v.kind]}</span></dd></div>
                     <div><dt>Latency</dt><dd>{ms(e.latency_ms ?? 0)}</dd></div>
                     <div><dt>Time</dt><dd>{time(e.ts)}</dd></div>
                   </dl>
