@@ -69,19 +69,56 @@ tool trace do not depend on what is being sold.
 | **Mock demo (always on)** | https://flowq-ai.vercel.app | Runs entirely in the browser on scripted data. No backend, no AI, no keys. |
 | **Live demo (real AI)** | https://distance-qui-ver-partition.trycloudflare.com | Real voice and chat agent. Works while our laptop is online. |
 
-Both demos run the gadget shop pack. Things to say (voice call) or type (WhatsApp panel):
+Both demos run the gadget shop pack. If the live link does not open, our laptop is offline: use
+the mock demo.
 
-1. "Hi, do you have the iPhone 15?"
-2. "I want to trade in my iPhone 13. It is in perfect condition." — then upload a photo of a phone
-   when asked; the agent prices on what the photo shows, not on the claim.
-3. "Can you do 50 AZN more?" — repeat it: the offer rises in small steps and stops at +5%.
+## How to use the demo
 
-Also worth trying: "I already paid" before paying (the agent checks and does not accept it), and
-"I want to speak to a manager" (handoff with a summary). The agent console at the bottom shows
-every tool call the agent makes, so you can see what it actually did.
+**What is on the screen.** The two phones on the left are what the customer sees: a voice call and
+a WhatsApp chat. The **FlowQ Agent** panel on the right is what the business sees: who the customer
+is, the order taking shape, and every action the agent takes.
 
-In the live demo, voice needs microphone permission and is limited to 3 voice sessions per visitor
-per hour. Payment is a demo page: no card is charged.
+1. **Pick a customer** with the **Customer** menu (top right). Each one has their own history, and
+   the agent greets them with what it remembers. The default customer works for everything below.
+2. **Talk or type.** You can do either, or both: they share one memory.
+   - **Voice:** press the green **Call** button on the left phone, allow the microphone, and speak.
+     The transcript appears on the phone. Press **End** to hang up.
+   - **Chat:** type in the **Message…** box on the WhatsApp phone and press Enter. The paperclip
+     sends photos.
+3. **Walk through a sale.** Say or type these, in order:
+   1. "Hi, do you have the iPhone 15?" — real stock and price from the catalog.
+   2. "I want to trade in my iPhone 13. It is in perfect condition." — a photo request arrives in
+      WhatsApp, also during a voice call.
+   3. Send any photo of a phone with the paperclip. The agent prices on what the photo shows, not
+      on the claim, and says so if they disagree.
+   4. "Can you do 50 AZN more?" — ask two or three times. The offer rises in small steps and
+      stops at +5%; after that the agent holds firm.
+   5. "Deliver it to Yasamal, please." then "OK, I agree. Please place the order." — an itemised
+      order summary and a payment link arrive in WhatsApp.
+   6. "I already paid." — before paying. The agent checks the payment record and does not accept
+      the claim.
+   7. Press **Pay … AZN** in the chat, then **Pay** on the demo payment page (no card is charged),
+      go back and ask "I paid now, can you check?" — now it confirms.
+   8. Optional: "Please call me back" (the call ends and FlowQ rings you back a few seconds
+      later) and "I want to speak to a manager" (handoff to a person with a summary).
+4. **Watch the FlowQ Agent panel while you do it.**
+   - **Tool calls, Median latency, Policy blocks, Mismatches:** running counts for this session.
+     A policy block is a backend rule holding the line (the +5% cap, an unconfirmed payment). A
+     mismatch is a photo contradicting what the customer said.
+   - **Current order:** fills in step by step — product, trade-in, offer, delivery, payment.
+   - **Live actions:** every tool call in plain English, newest first. Click one to see the raw
+     arguments and result.
+5. **Start over** with **Reset demo** (top right). It clears the screen for that customer; it does
+   not erase what the agent remembers. **Demo script** shows this scenario inside the app.
+
+**Mock demo or live demo?**
+
+| | Mock demo | Live demo |
+| --- | --- | --- |
+| Replies | Scripted, matched on keywords: keep close to the lines above | Real AI: say it any way you like |
+| Voice call | A recorded script plays; no microphone needed | Real conversation; needs microphone permission |
+| Limits | None | 3 voice sessions per visitor per hour |
+| Availability | Always | Only while our laptop is online |
 
 ## How it works
 
@@ -115,26 +152,60 @@ per hour. Payment is a demo page: no card is charged.
 - **Real channels (optional).** With Twilio configured, the one registered demo number also gets
   real WhatsApp messages through the Twilio sandbox, and a telephone bridge exists for real calls.
 
-## Run it locally
+## Run it on your computer
 
-Requirements: Python 3.11, Node 20+.
+You need **Python 3.11**, **Node.js 20 or newer**, and an **OpenAI API key** for the real agent
+(without a key, see "No key?" below). Tested on a fresh clone of this repository.
+
+**1. Get the code**
 
 ```bash
-# Backend (http://localhost:8000)
+git clone https://github.com/atilla-m/flowq-ai.git
+cd flowq-ai
+```
+
+**2. Start the backend** (terminal 1, from the repository root)
+
+```bash
 python3.11 -m venv backend/.venv
 backend/.venv/bin/pip install -r backend/requirements.txt
-cp backend/.env.example backend/.env        # then set OPENAI_API_KEY in backend/.env
+cp backend/.env.example backend/.env
+# open backend/.env and set OPENAI_API_KEY=sk-...
 backend/.venv/bin/python -m backend
+```
 
-# Frontend (http://localhost:5173)
+It listens on http://localhost:8000 and creates its demo database on first start. Check it with
+`curl http://localhost:8000/api/health`, which should print `{"ok":true}`.
+
+No `python3.11` command? With [uv](https://docs.astral.sh/uv/) installed, replace the first two
+lines with `uv venv backend/.venv --python 3.11` and
+`uv pip install --python backend/.venv/bin/python -r backend/requirements.txt`.
+
+**3. Start the frontend** (terminal 2)
+
+```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-No key? `cd frontend && VITE_MOCK=1 npm run dev` runs the whole UI on scripted data.
+**4. Open http://localhost:5173** and follow [How to use the demo](#how-to-use-the-demo). Allow the
+microphone when the browser asks, and use headphones so the agent does not hear itself.
 
-Environment variables are documented in [`backend/.env.example`](backend/.env.example) and
+**No key?** Skip step 2 and start the frontend with `VITE_MOCK=1 npm run dev`. The whole screen
+then runs on scripted data in the browser, with no backend and no AI.
+
+**If something does not work**
+
+- *"Backend unavailable"*: the backend is not running, or the frontend is not on port
+  5173. The backend only accepts browsers from `http://localhost:5173` unless you add another
+  origin to `ALLOWED_ORIGINS` in `backend/.env`.
+- *Chat or call answers "Set OPENAI_API_KEY…"*: the key is missing from `backend/.env`. Restart
+  the backend after adding it.
+- *The call does not start*: the browser blocked the microphone. Allow it for the site and press
+  Call again. The chat works without a microphone.
+
+Every setting is documented in [`backend/.env.example`](backend/.env.example) and
 [`frontend/.env.example`](frontend/.env.example). The OpenAI key stays on the backend; the browser
 only ever receives a short-lived voice session secret. More detail:
 [backend README](backend/README.md), [frontend README](frontend/README.md).
